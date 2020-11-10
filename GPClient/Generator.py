@@ -120,10 +120,10 @@ if __name__ == "__main__":
         }
         bp.sync({request:bp.Event("allDone")});
     });"""
-    print("hello1")
+    print("start")
     with thread.ThreadPoolExecutor(max_workers=4) as e:
         e.submit(thread_check, hotncold)
         e.submit(thread_check, hotncold)
         e.submit(thread_check, hotncold)
         e.submit(thread_check, hotncold)
-    print("hello2")
+    print("finish")

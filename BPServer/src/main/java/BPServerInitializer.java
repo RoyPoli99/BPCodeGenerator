@@ -5,6 +5,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.Delimiters;
 import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.json.JsonObjectDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 
 public class BPServerInitializer extends ChannelInitializer<SocketChannel> {

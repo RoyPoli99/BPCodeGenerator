@@ -11,7 +11,7 @@ from deap import gp
 from deap.gp import PrimitiveSetTyped
 from Client import calculate_fitness
 from Client import send_request
-from classes import *
+from TTTclasses import *
 
 # Define global arguments
 NUMBER_OF_GENERATIONS = 200
@@ -31,9 +31,6 @@ def eval_generator(individual):
 
 
 pset = PrimitiveSetTyped("main", [], int)
-
-# Define CFG
-
 
 # Define Individual and Fitness
 creator.create("FitnessMax", base.Fitness, weights=(1.0,))

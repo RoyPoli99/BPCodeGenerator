@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+message bprog {
+    string code = 1;
+}
+
+message Individual {
+    int32 generation = 1;
+    int32 id = 2;
+    bprog code = 3;
+}
+
+message EvaluationRequest {
+    Individual individual = 1;
+}
+
+message EvaluationResponse {
+    int32 wins = 1;
+    int32 draws = 2;
+}
+
+service EvaluationService {
+    rpc Evaluate(EvaluationRequest) returns (EvaluationResponse);
+}

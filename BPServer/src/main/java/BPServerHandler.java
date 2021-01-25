@@ -16,8 +16,13 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class BPServerHandler extends SimpleChannelInboundHandler<String> {
 
@@ -31,20 +36,30 @@ public class BPServerHandler extends SimpleChannelInboundHandler<String> {
             rand_player = new Scanner(new File("src/main/resources/BPJSTicTacToeRand.js")).useDelimiter("\\Z").next();
             opt_player = new Scanner(new File("src/main/resources/BPJSTicTacToeOpt.js")).useDelimiter("\\Z").next();
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            try {
+                rand_player = new Scanner(new File("resources/BPJSTicTacToeRand.js")).useDelimiter("\\Z").next();
+                opt_player = new Scanner(new File("resources/BPJSTicTacToeOpt.js")).useDelimiter("\\Z").next();
+            } catch (FileNotFoundException fileNotFoundException) {
+                fileNotFoundException.printStackTrace();
+            }
         }
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, String message) throws Exception {
         Channel incoming = channelHandlerContext.channel();
+        //Bp.BProgram.Builder builder = Bp.BProgram.newBuilder();
+        //Bp.BProgram msg = Bp.BProgram.parseFrom(message.getBytes());
         curr_msg += message;
         String response = "";
         if(curr_msg.contains("END")){
-            System.out.println("HERE");
+            //System.out.println("HERE");
             double result = run_games(curr_msg);
             response = String.valueOf(result);
             channelHandlerContext.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+        }
+        if(curr_msg.contains("STOP_SERVER")){
+            System.exit(0);
         }
     }
 
@@ -76,24 +91,51 @@ public class BPServerHandler extends SimpleChannelInboundHandler<String> {
         String[] bthreads = clear[0].split("\n");
         String player;
         if(clear[1].equals("RAND"))
-            player = rand_player;
+            player = opt_player;
         else
             player = opt_player;
         String b_program = add_bthreads(bthreads, player);
         double score = 0;
-        for(int i=0; i<50; i++) {
+        //ExecutorService executorService = Executors.newFixedThreadPool(30);
+        //List<Future<List<BEvent>>> futures = new LinkedList<>();
+        for(int i=0; i<30; i++) {
             BProgram bp = new StringBProgram(b_program);
-            BProgramRunner brunner = new BProgramRunner(bp);
             InMemoryEventLoggingListener logger = new InMemoryEventLoggingListener();
+            BProgramRunner brunner = new BProgramRunner(bp);
             brunner.addListener(logger);
-            //new Thread(brunner).run();
-            brunner.run();
-            List<BEvent> events = logger.getEvents();
-            String result = (events.get(events.size() - 1)).name;
-            if(result.equals("Draw") || result.equals("OWin")) {
-                score += 1;
-            }
+            //Future<List<BEvent>> future = executorService.submit(() -> {
+            //    brunner.run();
+            //    return logger.getEvents();
+            //});
+            //futures.add(future);
+
+             //Thread t = new Thread(brunner);
+             //t.start();
+
+             brunner.run();
+             List<BEvent> events = logger.getEvents();
+             String result = (events.get(events.size() - 1)).name;
+             if(result.equals("Draw") || result.equals("OWin")) {
+                 score += 1;
+             }
         }
+        /*
+        for(int i=0; i<futures.size(); i++){
+            try {
+                score += getDrawScore(futures.get(i).get());
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        }*/
+
         return score;
+    }
+
+    private double getDrawScore(List<BEvent> events){
+        String result = (events.get(events.size() - 1)).name;
+        if(result.equals("Draw") || result.equals("OWin")) {
+            return 1;
+        }
+        return 0;
     }
 }

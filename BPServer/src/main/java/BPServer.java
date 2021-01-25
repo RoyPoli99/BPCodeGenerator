@@ -14,7 +14,7 @@ import java.util.Scanner;
 public class BPServer {
 
     public static void main(String[] args) throws IOException {
-        System.out.println("hello");
+        //System.out.println("hello");
         BPServer bps = new BPServer(8080);
         bps.run();
     }

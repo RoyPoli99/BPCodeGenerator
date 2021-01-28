@@ -62,6 +62,7 @@ public class EvaluationServiceImpl extends EvaluationServiceGrpc.EvaluationServi
         int wins = 0;
         int draws = 0;
         BProgram bp = new StringBProgram(b_program);
+        bp.setEventSelectionStrategy(new PrioritizedBSyncEventSelectionStrategy());
         DfsBProgramVerifier vrf = new DfsBProgramVerifier();
         VerificationResult res;
         try {

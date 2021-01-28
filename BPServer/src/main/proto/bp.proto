@@ -12,6 +12,11 @@ message Individual {
 
 message EvaluationRequest {
     Individual individual = 1;
+    EvaluationType type = 2;
+}
+
+message EvaluationType {
+    string name = 1;
 }
 
 message EvaluationResponse {
@@ -20,5 +25,13 @@ message EvaluationResponse {
 }
 
 service EvaluationService {
+    rpc Evaluate(EvaluationRequest) returns (EvaluationResponse);
+}
+
+service RunnerEvaluator{
+    rpc Evaluate(EvaluationRequest) returns (EvaluationResponse);
+}
+
+service VerifierEvaluator {
     rpc Evaluate(EvaluationRequest) returns (EvaluationResponse);
 }

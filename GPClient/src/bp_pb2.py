@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x08\x62p.proto\"\x15\n\x05\x62prog\x12\x0c\n\x04\x63ode\x18\x01 \x01(\t\"B\n\nIndividual\x12\x12\n\ngeneration\x18\x01 \x01(\x05\x12\n\n\x02id\x18\x02 \x01(\x05\x12\x14\n\x04\x63ode\x18\x03 \x01(\x0b\x32\x06.bprog\"4\n\x11\x45valuationRequest\x12\x1f\n\nindividual\x18\x01 \x01(\x0b\x32\x0b.Individual\"1\n\x12\x45valuationResponse\x12\x0c\n\x04wins\x18\x01 \x01(\x05\x12\r\n\x05\x64raws\x18\x02 \x01(\x05\x32H\n\x11\x45valuationService\x12\x33\n\x08\x45valuate\x12\x12.EvaluationRequest\x1a\x13.EvaluationResponseb\x06proto3'
+  serialized_pb=b'\n\x08\x62p.proto\"\x15\n\x05\x62prog\x12\x0c\n\x04\x63ode\x18\x01 \x01(\t\"B\n\nIndividual\x12\x12\n\ngeneration\x18\x01 \x01(\x05\x12\n\n\x02id\x18\x02 \x01(\x05\x12\x14\n\x04\x63ode\x18\x03 \x01(\x0b\x32\x06.bprog\"4\n\x11\x45valuationRequest\x12\x1f\n\nindividual\x18\x01 \x01(\x0b\x32\x0b.Individual\"a\n\x12\x45valuationResponse\x12\x0c\n\x04wins\x18\x01 \x01(\x01\x12\r\n\x05\x64raws\x18\x02 \x01(\x01\x12\x0e\n\x06losses\x18\x03 \x01(\x01\x12\x0e\n\x06\x62locks\x18\x04 \x01(\x01\x12\x0e\n\x06misses\x18\x05 \x01(\x01\x32H\n\x11\x45valuationService\x12\x33\n\x08\x45valuate\x12\x12.EvaluationRequest\x1a\x13.EvaluationResponseb\x06proto3'
 )
 
 
@@ -145,15 +145,36 @@ _EVALUATIONRESPONSE = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='wins', full_name='EvaluationResponse.wins', index=0,
-      number=1, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
+      number=1, type=1, cpp_type=5, label=1,
+      has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
       name='draws', full_name='EvaluationResponse.draws', index=1,
-      number=2, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
+      number=2, type=1, cpp_type=5, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='losses', full_name='EvaluationResponse.losses', index=2,
+      number=3, type=1, cpp_type=5, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='blocks', full_name='EvaluationResponse.blocks', index=3,
+      number=4, type=1, cpp_type=5, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='misses', full_name='EvaluationResponse.misses', index=4,
+      number=5, type=1, cpp_type=5, label=1,
+      has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
@@ -170,7 +191,7 @@ _EVALUATIONRESPONSE = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=157,
-  serialized_end=206,
+  serialized_end=254,
 )
 
 _INDIVIDUAL.fields_by_name['code'].message_type = _BPROG
@@ -218,8 +239,8 @@ _EVALUATIONSERVICE = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=208,
-  serialized_end=280,
+  serialized_start=256,
+  serialized_end=328,
   methods=[
   _descriptor.MethodDescriptor(
     name='Evaluate',

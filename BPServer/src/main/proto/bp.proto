@@ -12,26 +12,16 @@ message Individual {
 
 message EvaluationRequest {
     Individual individual = 1;
-    EvaluationType type = 2;
-}
-
-message EvaluationType {
-    string name = 1;
 }
 
 message EvaluationResponse {
-    int32 wins = 1;
-    int32 draws = 2;
+    double wins = 1;
+    double draws = 2;
+    double losses = 3;
+    double blocks = 4;
+    double misses = 5;
 }
 
 service EvaluationService {
-    rpc Evaluate(EvaluationRequest) returns (EvaluationResponse);
-}
-
-service RunnerEvaluator{
-    rpc Evaluate(EvaluationRequest) returns (EvaluationResponse);
-}
-
-service VerifierEvaluator {
     rpc Evaluate(EvaluationRequest) returns (EvaluationResponse);
 }

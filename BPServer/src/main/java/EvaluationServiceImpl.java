@@ -1,21 +1,15 @@
-//import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
-import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTraceInspection;
-import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
 import il.ac.bgu.cs.bp.bpjs.analysis.listeners.PrintDfsVerifierListener;
-import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import io.grpc.stub.StreamObserver;
-
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Scanner;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 
 public class EvaluationServiceImpl extends EvaluationServiceGrpc.EvaluationServiceImplBase{
 
@@ -41,27 +35,36 @@ public class EvaluationServiceImpl extends EvaluationServiceGrpc.EvaluationServi
     public void evaluate(Bp.EvaluationRequest request, StreamObserver<Bp.EvaluationResponse> responseObserver) {
         String code = request.getIndividual().getCode().getCode();
         int gen = request.getIndividual().getGeneration();
-        int[] res = run_games(code, gen);
-        System.out.println("here");
+        System.out.println("Generation #" + gen + ": Evaluating individual #" + request.getIndividual().getId());
+        double[] res = run_games(code, gen);
         Bp.EvaluationResponse response = Bp.EvaluationResponse.newBuilder()
-                .setDraws(res[1])
                 .setWins(res[0])
+                .setLosses(res[1])
+                .setDraws(res[2])
+                .setBlocks(res[3])
+                .setMisses(res[4])
                 .build();
+        System.out.println("Generation #" + gen + ": Completed individual #" + request.getIndividual().getId());
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
 
-    private int[] run_games(String code, int generation){
+
+    private double[] run_games(String code, int generation){
         String[] bthreads = code.split("\n");
         String player;
-        if(generation >= 100)
+        if(generation >= 200)
             player = opt_player;
         else
             player = rand_player;
         String b_program = add_bthreads(bthreads, player);
-        int wins = 0;
-        int draws = 0;
+        //int wins = 0;
+        //int draws = 0;
+
         BProgram bp = new StringBProgram(b_program);
+        return verify(bp);
+
+        /*
         bp.setEventSelectionStrategy(new PrioritizedBSyncEventSelectionStrategy());
         DfsBProgramVerifier vrf = new DfsBProgramVerifier();
         VerificationResult res;
@@ -71,8 +74,9 @@ public class EvaluationServiceImpl extends EvaluationServiceGrpc.EvaluationServi
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //TODO: run verify once? or play multiple games and look for violations? maybe both?
-        /* The following code runs the games, above code is verification
+        */
+
+        /*
         InMemoryEventLoggingListener[] loggers = new InMemoryEventLoggingListener[50];
         Future<?>[] futures = new Future[50];
         for(int i=0; i<50; i++) {
@@ -103,7 +107,49 @@ public class EvaluationServiceImpl extends EvaluationServiceGrpc.EvaluationServi
                 wins += 1;
             }
         }*/
-        return new int[]{wins, draws};
+        // return new int[]{wins, draws};
+    }
+
+    private double[] verify(BProgram bprog){
+        bprog.setEventSelectionStrategy(new PrioritizedBSyncEventSelectionStrategy());
+        GenerateAllTracesInspection inspector = new GenerateAllTracesInspection();
+        DfsBProgramVerifier vfr = new DfsBProgramVerifier();
+        vfr.addInspection(inspector);
+        vfr.setProgressListener(new PrintDfsVerifierListener());
+        vfr.setIterationCountGap(100);
+        vfr.setMaxTraceLength(10);
+        try {
+            vfr.verify(bprog);
+            System.out.println("finished verification, starting traces generation");
+            Collection<List<BEvent>> traces = inspector.calculateAllTraces();
+            int wins = 0, losses = 0, draws = 0, blocks = 0, misses = 0;
+            for(List<BEvent> trace : traces){
+                String lastEvent = trace.get(trace.size() - 1).name;
+                for(BEvent ev : trace){
+                    switch(ev.name){
+                        case "OWin":
+                            wins++;
+                            break;
+                        case "XWin":
+                            losses++;
+                            break;
+                        case "Draw":
+                            draws++;
+                            break;
+                        case "BLOCK_VIOLATION":
+                            blocks++;
+                            break;
+                        case "WIN_VIOLATION":
+                            misses++;
+                    }
+                }
+            }
+            double traceNum = traces.size();
+            return new double[]{wins / traceNum, losses / traceNum, draws / traceNum, blocks / traceNum, misses / traceNum};
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new double[]{0, 0, 0, 0, 0};
+        }
     }
 
     private String add_bthreads(String[] btheads, String player_text){

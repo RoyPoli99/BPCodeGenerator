@@ -1,3 +1,4 @@
+import time
 from concurrent.futures import ThreadPoolExecutor
 import matplotlib.pyplot as plt
 import numpy
@@ -7,7 +8,7 @@ from deap import creator
 from deap import tools
 from deap import gp
 from deap.gp import PrimitiveSetTyped
-from Client import calculate_fitness, send_stop
+from Client import calculate_fitness, send_stop, send_proto_request
 from Client import send_request
 from TTTclasses import *
 import bp_pb2
@@ -22,17 +23,19 @@ MEDIANS = []
 CURR_GEN = 0
 
 
+def results_to_fitness(wins, draws, losses, blocks, misses):
+    return 10 * (2 * wins + draws - losses - blocks - misses)
+
 # Send to BPServer to evaluate
 def eval_generator(individual):
     func = toolbox.compile(expr=individual)
     func_string = str(func(0).root)
-    gen_flag = "RAND"
-    if CURR_GEN >= 100:
-        gen_flag = "OPT"
-    # fitness = calculate_fitness("START" + func_string + "END" + gen_flag)
-    bprogram = bp_pb2.BProgram(func_string, CURR_GEN)
-    fitness = calculate_fitness()
-    # print(fitness)
+    indv = bp_pb2.Individual()
+    indv.generation = CURR_GEN
+    indv.id = 0
+    indv.code.code = func_string
+    results = send_proto_request(indv)
+    fitness = results_to_fitness(results.wins, results.draws, results.losses, results.blocks, results.misses)
     return fitness,
 
 pset = PrimitiveSetTyped("main", [root], root_wrapper)
@@ -155,7 +158,7 @@ def real_time_plotter(name, plot):
     plt.plot(AVERAGES, label="Average", color="blue")
     plt.plot(MAXIMUMS, label="Max", color="green")
     plt.plot(MINIMUMS, label="Min", color="red")
-    plt.plot(MINIMUMS, label="Median", color="purple")
+    plt.plot(MEDIANS, label="Median", color="purple")
     plt.ylabel("Fitness")
     plt.suptitle(name)
     plt.legend()
@@ -175,6 +178,7 @@ def run_experiment(cross_over_p, mutation_p, experiment_name):
     stats.register("std", numpy.std)
     stats.register("min", numpy.min)
     stats.register("max", numpy.max)
+    stats.register("time", lambda x: time.time())
     stats.register("plot", lambda x: real_time_plotter(experiment_name, x))
 
     # Run experiment
@@ -192,10 +196,10 @@ def thread_check(arg):
 
 if __name__ == "__main__":
     print("start")
-    bla, log = run_experiment(0.7, 0.001, "TTT Simulation0.001")
+    bla, log = run_experiment(0.7, 0.001, "TTT SimulationVER")
     # bla, log = run_experiment(0.7, 0.005, "TTT Simulation0.005")
     # bla, log = run_experiment(0.7, 0.01, "TTT Simulation0.01")
-    send_stop()
+    # send_stop()
 
     # with thread.ThreadPoolExecutor(max_workers=4) as e:
     #     e.submit(thread_check, hotncold)

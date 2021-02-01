@@ -1,5 +1,5 @@
-function Move(row, col, type){
-	return bp.Event(type + "(" + row + "," + col + ")", {row:row, col:col});
+function Move(row, col, type) {
+	return bp.Event(type, {row: row, col: col});
 }
 
 function X(row, col) {
@@ -10,22 +10,32 @@ function O(row, col) {
 	return Move(row, col, "O");
 }
 
-//Static events:
+var move = bp.EventSet("Move events", function (e) {
+	//return e instanceof Move;
+	return e.name == 'X' || e.name == "O";
+});
+
+var Xmove = bp.EventSet("X events", function (e) {
+	//return e instanceof Move;
+	return e.name == "X"
+});
+
+var Omove = bp.EventSet("O events", function (e) {
+	//return e instanceof Move;
+	return e.name == "O"
+});
+
 var XWin = bp.Event("XWin");
 var OWin = bp.Event("OWin");
 var draw = bp.Event("Draw");
-var gameOver = bp.Event("GameOver");
+var gameOver = bp.EventSet("GameOver", function (e) {
+	return e.equals(XWin) || e.equals(OWin) || e.equals(draw);
+});
 
 // GameRules:
 
 // This BThreads are on each square of the grid
 function addSquareBThreads(row, col) {
-	/*
-	bp.registerBThread("RandomXPlayer(" + row + "," + col + ")", function () {
-		bp.sync({request:[X(row, col)]});
-	});
-	*/
-
 	// Blocks further marking of a square already marked by X or O.
 	bp.registerBThread("SquareTaken(" + row + "," + col + ")", function() {
 		while (true) {
@@ -42,67 +52,25 @@ for (var r = 0; r < 3; r++) {
 }
 
 // Represents Enforce Turns
-bp.registerBThread("EnforceTurns", function() {
+bp.registerBThread("EnforceTurns", function () {
 	while (true) {
-		bp.sync({ waitFor:[ X(0, 0), X(0, 1), X(0, 2),
-				X(1, 0), X(1, 1), X(1, 2),
-				X(2, 0), X(2, 1), X(2, 2) ],
-			block:[ O(0, 0), O(0, 1), O(0, 2),
-				O(1, 0), O(1, 1), O(1, 2),
-				O(2, 0), O(2, 1), O(2, 2) ] });
-
-		bp.sync({ waitFor:[ O(0, 0), O(0, 1), O(0, 2), O(1, 0), O(1, 1), O(1, 2), O(2, 0), O(2, 1), O(2, 2) ],
-			block:[ X(0, 0), X(0, 1), X(0, 2), X(1, 0), X(1, 1), X(1, 2), X(2, 0), X(2, 1), X(2, 2) ] });
+		bp.sync({waitFor: Xmove, block: Omove});
+		bp.sync({waitFor: Omove, block: Xmove});
 	}
 });
 
 // Represents when the game ends
-bp.registerBThread("EndOfGame", function() {
-	bp.sync({ waitFor:[ OWin, XWin, draw ] });
-
-	bp.sync({ block:[ X(0, 0), X(0, 1), X(0, 2),
-			X(1, 0), X(1, 1), X(1, 2),
-			X(2, 0), X(2, 1), X(2, 2),
-			O(0, 0), O(0, 1), O(0, 2),
-			O(1, 0), O(1, 1), O(1, 2),
-			O(2, 0), O(2, 1), O(2, 2),
-			OWin, XWin, draw] });
-});
-
-var move = bp.EventSet("Move events", function(e) {
-	//return e instanceof Move;
-	return e.name.startsWith("X(") || e.name.startsWith("O(");
-});
-
-var Xmove = bp.EventSet("X events", function(e) {
-	//return e instanceof Move;
-	return e.name.startsWith("X(");
-});
-
-var Omove = bp.EventSet("O events", function(e) {
-	//return e instanceof Move;
-	return e.name.startsWith("O(");
+bp.registerBThread("EndOfGame", function () {
+	bp.sync({waitFor: gameOver})
+	bp.sync({block: bp.all})
 });
 
 // Represents when it is a draw
-bp.registerBThread("DetectDraw", function() {
-	// For debug
-	bp.sync({ waitFor:[ move ] });
-	bp.sync({ waitFor:[ move ] });
-	bp.sync({ waitFor:[ move ] });
-
-	bp.sync({ waitFor:[ move ] });
-	bp.sync({ waitFor:[ move ] });
-	bp.sync({ waitFor:[ move ] });
-
-	bp.sync({ waitFor:[ move ] });
-	bp.sync({ waitFor:[ move ] });
-	bp.sync({ waitFor:[ move ] });
-	/*
-	 * for (var i=0; i< 9; i++) { bp.sync({ waitFor:[ move ] }); }
-	 */
-
-	bp.sync({ request:[ draw ] }, 90);
+bp.registerBThread("DetectDraw", function () {
+	for (var i = 0; i < 9; i++) {
+		bp.sync({waitFor: move})
+	}
+	bp.sync({request: draw}, 90);
 });
 
 function addLinePermutationBthreads(f, p) {
@@ -116,7 +84,7 @@ function addLinePermutationBthreads(f, p) {
 
 			bp.sync({ waitFor:[ X(f[p[2]].x, f[p[2]].y) ] });
 
-			bp.sync({ request:[ XWin ], block:[ Omove ] }, 100);
+			bp.sync({ request: XWin }, 100);
 
 		}
 	});
@@ -130,7 +98,7 @@ function addLinePermutationBthreads(f, p) {
 
 			bp.sync({ waitFor:[ O(f[p[2]].x, f[p[2]].y) ] });
 
-			bp.sync({ request:[ OWin ], block:[ Xmove ] }, 100);
+			bp.sync({request: OWin}, 100);
 
 		}
 	});
@@ -340,47 +308,3 @@ bp.registerBThread("SidesX", function() {
 
 // Preference to put O on the sides
 bThread9
-
-// Assertions
-
-function addAssertions(f, p) {
-
-	bp.registerBThread("AssertWin(<" + f[p[0]].x + "," + f[p[0]].y + ">," + "<" + f[p[1]].x + "," + f[p[1]].y + ">," + "<" + f[p[2]].x + "," + f[p[2]].y + ">)", function() {
-		while (true) {
-			let ev1 = bp.sync({ waitFor:[ O(f[p[0]].x, f[p[0]].y), X(f[p[2]].x, f[p[2]].y) ] });
-			if (ev1.name.startsWith("X(")){
-				break;
-			}
-			let ev2 = bp.sync({ waitFor:[ O(f[p[1]].x, f[p[1]].y), X(f[p[2]].x, f[p[2]].y) ] });
-			if (ev2.name.startsWith("X(")){
-				break;
-			}
-			let ev = bp.sync({ waitFor:[Omove, X(f[p[2]].x, f[p[2]].y)]});
-			bp.ASSERT(ev.name.startsWith("X(") || ev.name.startsWith("O(" + f[p[2]].x + "," + f[p[2]].y + ")"), "WIN_VIOLATION");
-		}
-	});
-
-	bp.registerBThread("AssertBlock(<" + f[p[0]].x + "," + f[p[0]].y + ">," + "<" + f[p[1]].x + "," + f[p[1]].y + ">," + "<" + f[p[2]].x + "," + f[p[2]].y + ">)", function() {
-		while (true) {
-
-			let ev1 = bp.sync({ waitFor:[ X(f[p[0]].x, f[p[0]].y), O(f[p[2]].x, f[p[2]].y) ] });
-			if (ev1.name.startsWith("O("))
-				break;
-
-			let ev2 = bp.sync({ waitFor:[ X(f[p[1]].x, f[p[1]].y), O(f[p[2]].x, f[p[2]].y) ] });
-			if (ev2.name.startsWith("O("))
-				break;
-
-			let ev = bp.sync({ waitFor:[Omove]});
-			let evNext = bp.sync({ waitFor:[Xmove, OWin]})
-			bp.ASSERT(!evNext.name.startsWith("X(") || ev.name.startsWith("O(" + f[p[2]].x + "," + f[p[2]].y + ")"), "BLOCK_VIOLATION");
-
-		}
-	});
-}
-
-lines.forEach(function(l) {
-	perms.forEach(function(p) {
-		addAssertions(l, p);
-	});
-});

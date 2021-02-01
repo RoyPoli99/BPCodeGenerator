@@ -218,6 +218,9 @@ function addAssertions(f, p) {
       }
       let ev = bp.sync({waitFor: [Omove, X(f[p[2]].x, f[p[2]].y)]});
       bp.ASSERT(ev.name.startsWith("X(") || ev.name.startsWith("O(" + f[p[2]].x + "," + f[p[2]].y + ")"), "WIN_VIOLATION");
+      if(!(ev.name.startsWith("X(") || ev.name.startsWith("O(" + f[p[2]].x + "," + f[p[2]].y + ")"))){
+        bp.sync({request: bp.Event("WIN_VIOLATION")}, 110);
+      }
     }
   });
 
@@ -234,15 +237,17 @@ function addAssertions(f, p) {
 
       let ev = bp.sync({waitFor: [Omove]});
       let evNext = bp.sync({waitFor: [Xmove, OWin]})
-      bp.ASSERT(!evNext.name.startsWith("X(") || ev.name.startsWith("O(" + f[p[2]].x + "," + f[p[2]].y + ")"), "BLOCK_VIOLATION");
+      //bp.ASSERT(!evNext.name.startsWith("X(") || ev.name.startsWith("O(" + f[p[2]].x + "," + f[p[2]].y + ")"), "BLOCK_VIOLATION");
+      if(!(!evNext.name.startsWith("X(") || ev.name.startsWith("O(" + f[p[2]].x + "," + f[p[2]].y + ")"))){
+        bp.sync({request: bp.Event("BLOCK_VIOLATION")}, 110);
+      }
 
     }
   });
 }
 
-/*
 lines.forEach(function (l) {
   perms.forEach(function (p) {
     addAssertions(l, p);
   });
-});*/
+});

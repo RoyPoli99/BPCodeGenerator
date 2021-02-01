@@ -2,6 +2,7 @@ import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTrace;
 import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTraceInspection;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -10,8 +11,8 @@ public class GenerateAllTracesInspection implements ExecutionTraceInspection {
   /**
    * Maps <sourceNodeId, <targetNodeId, eventFromSourceToTarget>>
    */
-  private final Map<Integer, Map<Integer, BEvent>> graph = new TreeMap<>();
-  private int startNode;
+  private final Map<BProgramSyncSnapshot, Map<BProgramSyncSnapshot, BEvent>> graph = new TreeMap<>();
+  private BProgramSyncSnapshot startNode;
 
   @Override
   public String title() {
@@ -23,11 +24,11 @@ public class GenerateAllTracesInspection implements ExecutionTraceInspection {
     int stateCount = aTrace.getStateCount();
     var lastNode = aTrace.getNodes().get(stateCount - 1);
     if (stateCount == 1) {
-      startNode = aTrace.getNodes().get(0).getState().hashCode();
+      startNode = aTrace.getNodes().get(0).getState();
     } else {
       var src = aTrace.getNodes().get(stateCount - 2);
-      Map<Integer, BEvent> srcNode = graph.computeIfAbsent(src.getState().hashCode(), k -> new TreeMap<>());
-      srcNode.put(lastNode.getState().hashCode(), src.getEvent().get());
+      Map<BProgramSyncSnapshot, BEvent> srcNode = graph.computeIfAbsent(src.getState(), k -> new TreeMap<>());
+      srcNode.put(lastNode.getState(), src.getEvent().get());
     }
     return Optional.empty();
   }
@@ -36,8 +37,8 @@ public class GenerateAllTracesInspection implements ExecutionTraceInspection {
     return dfsFrom(startNode, new ArrayDeque<>(), new ArrayDeque<>());
   }
 
-  private Collection<List<BEvent>> dfsFrom(int id, ArrayDeque<Integer> nodeStack, ArrayDeque<BEvent> eventStack) {
-    Map<Integer, BEvent> outbounds = graph.get(id);
+  private Collection<List<BEvent>> dfsFrom(BProgramSyncSnapshot id, ArrayDeque<BProgramSyncSnapshot> nodeStack, ArrayDeque<BEvent> eventStack) {
+    Map<BProgramSyncSnapshot, BEvent> outbounds = graph.get(id);
     nodeStack.push(id);
     if (outbounds == null || outbounds.isEmpty()) {
       nodeStack.pop();

@@ -1920,14 +1920,29 @@ public final class Bp {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>int32 wins = 1;</code>
+     * <code>double wins = 1;</code>
      */
-    int getWins();
+    double getWins();
 
     /**
-     * <code>int32 draws = 2;</code>
+     * <code>double draws = 2;</code>
      */
-    int getDraws();
+    double getDraws();
+
+    /**
+     * <code>double losses = 3;</code>
+     */
+    double getLosses();
+
+    /**
+     * <code>double blocks = 4;</code>
+     */
+    double getBlocks();
+
+    /**
+     * <code>double misses = 5;</code>
+     */
+    double getMisses();
   }
   /**
    * Protobuf type {@code EvaluationResponse}
@@ -1974,14 +1989,29 @@ public final class Bp {
             case 0:
               done = true;
               break;
-            case 8: {
+            case 9: {
 
-              wins_ = input.readInt32();
+              wins_ = input.readDouble();
               break;
             }
-            case 16: {
+            case 17: {
 
-              draws_ = input.readInt32();
+              draws_ = input.readDouble();
+              break;
+            }
+            case 25: {
+
+              losses_ = input.readDouble();
+              break;
+            }
+            case 33: {
+
+              blocks_ = input.readDouble();
+              break;
+            }
+            case 41: {
+
+              misses_ = input.readDouble();
               break;
             }
             default: {
@@ -2017,21 +2047,48 @@ public final class Bp {
     }
 
     public static final int WINS_FIELD_NUMBER = 1;
-    private int wins_;
+    private double wins_;
     /**
-     * <code>int32 wins = 1;</code>
+     * <code>double wins = 1;</code>
      */
-    public int getWins() {
+    public double getWins() {
       return wins_;
     }
 
     public static final int DRAWS_FIELD_NUMBER = 2;
-    private int draws_;
+    private double draws_;
     /**
-     * <code>int32 draws = 2;</code>
+     * <code>double draws = 2;</code>
      */
-    public int getDraws() {
+    public double getDraws() {
       return draws_;
+    }
+
+    public static final int LOSSES_FIELD_NUMBER = 3;
+    private double losses_;
+    /**
+     * <code>double losses = 3;</code>
+     */
+    public double getLosses() {
+      return losses_;
+    }
+
+    public static final int BLOCKS_FIELD_NUMBER = 4;
+    private double blocks_;
+    /**
+     * <code>double blocks = 4;</code>
+     */
+    public double getBlocks() {
+      return blocks_;
+    }
+
+    public static final int MISSES_FIELD_NUMBER = 5;
+    private double misses_;
+    /**
+     * <code>double misses = 5;</code>
+     */
+    public double getMisses() {
+      return misses_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -2048,11 +2105,20 @@ public final class Bp {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (wins_ != 0) {
-        output.writeInt32(1, wins_);
+      if (wins_ != 0D) {
+        output.writeDouble(1, wins_);
       }
-      if (draws_ != 0) {
-        output.writeInt32(2, draws_);
+      if (draws_ != 0D) {
+        output.writeDouble(2, draws_);
+      }
+      if (losses_ != 0D) {
+        output.writeDouble(3, losses_);
+      }
+      if (blocks_ != 0D) {
+        output.writeDouble(4, blocks_);
+      }
+      if (misses_ != 0D) {
+        output.writeDouble(5, misses_);
       }
       unknownFields.writeTo(output);
     }
@@ -2063,13 +2129,25 @@ public final class Bp {
       if (size != -1) return size;
 
       size = 0;
-      if (wins_ != 0) {
+      if (wins_ != 0D) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(1, wins_);
+          .computeDoubleSize(1, wins_);
       }
-      if (draws_ != 0) {
+      if (draws_ != 0D) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, draws_);
+          .computeDoubleSize(2, draws_);
+      }
+      if (losses_ != 0D) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(3, losses_);
+      }
+      if (blocks_ != 0D) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(4, blocks_);
+      }
+      if (misses_ != 0D) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(5, misses_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -2086,10 +2164,21 @@ public final class Bp {
       }
       Bp.EvaluationResponse other = (Bp.EvaluationResponse) obj;
 
-      if (getWins()
-          != other.getWins()) return false;
-      if (getDraws()
-          != other.getDraws()) return false;
+      if (java.lang.Double.doubleToLongBits(getWins())
+          != java.lang.Double.doubleToLongBits(
+              other.getWins())) return false;
+      if (java.lang.Double.doubleToLongBits(getDraws())
+          != java.lang.Double.doubleToLongBits(
+              other.getDraws())) return false;
+      if (java.lang.Double.doubleToLongBits(getLosses())
+          != java.lang.Double.doubleToLongBits(
+              other.getLosses())) return false;
+      if (java.lang.Double.doubleToLongBits(getBlocks())
+          != java.lang.Double.doubleToLongBits(
+              other.getBlocks())) return false;
+      if (java.lang.Double.doubleToLongBits(getMisses())
+          != java.lang.Double.doubleToLongBits(
+              other.getMisses())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -2102,9 +2191,20 @@ public final class Bp {
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + WINS_FIELD_NUMBER;
-      hash = (53 * hash) + getWins();
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          java.lang.Double.doubleToLongBits(getWins()));
       hash = (37 * hash) + DRAWS_FIELD_NUMBER;
-      hash = (53 * hash) + getDraws();
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          java.lang.Double.doubleToLongBits(getDraws()));
+      hash = (37 * hash) + LOSSES_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          java.lang.Double.doubleToLongBits(getLosses()));
+      hash = (37 * hash) + BLOCKS_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          java.lang.Double.doubleToLongBits(getBlocks()));
+      hash = (37 * hash) + MISSES_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          java.lang.Double.doubleToLongBits(getMisses()));
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -2238,9 +2338,15 @@ public final class Bp {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        wins_ = 0;
+        wins_ = 0D;
 
-        draws_ = 0;
+        draws_ = 0D;
+
+        losses_ = 0D;
+
+        blocks_ = 0D;
+
+        misses_ = 0D;
 
         return this;
       }
@@ -2270,6 +2376,9 @@ public final class Bp {
         Bp.EvaluationResponse result = new Bp.EvaluationResponse(this);
         result.wins_ = wins_;
         result.draws_ = draws_;
+        result.losses_ = losses_;
+        result.blocks_ = blocks_;
+        result.misses_ = misses_;
         onBuilt();
         return result;
       }
@@ -2318,11 +2427,20 @@ public final class Bp {
 
       public Builder mergeFrom(Bp.EvaluationResponse other) {
         if (other == Bp.EvaluationResponse.getDefaultInstance()) return this;
-        if (other.getWins() != 0) {
+        if (other.getWins() != 0D) {
           setWins(other.getWins());
         }
-        if (other.getDraws() != 0) {
+        if (other.getDraws() != 0D) {
           setDraws(other.getDraws());
+        }
+        if (other.getLosses() != 0D) {
+          setLosses(other.getLosses());
+        }
+        if (other.getBlocks() != 0D) {
+          setBlocks(other.getBlocks());
+        }
+        if (other.getMisses() != 0D) {
+          setMisses(other.getMisses());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -2353,54 +2471,132 @@ public final class Bp {
         return this;
       }
 
-      private int wins_ ;
+      private double wins_ ;
       /**
-       * <code>int32 wins = 1;</code>
+       * <code>double wins = 1;</code>
        */
-      public int getWins() {
+      public double getWins() {
         return wins_;
       }
       /**
-       * <code>int32 wins = 1;</code>
+       * <code>double wins = 1;</code>
        */
-      public Builder setWins(int value) {
+      public Builder setWins(double value) {
         
         wins_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>int32 wins = 1;</code>
+       * <code>double wins = 1;</code>
        */
       public Builder clearWins() {
         
-        wins_ = 0;
+        wins_ = 0D;
         onChanged();
         return this;
       }
 
-      private int draws_ ;
+      private double draws_ ;
       /**
-       * <code>int32 draws = 2;</code>
+       * <code>double draws = 2;</code>
        */
-      public int getDraws() {
+      public double getDraws() {
         return draws_;
       }
       /**
-       * <code>int32 draws = 2;</code>
+       * <code>double draws = 2;</code>
        */
-      public Builder setDraws(int value) {
+      public Builder setDraws(double value) {
         
         draws_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>int32 draws = 2;</code>
+       * <code>double draws = 2;</code>
        */
       public Builder clearDraws() {
         
-        draws_ = 0;
+        draws_ = 0D;
+        onChanged();
+        return this;
+      }
+
+      private double losses_ ;
+      /**
+       * <code>double losses = 3;</code>
+       */
+      public double getLosses() {
+        return losses_;
+      }
+      /**
+       * <code>double losses = 3;</code>
+       */
+      public Builder setLosses(double value) {
+        
+        losses_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>double losses = 3;</code>
+       */
+      public Builder clearLosses() {
+        
+        losses_ = 0D;
+        onChanged();
+        return this;
+      }
+
+      private double blocks_ ;
+      /**
+       * <code>double blocks = 4;</code>
+       */
+      public double getBlocks() {
+        return blocks_;
+      }
+      /**
+       * <code>double blocks = 4;</code>
+       */
+      public Builder setBlocks(double value) {
+        
+        blocks_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>double blocks = 4;</code>
+       */
+      public Builder clearBlocks() {
+        
+        blocks_ = 0D;
+        onChanged();
+        return this;
+      }
+
+      private double misses_ ;
+      /**
+       * <code>double misses = 5;</code>
+       */
+      public double getMisses() {
+        return misses_;
+      }
+      /**
+       * <code>double misses = 5;</code>
+       */
+      public Builder setMisses(double value) {
+        
+        misses_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>double misses = 5;</code>
+       */
+      public Builder clearMisses() {
+        
+        misses_ = 0D;
         onChanged();
         return this;
       }
@@ -2489,11 +2685,12 @@ public final class Bp {
       "\n\010bp.proto\"\025\n\005bprog\022\014\n\004code\030\001 \001(\t\"B\n\nInd" +
       "ividual\022\022\n\ngeneration\030\001 \001(\005\022\n\n\002id\030\002 \001(\005\022" +
       "\024\n\004code\030\003 \001(\0132\006.bprog\"4\n\021EvaluationReque" +
-      "st\022\037\n\nindividual\030\001 \001(\0132\013.Individual\"1\n\022E" +
-      "valuationResponse\022\014\n\004wins\030\001 \001(\005\022\r\n\005draws" +
-      "\030\002 \001(\0052H\n\021EvaluationService\0223\n\010Evaluate\022" +
-      "\022.EvaluationRequest\032\023.EvaluationResponse" +
-      "b\006proto3"
+      "st\022\037\n\nindividual\030\001 \001(\0132\013.Individual\"a\n\022E" +
+      "valuationResponse\022\014\n\004wins\030\001 \001(\001\022\r\n\005draws" +
+      "\030\002 \001(\001\022\016\n\006losses\030\003 \001(\001\022\016\n\006blocks\030\004 \001(\001\022\016" +
+      "\n\006misses\030\005 \001(\0012H\n\021EvaluationService\0223\n\010E" +
+      "valuate\022\022.EvaluationRequest\032\023.Evaluation" +
+      "Responseb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -2522,7 +2719,7 @@ public final class Bp {
     internal_static_EvaluationResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_EvaluationResponse_descriptor,
-        new java.lang.String[] { "Wins", "Draws", });
+        new java.lang.String[] { "Wins", "Draws", "Losses", "Blocks", "Misses", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

@@ -4,6 +4,7 @@ import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.eventselection.PrioritizedBSyncEventSelectionStrategy;
+import il.ac.bgu.cs.bp.statespacemapper.GenerateAllTracesInspection;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -29,7 +30,7 @@ public class Verifier {
     try {
       vfr.verify(bprog);
       System.out.println("finished verification, starting traces generation");
-      Collection<List<BEvent>> traces = inspector.calculateAllTraces();
+      Collection<List<BEvent>> traces = inspector.getResult().traces;
       Collection<List<Cell>> tracesCells = traces.stream().map(l -> l.stream().map(Cell::new).collect(Collectors.toList())).sorted(new TraceComperator()).collect(Collectors.toList());
       String tracesS = tracesCells.toString();
       System.out.println(tracesCells);

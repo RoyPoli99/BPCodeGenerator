@@ -1,6 +1,5 @@
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
-import io.grpc.stub.StreamObserver;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -9,6 +8,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 
 public abstract class Evaluator implements Callable<Bp.EvaluationResponse> {
+
     private static String rand_player;
     private static String opt_player;
     static {
@@ -22,13 +22,11 @@ public abstract class Evaluator implements Callable<Bp.EvaluationResponse> {
 
     protected int gen;
     protected int id;
-    private ExecutorService es;
     protected final BProgram bprog;
 
 
-    public Evaluator(ExecutorService es, String code, int gen, int id){
+    protected Evaluator(String code, int gen, int id){
         super();
-        this.es = es;
         String[] bthreads = code.split("\n");
         String player;
         if(gen >= 200)

@@ -1,20 +1,14 @@
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.model.BProgram;
-import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.eventselection.PrioritizedBSyncEventSelectionStrategy;
-import io.grpc.stub.StreamObserver;
+import il.ac.bgu.cs.bp.statespacemapper.GenerateAllTracesInspection;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 public class VerificationEvaluator extends Evaluator {
-    public VerificationEvaluator(ExecutorService es, String code, int gen, int id) {
-        super(es, code,gen,id);
+    public VerificationEvaluator(String code, int gen, int id) {
+        super(code,gen,id);
     }
 
     @Override
@@ -42,7 +36,7 @@ public class VerificationEvaluator extends Evaluator {
         try {
             vfr.verify(bprog);
             //System.out.println("finished verification, starting traces generation");
-            Collection<List<BEvent>> traces = inspector.calculateAllTraces();
+            Collection<List<BEvent>> traces = inspector.getResult().traces;
             int wins = 0, losses = 0, draws = 0, blocks = 0, misses = 0;
             for(List<BEvent> trace : traces){
                 String lastEvent = trace.get(trace.size() - 1).name;

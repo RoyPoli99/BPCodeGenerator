@@ -12,9 +12,14 @@ public class BPServerProto {
         System.out.println("Number of threads="+numOfThreads);
         ExecutorService es = Executors.newFixedThreadPool(numOfThreads);
         //ExecutorService es = Executors.newFixedThreadPool(Integer.parseInt(args[0]));
-        Server server = ServerBuilder.forPort(8080)
-                .addService(new EvaluationServiceImpl(es))
-                .build();
+        int port = 8080;
+        String host = "localhost";
+        Channel channel = ManagedChannelBuilder.forAddress(host, port).usePlaintext().build();
+        Server server = ServerBuilder.forPort(port)
+            .executor(es)
+            .addService(new EvaluationServiceImpl())
+            .build();
+
         server.start();
         System.out.println("Server started");
         server.awaitTermination();

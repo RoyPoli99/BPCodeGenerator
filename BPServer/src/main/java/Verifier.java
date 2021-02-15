@@ -3,6 +3,7 @@ import il.ac.bgu.cs.bp.bpjs.analysis.listeners.PrintDfsVerifierListener;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.eventselection.PrioritizedBSyncEventSelectionStrategy;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -16,7 +17,9 @@ import static java.util.stream.Collectors.joining;
 public class Verifier {
   public static void main(String[] args) throws InterruptedException {
     final BProgram bprog = new ResourceBProgram("TTT.js");
-    bprog.setEventSelectionStrategy(new PrioritizedBSyncEventSelectionStrategy());
+    var prio = new PrioritizedBSyncEventSelectionStrategy();
+    prio.setDefaultPriority(0);
+    bprog.setEventSelectionStrategy(prio);
     GenerateAllTracesInspection inspector = new GenerateAllTracesInspection();
     DfsBProgramVerifier vfr = new DfsBProgramVerifier();
     vfr.addInspection(inspector);

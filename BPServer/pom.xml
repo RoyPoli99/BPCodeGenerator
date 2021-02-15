@@ -7,6 +7,13 @@
     <artifactId>BPServer</artifactId>
     <version>1.1</version>
     <packaging>jar</packaging>
+
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
     <build>
         <extensions>
             <extension>
@@ -47,7 +54,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        BPServer
+                                        BPServerProto
                                     </mainClass>
                                 </manifest>
                             </archive>
@@ -69,6 +76,11 @@
         </plugins>
     </build>
     <dependencies>
+        <dependency>
+            <groupId>com.github.bThink-BGU</groupId>
+            <artifactId>StateSpaceMapper</artifactId>
+            <version>0.1.1</version>
+        </dependency>
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
@@ -92,7 +104,7 @@
         <dependency>
             <groupId>com.github.bthink-bgu</groupId>
             <artifactId>BPjs</artifactId>
-            <version>0.11.0</version>
+            <version>0.12.0</version>
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>

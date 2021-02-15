@@ -3,6 +3,7 @@ import io.grpc.*;
 import java.lang.management.ManagementFactory;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class BPServerProto {
 
@@ -11,7 +12,7 @@ public class BPServerProto {
         System.out.println("Number of threads="+numOfThreads);
         ExecutorService es = Executors.newFixedThreadPool(numOfThreads);
         //ExecutorService es = Executors.newFixedThreadPool(Integer.parseInt(args[0]));
-        Server server = ServerBuilder.forPort(50051)
+        Server server = ServerBuilder.forPort(8080)
                 .addService(new EvaluationServiceImpl(es))
                 .build();
         server.start();

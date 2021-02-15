@@ -207,41 +207,64 @@ bThread9
 function addAssertions(f, p) {
 
   bp.registerBThread("AssertWin(<" + f[p[0]].x + "," + f[p[0]].y + ">," + "<" + f[p[1]].x + "," + f[p[1]].y + ">," + "<" + f[p[2]].x + "," + f[p[2]].y + ">)", function () {
-    while (true) {
-      let ev1 = bp.sync({waitFor: [O(f[p[0]].x, f[p[0]].y), X(f[p[2]].x, f[p[2]].y)]});
-      if (ev1.name.startsWith("X(")) {
-        break;
+
+      if(bp.sync({waitFor: [O(f[p[0]].x, f[p[0]].y), X(f[p[2]].x, f[p[2]].y)]}).name === 'X') {
+        return;
       }
-      let ev2 = bp.sync({waitFor: [O(f[p[1]].x, f[p[1]].y), X(f[p[2]].x, f[p[2]].y)]});
-      if (ev2.name.startsWith("X(")) {
-        break;
+      //let ev2 = bp.sync({waitFor: [O(f[p[1]].x, f[p[1]].y), X(f[p[2]].x, f[p[2]].y)]});
+      if(bp.sync({waitFor: [O(f[p[1]].x, f[p[1]].y), X(f[p[2]].x, f[p[2]].y)]}).name === 'X'){
+        return;
       }
-      let ev = bp.sync({waitFor: [Omove, X(f[p[2]].x, f[p[2]].y)]});
-      bp.ASSERT(ev.name.startsWith("X(") || ev.name.startsWith("O(" + f[p[2]].x + "," + f[p[2]].y + ")"), "WIN_VIOLATION");
-      if(!(ev.name.startsWith("X(") || ev.name.startsWith("O(" + f[p[2]].x + "," + f[p[2]].y + ")"))){
+      //if (ev2.name == 'X') {
+      //  return;
+      //}
+      //let ev = bp.sync({waitFor: [Omove, X(f[p[2]].x, f[p[2]].y)]});
+      if(bp.sync({waitFor: [Omove, X(f[p[2]].x, f[p[2]].y)]}).name === 'X'){
+        //x blocked the win - no violation
+        return;
+      }
+      else {
+        if (bp.sync({waitFor: [OWin, Xmove]}).name === 'X') {
+          //x moved again, was not win
+          bp.sync({request: bp.Event("WIN_VIOLATION")}, 110);
+        } else {
+          //was a win
+          return;
+        }
+      }
+      //bp.ASSERT(ev.name.startsWith("X(") || ev.name.startsWith("O(" + f[p[2]].x + "," + f[p[2]].y + ")"), "WIN_VIOLATION");
+      /*if(!(ev.name.startsWith("X(") || ev.name.startsWith("O(" + f[p[2]].x + "," + f[p[2]].y + ")"))){
         bp.sync({request: bp.Event("WIN_VIOLATION")}, 110);
-      }
-    }
+      }*/
   });
 
   bp.registerBThread("AssertBlock(<" + f[p[0]].x + "," + f[p[0]].y + ">," + "<" + f[p[1]].x + "," + f[p[1]].y + ">," + "<" + f[p[2]].x + "," + f[p[2]].y + ">)", function () {
     while (true) {
 
       let ev1 = bp.sync({waitFor: [X(f[p[0]].x, f[p[0]].y), O(f[p[2]].x, f[p[2]].y)]});
-      if (ev1.name.startsWith("O("))
+      if (ev1.name === "O")
         break;
 
       let ev2 = bp.sync({waitFor: [X(f[p[1]].x, f[p[1]].y), O(f[p[2]].x, f[p[2]].y)]});
-      if (ev2.name.startsWith("O("))
+      if (ev2.name === "O")
         break;
 
-      let ev = bp.sync({waitFor: [Omove]});
-      let evNext = bp.sync({waitFor: [Xmove, OWin]})
-      //bp.ASSERT(!evNext.name.startsWith("X(") || ev.name.startsWith("O(" + f[p[2]].x + "," + f[p[2]].y + ")"), "BLOCK_VIOLATION");
-      if(!(!evNext.name.startsWith("X(") || ev.name.startsWith("O(" + f[p[2]].x + "," + f[p[2]].y + ")"))){
-        bp.sync({request: bp.Event("BLOCK_VIOLATION")}, 110);
-      }
+      // let ev = bp.sync({waitFor: [Omove]});
+      // let evNext = bp.sync({waitFor: [Xmove, OWin]})
+      // //bp.ASSERT(!evNext.name.startsWith("X(") || ev.name.startsWith("O(" + f[p[2]].x + "," + f[p[2]].y + ")"), "BLOCK_VIOLATION");
+      // if(!(!evNext.name.startsWith("X(") || ev.name.startsWith("O(" + f[p[2]].x + "," + f[p[2]].y + ")"))){
+      //   bp.sync({request: bp.Event("BLOCK_VIOLATION")}, 110);
+      // }
 
+
+      if (bp.sync({waitFor: [O(f[p[2]].x, f[p[2]].y), Xmove]}).name === 'X') {
+          //O was not placed to block
+          bp.sync({request: bp.Event("BLOCK_VIOLATION")}, 110);
+        }
+        else {
+          //blocked win
+          return;
+        }
     }
   });
 }

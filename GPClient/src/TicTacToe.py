@@ -21,6 +21,7 @@ MAXIMUMS = []
 MINIMUMS = []
 MEDIANS = []
 CURR_GEN = 0
+INDV_ID = 0
 
 
 def results_to_fitness(wins, draws, losses, blocks, misses):
@@ -28,11 +29,13 @@ def results_to_fitness(wins, draws, losses, blocks, misses):
 
 # Send to BPServer to evaluate
 def eval_generator(individual):
+    global INDV_ID
     func = toolbox.compile(expr=individual)
     func_string = str(func(0).root)
     indv = bp_pb2.Individual()
     indv.generation = CURR_GEN
-    indv.id = 0
+    INDV_ID += 1
+    indv.id = INDV_ID
     indv.code.code = func_string
     results = send_proto_request(indv)
     fitness = results_to_fitness(results.wins, results.draws, results.losses, results.blocks, results.misses)
@@ -144,7 +147,8 @@ toolbox.register("map", executor.map)
 
 
 def real_time_plotter(name, plot):
-    global AVERAGES, MAXIMUMS, MINIMUMS, MEDIANS, CURR_GEN
+    global AVERAGES, MAXIMUMS, MINIMUMS, MEDIANS, CURR_GEN, INDV_ID
+    INDV_ID = 0
     # print(CURR_GEN)
     new_avg = numpy.mean(plot)
     new_max = numpy.max(plot)

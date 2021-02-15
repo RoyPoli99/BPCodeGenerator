@@ -1,6 +1,5 @@
 import io.grpc.stub.StreamObserver;
 
-import java.util.concurrent.ExecutorService;
 
 public class EvaluationServiceImpl extends EvaluationServiceGrpc.EvaluationServiceImplBase {
   public EvaluationServiceImpl() {

@@ -13,8 +13,6 @@ public class BPServerProto {
         ExecutorService es = Executors.newFixedThreadPool(numOfThreads);
         //ExecutorService es = Executors.newFixedThreadPool(Integer.parseInt(args[0]));
         int port = 8080;
-        String host = "localhost";
-        Channel channel = ManagedChannelBuilder.forAddress(host, port).usePlaintext().build();
         Server server = ServerBuilder.forPort(port)
             .executor(es)
             .addService(new EvaluationServiceImpl())

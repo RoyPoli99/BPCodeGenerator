@@ -1,5 +1,6 @@
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.eventselection.PrioritizedBSyncEventSelectionStrategy;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,21 +20,26 @@ public abstract class Evaluator implements Callable<Bp.EvaluationResponse> {
         }
     }
 
-    protected int gen;
-    protected int id;
+    protected final int gen;
+    protected final int id;
     protected final BProgram bprog;
 
 
-    protected Evaluator(String code, int gen, int id){
+    protected Evaluator(String code, int gen, int id, String playerType){
         super();
+        this.id = id;
+        this.gen = gen;
         String[] bthreads = code.split("\n");
         String player;
-        if(gen >= 200)
+        if(playerType.equals("opt"))
             player = opt_player;
         else
             player = rand_player;
         String b_program = add_bthreads(bthreads, player);
         bprog = new StringBProgram(b_program);
+        var prio = new PrioritizedBSyncEventSelectionStrategy();
+        prio.setDefaultPriority(0);
+        bprog.setEventSelectionStrategy(prio);
     }
 
     protected abstract Bp.EvaluationResponse evaluate();

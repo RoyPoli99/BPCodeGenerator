@@ -8,7 +8,7 @@ import java.util.List;
 
 public class VerificationEvaluator extends Evaluator {
     public VerificationEvaluator(String code, int gen, int id) {
-        super(code,gen,id);
+        super(code,gen,id, "rand");
     }
 
     @Override
@@ -24,9 +24,6 @@ public class VerificationEvaluator extends Evaluator {
     }
 
     private double[] verify(){
-        var prio = new PrioritizedBSyncEventSelectionStrategy();
-        prio.setDefaultPriority(0);
-        bprog.setEventSelectionStrategy(prio);
         GenerateAllTracesInspection inspector = new GenerateAllTracesInspection();
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         vfr.addInspection(inspector);

@@ -15,7 +15,12 @@ public abstract class Evaluator implements Callable<Bp.EvaluationResponse> {
             rand_player = new Scanner(new File("resources/BPJSTicTacToeRand.js")).useDelimiter("\\Z").next();
             opt_player = new Scanner(new File("resources/BPJSTicTacToeOpt.js")).useDelimiter("\\Z").next();
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            try{
+                rand_player = new Scanner(new File("src/main/resources/BPJSTicTacToeRand.js")).useDelimiter("\\Z").next();
+                opt_player = new Scanner(new File("src/main/resources/BPJSTicTacToeOpt.js")).useDelimiter("\\Z").next();
+            } catch (FileNotFoundException e2) {
+                e.printStackTrace();
+            }
         }
     }
 

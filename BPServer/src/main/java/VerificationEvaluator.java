@@ -31,7 +31,7 @@ public class VerificationEvaluator extends Evaluator {
         vfr.setIterationCountGap(100);
         vfr.setMaxTraceLength(10);
         try {
-            vfr.verify(bprog);
+            vfr.verify(BProgramFactory());
             //System.out.println("finished verification, starting traces generation");
             Collection<List<BEvent>> traces = inspector.getResult().traces;
             int wins = 0, losses = 0, draws = 0, blocks = 0, misses = 0;

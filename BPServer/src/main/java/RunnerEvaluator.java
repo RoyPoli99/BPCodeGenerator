@@ -1,16 +1,17 @@
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class RunnerEvaluator extends Evaluator {
   private static ExecutorService es = Executors.newCachedThreadPool();
 
   public RunnerEvaluator(String code, int gen, int id) {
-    super(code, gen, id, gen > 200 ? "opt" : "rand");
+    super(code, gen, id, gen > 100 ? "opt" : "rand");
   }
 
   @Override
@@ -26,43 +27,65 @@ public class RunnerEvaluator extends Evaluator {
   }
 
   private double[] run_games() {
-    InMemoryEventLoggingListener[] loggers = new InMemoryEventLoggingListener[50];
-    Future<?>[] futures = new Future[50];
+    //InMemoryEventLoggingListener[] loggers = new InMemoryEventLoggingListener[50];
+    /*Future<?>[] futures = new Future[50];
     for (int i = 0; i < 50; i++) {
       loggers[i] = new InMemoryEventLoggingListener();
       BProgramRunner brunner = new BProgramRunner(bprog, es);
       brunner.addListener(loggers[i]);
       futures[i] = es.submit(brunner);
+    }*/
+    AtomicInteger wins = new AtomicInteger();
+    AtomicInteger losses = new AtomicInteger();
+    AtomicInteger draws = new AtomicInteger();
+    AtomicInteger blocks = new AtomicInteger();
+    AtomicInteger misses = new AtomicInteger();
+    Set<List<Integer>> numbers = new HashSet<>();
+    Random rand = new Random();
+    //for (int i = 0; i < 50; i++) {
+    while(numbers.size() < 50){
+      List<Integer> l = new LinkedList<>();
+      for (int j = 0; j < 5; j++) {
+        l.add(rand.nextInt(9-j*2));
+      }
+      numbers.add(l);
     }
-    int wins = 0, losses = 0, draws = 0, blocks = 0, misses = 0;
-    for (int i = 0; i < 50; i++) {
+    numbers.forEach(l -> {
+      /*
       try {
-        futures[i].get();
+        while(!futures[i].isDone()) {
+          Thread.sleep(1000);
+        }
       } catch (Exception e) {
         e.printStackTrace();
-      }
-      List<BEvent> events = loggers[i].getEvents();
+      }*/
+      InMemoryEventLoggingListener logger = new InMemoryEventLoggingListener();
+      BProgramRunner brunner = new BProgramRunner(BProgramFactory());
+      brunner.addListener(new RunnerXPlayer(l));
+      brunner.addListener(logger);
+      brunner.run();
+      List<BEvent> events = logger.getEvents();
       for (BEvent ev : events) {
         switch (ev.name) {
           case "OWin":
-            wins++;
+            wins.getAndIncrement();
             break;
           case "XWin":
-            losses++;
+            losses.getAndIncrement();
             break;
           case "Draw":
-            draws++;
+            draws.getAndIncrement();
             break;
           case "BLOCK_VIOLATION":
-            blocks++;
+            blocks.getAndIncrement();
             break;
           case "WIN_VIOLATION":
-            misses++;
+            misses.getAndIncrement();
         }
       }
-    }
+    });
     double traceNum = 50;
-    return new double[]{wins / traceNum, losses / traceNum, draws / traceNum, blocks / traceNum, misses / traceNum};
+    return new double[]{wins.get() / traceNum, losses.get() / traceNum, draws.get() / traceNum, blocks.get() / traceNum, misses.get() / traceNum};
 
   }
 }

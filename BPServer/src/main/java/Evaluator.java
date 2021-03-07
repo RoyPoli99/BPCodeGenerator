@@ -14,10 +14,12 @@ public abstract class Evaluator implements Callable<Bp.EvaluationResponse> {
     static {
         try {
             rand_player = new Scanner(new File("resources/BPJSTicTacToeRand.js")).useDelimiter("\\Z").next();
+            //rand_player = new Scanner(new File("resources/BPJSTicTacToe.js")).useDelimiter("\\Z").next();
             opt_player = new Scanner(new File("resources/BPJSTicTacToeOpt.js")).useDelimiter("\\Z").next();
         } catch (FileNotFoundException e) {
             try{
                 rand_player = new Scanner(new File("src/main/resources/BPJSTicTacToeRand.js")).useDelimiter("\\Z").next();
+                //rand_player = new Scanner(new File("src/main/resources/BPJSTicTacToe.js")).useDelimiter("\\Z").next();
                 opt_player = new Scanner(new File("src/main/resources/BPJSTicTacToeOpt.js")).useDelimiter("\\Z").next();
             } catch (FileNotFoundException e2) {
                 e.printStackTrace();
@@ -27,7 +29,8 @@ public abstract class Evaluator implements Callable<Bp.EvaluationResponse> {
 
     protected final int gen;
     protected final int id;
-    protected final BProgram bprog;
+    //protected final BProgram bprog;
+    protected final String b_program;
 
 
     protected Evaluator(String code, int gen, int id, String playerType){
@@ -40,11 +43,12 @@ public abstract class Evaluator implements Callable<Bp.EvaluationResponse> {
             player = opt_player;
         else
             player = rand_player;
-        String b_program = add_bthreads(bthreads, player);
+        b_program = add_bthreads(bthreads, player);
+        /*
         bprog = new StringBProgram(b_program);
         var prio = new PrioritizedBSyncEventSelectionStrategy();
         prio.setDefaultPriority(0);
-        bprog.setEventSelectionStrategy(prio);
+        bprog.setEventSelectionStrategy(prio);*/
     }
 
     protected abstract Bp.EvaluationResponse evaluate();
@@ -62,5 +66,13 @@ public abstract class Evaluator implements Callable<Bp.EvaluationResponse> {
         for(int i = 0; i <= 9; i++)
             curr = curr.replaceAll("bThread" + i, btheads[i]);
         return curr;
+    }
+
+    protected BProgram BProgramFactory(){
+        BProgram bprog = new StringBProgram(b_program);
+        var prio = new PrioritizedBSyncEventSelectionStrategy();
+        prio.setDefaultPriority(0);
+        bprog.setEventSelectionStrategy(prio);
+        return bprog;
     }
 }

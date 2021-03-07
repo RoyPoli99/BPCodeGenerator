@@ -34,9 +34,6 @@ var gameOver = bp.EventSet("GameOver", function (e) {
 
 // GameRules:
 function addSquareBThreads(row, col) {
-  bp.registerBThread("RandomXPlayer(" + row + "," + col + ")", function () {
-    bp.sync({request: [X(row, col)]});
-  });
   bp.registerBThread("SquareTaken(" + row + "," + col + ")", function () {
     while (true) {
       bp.sync({waitFor: [X(row, col), O(row, col)]});
@@ -50,6 +47,10 @@ for (var r = 0; r < 3; r++) {
     addSquareBThreads(r, c);
   }
 }
+bp.registerBThread("StartGame", function () {
+  bp.sync({request: bp.Event("Game_Start")}, 100);
+});
+
 bp.registerBThread("EnforceTurns", function () {
   while (true) {
     bp.sync({waitFor: Xmove, block: Omove});
@@ -208,12 +209,11 @@ function addAssertions(f, p) {
 
   bp.registerBThread("AssertWin(<" + f[p[0]].x + "," + f[p[0]].y + ">," + "<" + f[p[1]].x + "," + f[p[1]].y + ">," + "<" + f[p[2]].x + "," + f[p[2]].y + ">)", function () {
 
-    //let ev1 = bp.sync({waitFor: [O(f[p[0]].x, f[p[0]].y), X(f[p[2]].x, f[p[2]].y)]})
-    if(bp.sync({waitFor: [O(f[p[0]].x, f[p[0]].y), X(f[p[2]].x, f[p[2]].y)]}).name.equals('X')) {
+      if(bp.sync({waitFor: [O(f[p[0]].x, f[p[0]].y), X(f[p[2]].x, f[p[2]].y)]}).name === 'X') {
         return;
       }
       //let ev2 = bp.sync({waitFor: [O(f[p[1]].x, f[p[1]].y), X(f[p[2]].x, f[p[2]].y)]});
-    if(bp.sync({waitFor: [O(f[p[1]].x, f[p[1]].y), X(f[p[2]].x, f[p[2]].y)]}).name.equals('X')){
+    if(bp.sync({waitFor: [O(f[p[1]].x, f[p[1]].y), X(f[p[2]].x, f[p[2]].y)]}).name === 'X'){
         return;
       }
       //if (ev2.name == 'X') {
@@ -221,11 +221,11 @@ function addAssertions(f, p) {
       //}
       //let ev = bp.sync({waitFor: [Omove, X(f[p[2]].x, f[p[2]].y)]});
       while(true) {
-        if (bp.sync({waitFor: [Omove, X(f[p[2]].x, f[p[2]].y)]}).name.equals('X')) {
+        if (bp.sync({waitFor: [Omove, X(f[p[2]].x, f[p[2]].y)]}).name === 'X') {
           //x blocked the win - no violation
           return;
         } else {
-          if (bp.sync({waitFor: [OWin, Xmove]}).name.equals('X')) {
+          if (bp.sync({waitFor: [OWin, Xmove]}).name === 'X') {
             //x moved again, was not win
             bp.sync({request: bp.Event("WIN_VIOLATION")}, 110);
           } else {
@@ -241,12 +241,12 @@ function addAssertions(f, p) {
   });
 
   bp.registerBThread("AssertBlock(<" + f[p[0]].x + "," + f[p[0]].y + ">," + "<" + f[p[1]].x + "," + f[p[1]].y + ">," + "<" + f[p[2]].x + "," + f[p[2]].y + ">)", function () {
-      //let ev1 = bp.sync({waitFor: [X(f[p[0]].x, f[p[0]].y), O(f[p[2]].x, f[p[2]].y)]});
-      if (bp.sync({waitFor: [X(f[p[0]].x, f[p[0]].y), O(f[p[2]].x, f[p[2]].y)]}).name.equals("O"))
+      let ev1 = bp.sync({waitFor: [X(f[p[0]].x, f[p[0]].y), O(f[p[2]].x, f[p[2]].y)]});
+      if (ev1.name === "O")
         return;
 
-      //let ev2 = bp.sync({waitFor: [X(f[p[1]].x, f[p[1]].y), O(f[p[2]].x, f[p[2]].y)]});
-      if (bp.sync({waitFor: [X(f[p[1]].x, f[p[1]].y), O(f[p[2]].x, f[p[2]].y)]}).name.equals("O"))
+      let ev2 = bp.sync({waitFor: [X(f[p[1]].x, f[p[1]].y), O(f[p[2]].x, f[p[2]].y)]});
+      if (ev2.name === "O")
         return;
 
       // let ev = bp.sync({waitFor: [Omove]});
@@ -258,7 +258,7 @@ function addAssertions(f, p) {
 
 
       while (true) {
-        if (bp.sync({waitFor: [O(f[p[2]].x, f[p[2]].y), Xmove]}).name.equals('X')) {
+        if (bp.sync({waitFor: [O(f[p[2]].x, f[p[2]].y), Xmove]}).name === 'X') {
           //O was not placed to block
           bp.sync({request: bp.Event("BLOCK_VIOLATION")}, 110);
         } else {

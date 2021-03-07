@@ -1,3 +1,4 @@
+import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
 import matplotlib.pyplot as plt
@@ -12,9 +13,10 @@ from Client import calculate_fitness, send_stop, send_proto_request
 from Client import send_request
 from TTTclasses import *
 import bp_pb2
+import socket
 
 # Define global arguments
-NUMBER_OF_GENERATIONS = 100
+NUMBER_OF_GENERATIONS = 150
 POPULATION_SIZE = 100
 AVERAGES = []
 MAXIMUMS = []
@@ -23,9 +25,11 @@ MEDIANS = []
 CURR_GEN = 0
 INDV_ID = 0
 
+lock = threading.Lock()
+prev_time = 0
 
 def results_to_fitness(wins, draws, losses, blocks, misses):
-    return 10 * (2 * wins + draws - losses - blocks - misses)
+    return 10 * (3 * wins + draws - losses - blocks - 2 * misses)
 
 # Send to BPServer to evaluate
 def eval_generator(individual):
@@ -34,8 +38,9 @@ def eval_generator(individual):
     func_string = str(func(0).root)
     indv = bp_pb2.Individual()
     indv.generation = CURR_GEN
-    INDV_ID += 1
-    indv.id = INDV_ID
+    with lock:
+        INDV_ID += 1
+        indv.id = INDV_ID
     indv.code.code = func_string
     results = send_proto_request(indv)
     fitness = results_to_fitness(results.wins, results.draws, results.losses, results.blocks, results.misses)
@@ -142,8 +147,8 @@ toolbox.register("mate", gp.cxOnePoint)
 toolbox.register("expr_mut", gp.genGrow, min_=6, max_=6)
 toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
 
-executor = ThreadPoolExecutor()
-toolbox.register("map", executor.map)
+#executor = ThreadPoolExecutor()
+#toolbox.register("map", executor.map)
 
 
 def real_time_plotter(name, plot):
@@ -175,14 +180,23 @@ def save_results(log):
     x = 0
 
 
+def time_stat():
+    global prev_time
+    curr = time.time()
+    diff = curr - prev_time
+    prev_time = curr
+    return diff
+
 def run_experiment(cross_over_p, mutation_p, experiment_name):
+    global prev_time
     pop = toolbox.population(n=POPULATION_SIZE)
     stats = tools.Statistics(lambda ind: ind.fitness.values)
     stats.register("avg", numpy.mean)
     stats.register("std", numpy.std)
     stats.register("min", numpy.min)
     stats.register("max", numpy.max)
-    stats.register("time", lambda x: time.time())
+    prev_time = time.time()
+    stats.register("time", lambda x: time.time() - prev_time)
     stats.register("plot", lambda x: real_time_plotter(experiment_name, x))
 
     # Run experiment
@@ -200,7 +214,10 @@ def thread_check(arg):
 
 if __name__ == "__main__":
     print("start")
-    bla, log = run_experiment(0.7, 0.001, "TTT SimulationVER")
+    ip = socket.gethostbyname(socket.gethostname())
+    print("Python IP - " + ip)
+
+    bla, log = run_experiment(0.7, 0.001, "TTT SimulationRunOrg")
     # bla, log = run_experiment(0.7, 0.005, "TTT Simulation0.005")
     # bla, log = run_experiment(0.7, 0.01, "TTT Simulation0.01")
     # send_stop()

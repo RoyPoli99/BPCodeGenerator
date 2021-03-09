@@ -1,13 +1,11 @@
-function Move(row, col, type) {
-  return bp.Event(type, {row: row, col: col});
-}
+importPackage(Packages.evoBP);
 
 function X(row, col) {
-  return Move(row, col, "X");
+  return Move(row, col, String("X"));
 }
 
 function O(row, col) {
-  return Move(row, col, "O");
+  return Move(row, col, String("O"));
 }
 
 var move = bp.EventSet("Move events", function (e) {

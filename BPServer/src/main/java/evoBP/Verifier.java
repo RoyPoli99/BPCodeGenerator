@@ -1,3 +1,5 @@
+package evoBP;
+
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.analysis.listeners.PrintDfsVerifierListener;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;

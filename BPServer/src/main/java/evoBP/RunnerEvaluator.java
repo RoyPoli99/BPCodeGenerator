@@ -1,3 +1,5 @@
+package evoBP;
+
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
@@ -31,7 +33,7 @@ public class RunnerEvaluator extends Evaluator {
     /*Future<?>[] futures = new Future[50];
     for (int i = 0; i < 50; i++) {
       loggers[i] = new InMemoryEventLoggingListener();
-      BProgramRunner brunner = new BProgramRunner(bprog, es);
+      EvoBP.BProgramRunner brunner = new EvoBP.BProgramRunner(bprog, es);
       brunner.addListener(loggers[i]);
       futures[i] = es.submit(brunner);
     }*/

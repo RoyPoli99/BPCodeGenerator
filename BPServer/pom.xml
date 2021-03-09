@@ -65,7 +65,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        BPServerProto
+                                        evoBP.BPServerProto
                                     </mainClass>
                                 </manifest>
                             </archive>

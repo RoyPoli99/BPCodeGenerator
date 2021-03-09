@@ -1,3 +1,5 @@
+package evoBP;
+
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.eventselection.PrioritizedBSyncEventSelectionStrategy;
@@ -13,13 +15,13 @@ public abstract class Evaluator implements Callable<Bp.EvaluationResponse> {
     private static String opt_player;
     static {
         try {
-            rand_player = new Scanner(new File("resources/BPJSTicTacToeRand.js")).useDelimiter("\\Z").next();
-            //rand_player = new Scanner(new File("resources/BPJSTicTacToe.js")).useDelimiter("\\Z").next();
+            //rand_player = new Scanner(new File("resources/BPJSTicTacToeRand.js")).useDelimiter("\\Z").next();
+            rand_player = new Scanner(new File("resources/BPJSTicTacToe.js")).useDelimiter("\\Z").next();
             opt_player = new Scanner(new File("resources/BPJSTicTacToeOpt.js")).useDelimiter("\\Z").next();
         } catch (FileNotFoundException e) {
             try{
-                rand_player = new Scanner(new File("src/main/resources/BPJSTicTacToeRand.js")).useDelimiter("\\Z").next();
-                //rand_player = new Scanner(new File("src/main/resources/BPJSTicTacToe.js")).useDelimiter("\\Z").next();
+                //rand_player = new Scanner(new File("src/main/resources/BPJSTicTacToeRand.js")).useDelimiter("\\Z").next();
+                rand_player = new Scanner(new File("src/main/resources/BPJSTicTacToe.js")).useDelimiter("\\Z").next();
                 opt_player = new Scanner(new File("src/main/resources/BPJSTicTacToeOpt.js")).useDelimiter("\\Z").next();
             } catch (FileNotFoundException e2) {
                 e.printStackTrace();

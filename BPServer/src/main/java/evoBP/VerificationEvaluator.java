@@ -1,6 +1,7 @@
+package evoBP;
+
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.model.eventselection.PrioritizedBSyncEventSelectionStrategy;
 import il.ac.bgu.cs.bp.statespacemapper.GenerateAllTracesInspection;
 
 import java.util.Collection;

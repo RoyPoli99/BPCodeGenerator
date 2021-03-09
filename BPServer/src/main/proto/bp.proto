@@ -1,4 +1,5 @@
 syntax = "proto3";
+option java_package = "evoBP";
 
 message bprog {
     string code = 1;

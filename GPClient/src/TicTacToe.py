@@ -29,6 +29,8 @@ lock = threading.Lock()
 prev_time = 0
 
 def results_to_fitness(wins, draws, losses, blocks, misses):
+    if CURR_GEN >= 100:
+        return 10 * draws
     return 10 * (3 * wins + draws - losses - blocks - 2 * misses)
 
 # Send to BPServer to evaluate

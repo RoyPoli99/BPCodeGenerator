@@ -1,14 +1,11 @@
-import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
+package evoBP;
+
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListenerAdapter;
-import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class RunnerXPlayer extends BProgramRunnerListenerAdapter {
   private final List<Integer> numbers;
@@ -21,15 +18,15 @@ public class RunnerXPlayer extends BProgramRunnerListenerAdapter {
   @Override
   public void eventSelected(BProgram bp, BEvent e) {
     if(e.name.equals("X")||e.name.equals("O")) {
-      Map<String, Number> data = (Map<String, Number>) e.maybeData;
-      System.out.println("prev char is - " + board[data.get("row").intValue()][data.get("col").intValue()]);
-      board[data.get("row").intValue()][data.get("col").intValue()] = e.name.charAt(0);
+     var data = (Move) e;
+      //System.out.println("prev char is - " + board[data.get("row").intValue()][data.get("col").intValue()]);
+      board[data.row][data.col] = e.name.charAt(0);
     }
     if(e.name.equals("O")||e.name.equals("Game_Start")) {
       int nextNumber = numbers.remove(0);
       int[] position = get_position(nextNumber);
-      double curr_row = position[0], curr_col = position[1];
-      bp.enqueueExternalEvent(new BEvent("X", Map.of("row", curr_row, "col", curr_col)));
+      int curr_row = position[0], curr_col = position[1];
+      bp.enqueueExternalEvent(new Move(curr_row, curr_col, "X"));
     }
   }
 

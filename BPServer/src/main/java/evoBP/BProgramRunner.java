@@ -1,4 +1,4 @@
-/*
+package evoBP;/*
  * The MIT License
  *
  * Copyright 2017 michael.
@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
-import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
 import il.ac.bgu.cs.bp.bpjs.model.SafetyViolationTag;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -73,7 +72,7 @@ public class BProgramRunner implements Runnable {
     public void run() {
         try {
             // setup bprogram and runtime parts.
-            //execSvc = ExecutorServiceMaker.makeWithName("BProgramRunner-" + instanceNum );
+            //execSvc = ExecutorServiceMaker.makeWithName("EvoBP.BProgramRunner-" + instanceNum );
             failedAssertion = null;
             listeners.forEach(l -> l.starting(bprog));
             BProgramSyncSnapshot cur = bprog.setup();
@@ -150,7 +149,7 @@ public class BProgramRunner implements Runnable {
         } catch ( BPjsRuntimeException bre ) {
             listeners.forEach( l -> l.error(bprog, bre));
         } catch (InterruptedException itr) {
-            System.err.println("BProgramRunner interrupted: " + itr.getMessage() );
+            System.err.println("EvoBP.BProgramRunner interrupted: " + itr.getMessage() );
             
         } finally {
             execSvc.shutdown();

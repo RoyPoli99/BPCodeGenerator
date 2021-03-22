@@ -21,6 +21,7 @@ message EvaluationResponse {
     double losses = 3;
     double blocks = 4;
     double misses = 5;
+    double length = 6;
 }
 
 service EvaluationService {

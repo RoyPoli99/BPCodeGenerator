@@ -1,6 +1,9 @@
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
+from typing import List, Any
+#import pygraphviz as pgv
+import os
 import matplotlib.pyplot as plt
 import numpy
 from deap import algorithms
@@ -14,24 +17,56 @@ from Client import send_request
 from TTTclasses import *
 import bp_pb2
 import socket
+import pandas as pd
 
 # Define global arguments
-NUMBER_OF_GENERATIONS = 150
+NUMBER_OF_GENERATIONS = 400
 POPULATION_SIZE = 100
 AVERAGES = []
 MAXIMUMS = []
 MINIMUMS = []
 MEDIANS = []
-CURR_GEN = 0
+CURR_GEN = 1
 INDV_ID = 0
 
 lock = threading.Lock()
 prev_time = 0
 
+
+df = pd.DataFrame({'Generation': [],
+                   'Individual': [],
+                   'Fitness': [],
+                   'Wins': [],
+                   'Losses': [],
+                   'Draws': [],
+                   'Blocks': [],
+                   'Misses': [],
+                   'Length': [],
+                   'Code': []})
+
 def results_to_fitness(wins, draws, losses, blocks, misses):
-    if CURR_GEN >= 100:
-        return 10 * draws
     return 10 * (3 * wins + draws - losses - blocks - 2 * misses)
+
+
+def document_individual(individual, curr_id, fitness, wins, draws, losses, blocks, misses, length, code):
+    # tree
+    #nodes, edges, labels = gp.graph(individual)
+    #g = pgv.AGraph()
+    #g.add_nodes_from(nodes)
+    #g.add_edges_from(edges)
+    #g.layout(prog="dot")
+    #for i in nodes:
+    #    n = g.get_node(i)
+    #    n.attr["label"] = labels[i]
+    #img_name = "gen_" + str(CURR_GEN) + ".png"
+    #folder_name = "../trees/Individual" + str(curr_id)
+    #if not os.path.exists(folder_name):
+    #    os.makedirs(folder_name)
+    #g.draw(folder_name + "/" + img_name)
+    # stats
+    with lock:
+        df.loc[len(df)] = [CURR_GEN, curr_id, fitness, wins, draws, losses, blocks, misses, length, code]
+
 
 # Send to BPServer to evaluate
 def eval_generator(individual):
@@ -46,6 +81,7 @@ def eval_generator(individual):
     indv.code.code = func_string
     results = send_proto_request(indv)
     fitness = results_to_fitness(results.wins, results.draws, results.losses, results.blocks, results.misses)
+    document_individual(individual, indv.id, fitness, results.wins, results.draws, results.losses, results.blocks, results.misses, results.lengths, func_string)
     return fitness,
 
 pset = PrimitiveSetTyped("main", [root], root_wrapper)
@@ -100,10 +136,10 @@ pset.addPrimitive(requestl2Func, [Ol, Ol, priority], requestl2)
 pset.addPrimitive(requestl3Func, [Ol, Ol, Ol, priority], requestl3)
 pset.addPrimitive(requestl4Func, [Ol, Ol, Ol, Ol, priority], requestl4)
 
-pset.addPrimitive(xlFunc, [position, position], Xl)
-pset.addPrimitive(olFunc, [position, position], Ol)
+pset.addPrimitive(xlFunc, [position], Xl)
+pset.addPrimitive(olFunc, [position], Ol)
 
-pset.addPrimitive(xfFunc, [positionf, positionf], Xf)
+pset.addPrimitive(xfFunc, [positionf], Xf)
 
 pset.addPrimitive(oFunc, [position, position], O)
 
@@ -142,6 +178,11 @@ toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.ex
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("compile", gp.compile, pset=pset)
 
+# Plotting
+# expr = toolbox.individual()
+# nodes, edges, labels = gp.graph(expr)
+
+
 # Define GP Operators
 toolbox.register("evaluate", eval_generator)
 toolbox.register("select", tools.selTournament, tournsize=3)
@@ -149,8 +190,8 @@ toolbox.register("mate", gp.cxOnePoint)
 toolbox.register("expr_mut", gp.genGrow, min_=6, max_=6)
 toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
 
-#executor = ThreadPoolExecutor()
-#toolbox.register("map", executor.map)
+executor = ThreadPoolExecutor()
+toolbox.register("map", executor.map)
 
 
 def real_time_plotter(name, plot):
@@ -214,20 +255,62 @@ def thread_check(arg):
     print(send_request("START" + arg))
 
 
+def normalize_str(string: str) -> List[str]:
+    str_norm = []
+    last_c = None
+    for c in string:
+        if c.isalnum():
+            if last_c.isalnum():
+                str_norm[-1] += c
+            else:
+                str_norm.append(c)
+        elif not c.isspace():
+            str_norm.append(c)
+        last_c = c
+    return str_norm
+
+
+# Generate abstract syntax tree from normalized input.
+def get_ast(input_norm: List[str]) -> List[Any]:
+    ast = []
+    # Go through each element in the input:
+    # - if it is an open parenthesis, find matching parenthesis and make recursive
+    #   call for content in-between. Add the result as an element to the current list.
+    # - if it is an atom, just add it to the current list.
+    i = 0
+    while i < len(input_norm):
+        symbol = input_norm[i]
+        if symbol == '(':
+            list_content = []
+            match_ctr = 1 # If 0, parenthesis has been matched.
+            while match_ctr != 0:
+                i += 1
+                if i >= len(input_norm):
+                    raise ValueError("Invalid input: Unmatched open parenthesis.")
+                symbol = input_norm[i]
+                if symbol == '(':
+                    match_ctr += 1
+                elif symbol == ')':
+                    match_ctr -= 1
+                if match_ctr != 0:
+                    list_content.append(symbol)
+            ast.append(get_ast(list_content))
+        elif symbol == ')':
+                raise ValueError("Invalid input: Unmatched close parenthesis.")
+        else:
+            try:
+                ast.append(int(symbol))
+            except ValueError:
+                ast.append(symbol)
+        i += 1
+    return ast
+
+
 if __name__ == "__main__":
     print("start")
     ip = socket.gethostbyname(socket.gethostname())
     print("Python IP - " + ip)
 
-    bla, log = run_experiment(0.7, 0.001, "TTT SimulationRunOrg")
-    # bla, log = run_experiment(0.7, 0.005, "TTT Simulation0.005")
-    # bla, log = run_experiment(0.7, 0.01, "TTT Simulation0.01")
-    # send_stop()
+    bla, log = run_experiment(0.7, 0.001, "TTT SimulationRunOrg2")
+    df.to_csv("log2.csv")
 
-    # with thread.ThreadPoolExecutor(max_workers=4) as e:
-    #     e.submit(thread_check, hotncold)
-    #     e.submit(thread_check, hotncold)
-    #     e.submit(thread_check, hotncold)
-    #     e.submit(thread_check, hotncold)
-    #kill server
-    # print("finish")

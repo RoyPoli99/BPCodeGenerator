@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x08\x62p.proto\"\x15\n\x05\x62prog\x12\x0c\n\x04\x63ode\x18\x01 \x01(\t\"B\n\nIndividual\x12\x12\n\ngeneration\x18\x01 \x01(\x05\x12\n\n\x02id\x18\x02 \x01(\x05\x12\x14\n\x04\x63ode\x18\x03 \x01(\x0b\x32\x06.bprog\"4\n\x11\x45valuationRequest\x12\x1f\n\nindividual\x18\x01 \x01(\x0b\x32\x0b.Individual\"a\n\x12\x45valuationResponse\x12\x0c\n\x04wins\x18\x01 \x01(\x01\x12\r\n\x05\x64raws\x18\x02 \x01(\x01\x12\x0e\n\x06losses\x18\x03 \x01(\x01\x12\x0e\n\x06\x62locks\x18\x04 \x01(\x01\x12\x0e\n\x06misses\x18\x05 \x01(\x01\x32H\n\x11\x45valuationService\x12\x33\n\x08\x45valuate\x12\x12.EvaluationRequest\x1a\x13.EvaluationResponseb\x06proto3'
+  serialized_pb=b'\n\x08\x62p.proto\"\x15\n\x05\x62prog\x12\x0c\n\x04\x63ode\x18\x01 \x01(\t\"B\n\nIndividual\x12\x12\n\ngeneration\x18\x01 \x01(\x05\x12\n\n\x02id\x18\x02 \x01(\x05\x12\x14\n\x04\x63ode\x18\x03 \x01(\x0b\x32\x06.bprog\"4\n\x11\x45valuationRequest\x12\x1f\n\nindividual\x18\x01 \x01(\x0b\x32\x0b.Individual\"r\n\x12\x45valuationResponse\x12\x0c\n\x04wins\x18\x01 \x01(\x01\x12\r\n\x05\x64raws\x18\x02 \x01(\x01\x12\x0e\n\x06losses\x18\x03 \x01(\x01\x12\x0e\n\x06\x62locks\x18\x04 \x01(\x01\x12\x0e\n\x06misses\x18\x05 \x01(\x01\x12\x0f\n\x07lengths\x18\x06 \x01(\x01\x32H\n\x11\x45valuationService\x12\x33\n\x08\x45valuate\x12\x12.EvaluationRequest\x1a\x13.EvaluationResponseb\x06proto3'
 )
 
 
@@ -178,6 +178,13 @@ _EVALUATIONRESPONSE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='lengths', full_name='EvaluationResponse.lengths', index=5,
+      number=6, type=1, cpp_type=5, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -191,7 +198,7 @@ _EVALUATIONRESPONSE = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=157,
-  serialized_end=254,
+  serialized_end=271,
 )
 
 _INDIVIDUAL.fields_by_name['code'].message_type = _BPROG
@@ -239,8 +246,8 @@ _EVALUATIONSERVICE = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=256,
-  serialized_end=328,
+  serialized_start=273,
+  serialized_end=345,
   methods=[
   _descriptor.MethodDescriptor(
     name='Evaluate',

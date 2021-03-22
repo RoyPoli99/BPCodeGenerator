@@ -101,7 +101,9 @@ function addLinePermutationBthreads(f, p) {
   });
 
   // Player O strategy to add a the third O to win
-  bThread0
+  bp.registerBThread("AddThirdOToWin(<" + f[p[0]].x + "," + f[p[0]].y + ">," + "<" + f[p[1]].x + "," + f[p[1]].y + ">," + "<" + f[p[2]].x + "," + f[p[2]].y + ">)", function () {
+    bThread0
+  })
 
   // Player O strategy to prevent the third X of player X
   bThread1

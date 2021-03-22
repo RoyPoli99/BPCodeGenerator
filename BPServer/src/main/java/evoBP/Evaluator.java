@@ -15,13 +15,13 @@ public abstract class Evaluator implements Callable<Bp.EvaluationResponse> {
     private static String opt_player;
     static {
         try {
-            //rand_player = new Scanner(new File("resources/BPJSTicTacToeRand.js")).useDelimiter("\\Z").next();
-            rand_player = new Scanner(new File("resources/BPJSTicTacToe.js")).useDelimiter("\\Z").next();
+            rand_player = new Scanner(new File("resources/BPJSTicTacToeRand.js")).useDelimiter("\\Z").next();
+            //rand_player = new Scanner(new File("resources/BPJSTicTacToe.js")).useDelimiter("\\Z").next();
             opt_player = new Scanner(new File("resources/BPJSTicTacToeOpt.js")).useDelimiter("\\Z").next();
         } catch (FileNotFoundException e) {
             try{
-                //rand_player = new Scanner(new File("src/main/resources/BPJSTicTacToeRand.js")).useDelimiter("\\Z").next();
-                rand_player = new Scanner(new File("src/main/resources/BPJSTicTacToe.js")).useDelimiter("\\Z").next();
+                rand_player = new Scanner(new File("src/main/resources/BPJSTicTacToeRand.js")).useDelimiter("\\Z").next();
+                //rand_player = new Scanner(new File("src/main/resources/BPJSTicTacToe.js")).useDelimiter("\\Z").next();
                 opt_player = new Scanner(new File("src/main/resources/BPJSTicTacToeOpt.js")).useDelimiter("\\Z").next();
             } catch (FileNotFoundException e2) {
                 e.printStackTrace();
@@ -57,9 +57,9 @@ public abstract class Evaluator implements Callable<Bp.EvaluationResponse> {
 
     @Override
     public final Bp.EvaluationResponse call() {
-        System.out.println("Generation #" + gen + ": Evaluating individual #" + id);
+        //System.out.println("Generation #" + gen + ": Evaluating individual #" + id);
         var res = evaluate();
-        System.out.println("Generation #" + this.gen + ": Completed individual #" + this.id);
+        //System.out.println("Generation #" + this.gen + ": Completed individual #" + this.id);
         return res;
     }
 

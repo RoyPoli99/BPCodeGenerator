@@ -484,16 +484,16 @@ def requestl4Func(o1, o2, o3, o4, priority):
 # done requestl
 
 
-def xlFunc(pos1, pos2):
-    return Xl(pos1, pos2)
+def xlFunc(pos1):
+    return Xl(pos1, pos1)
 
 
-def xfFunc(pos1, pos2):
-    return Xf(pos1, pos2)
+def xfFunc(pos1):
+    return Xf(pos1, pos1)
 
 
-def olFunc(pos1, pos2):
-    return Ol(pos1, pos2)
+def olFunc(pos1):
+    return Ol(pos1, pos1)
 
 
 def oFunc(pos1, pos2):

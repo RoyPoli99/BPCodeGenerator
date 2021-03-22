@@ -55,33 +55,7 @@ class root:
     __repr__ = __str__
 
 
-class btl:
-    def __init__(self, whiletruel):
-        self.whiletruel = whiletruel
-
-    def __str__(self):
-        global currentBtNameIndex, btNames
-        currName = btNames[currentBtNameIndex]
-        currentBtNameIndex = (currentBtNameIndex + 1) % 10
-        return currName + str(self.whiletruel) + "});\n"
-
-    __repr__ = __str__
-
-
-class btf:
-    def __init__(self, whiletruef):
-        self.whiletruef = whiletruef
-
-    def __str__(self):
-        global currentBtNameIndex, btNames
-        currName = btNames[currentBtNameIndex]
-        currentBtNameIndex = (currentBtNameIndex + 1) % 10
-        return currName + str(self.whiletruef) + "});\n"
-
-    __repr__ = __str__
-
-
-class bt:
+class btA:
     def __init__(self, whiletrue):
         self.whiletrue = whiletrue
 
@@ -94,200 +68,235 @@ class bt:
     __repr__ = __str__
 
 
-class while_truel3:
-    def __init__(self, wait_forl1,wait_forl2, requestl):
-        self.requestl = requestl
-        self.wait_forl1 = wait_forl1
-        self.wait_forl2 = wait_forl2
+class btB:
+    def __init__(self, whiletrue):
+        self.whiletrue = whiletrue
 
     def __str__(self):
-        return "while(true){" + str(self.wait_forl1) + str(self.wait_forl2) + str(self.requestl) + "}"
+        global currentBtNameIndex, btNames
+        currName = btNames[currentBtNameIndex]
+        currentBtNameIndex = (currentBtNameIndex + 1) % 10
+        return currName + str(self.whiletrue) + "});\n"
+
     __repr__ = __str__
 
 
-class while_truef1:
-    def __init__(self, request):
+class btC:
+    def __init__(self, whiletrue):
+        self.whiletrue = whiletrue
+
+    def __str__(self):
+        global currentBtNameIndex, btNames
+        currName = btNames[currentBtNameIndex]
+        currentBtNameIndex = (currentBtNameIndex + 1) % 10
+        return currName + str(self.whiletrue) + "});\n"
+
+    __repr__ = __str__
+
+
+class while_trueA:
+    def __init__(self, waits, request):
         self.request = request
+        self.waits = waits
+
     def __str__(self):
-        return "while(true){" + str(self.request)+ "}"
+        code_str = ""
+        for wait in self.waits:
+            code_str += str(wait)
+        code_str += str(self.request)
+        return "while(true){" + code_str + "}"
     __repr__ = __str__
 
 
-class while_truef2:
-    def __init__(self, wait_forf, request):
+class while_trueB:
+    def __init__(self, waits, request):
         self.request = request
-        self.wait_forf = wait_forf
+        self.waits = waits
+
     def __str__(self):
-        return "while(true){" + str(self.wait_forf) + str(self.request)+ "}"
+        code_str = ""
+        for wait in self.waits:
+            code_str += str(wait)
+        code_str += str(self.request)
+        return "while(true){" + code_str + "}"
     __repr__ = __str__
 
 
-class while_truef3:
-    def __init__(self, wait_forf1,wait_forf2, request):
+class while_trueC:
+    def __init__(self, waits, request):
         self.request = request
-        self.wait_forf1 = wait_forf1
-        self.wait_forf2 = wait_forf2
+        self.waits = waits
 
     def __str__(self):
-        return "while(true){" + str(self.wait_forf1) + str(self.wait_forf2) + str(self.request) + "}"
+        code_str = ""
+        for wait in self.waits:
+            code_str += str(wait)
+        code_str += str(self.request)
+        return "while(true){" + code_str + "}"
     __repr__ = __str__
 
 
-class whiletrue:
-    def __init__(self, request):
-        self.request = request
+class wait02:
+    def __init__(self, events):
+        self.events = events
+
     def __str__(self):
-        return "while(true){" + str(self.request) + "}"
+        code_str = ""
+        for event in self.events:
+            code_str += str(event)
+            code_str += ", "
+        code_str = code_str[:-2]
+        return "bp.sync({waitFor:[" + code_str + "]});"
     __repr__ = __str__
 
 
-class wait_forl:
-    def __init__(self, eventl):
-        self.eventl = eventl
+class wait01:
+    def __init__(self, events):
+        self.events = events
 
     def __str__(self):
-        return "bp.sync({waitFor:[" + str(self.eventl) + "]});"
+        code_str = ""
+        for event in self.events:
+            code_str += str(event)
+            code_str += ", "
+        code_str = code_str[:-2]
+        return "bp.sync({waitFor:[" + code_str + "]});"
     __repr__ = __str__
 
 
-class wait_forf:
-    def __init__(self, Xf):
-        self.Xf = Xf
+class waitC:
+    def __init__(self, events):
+        self.events = events
 
     def __str__(self):
-        return "bp.sync({waitFor:[" + str(self.Xf) + "]});"
+        code_str = ""
+        for event in self.events:
+            code_str += str(event)
+            code_str += ", "
+        code_str = code_str[:-2]
+        return "bp.sync({waitFor:[" + code_str + "]});"
     __repr__ = __str__
 
 
-class requestl1:
-    def __init__(self, Ol, priority):
-        self.Ol = Ol
+class request02:
+    def __init__(self, events, priority):
+        self.events = events
         self.priority = priority
 
     def __str__(self):
-        return "bp.sync({request:[" + str(self.Ol) + "]}," + str(self.priority) + ");"
+        code_str = ""
+        for event in self.events:
+            code_str += str(event)
+            code_str += ", "
+        code_str = code_str[:-2]
+        return "bp.sync({request:[" + code_str + "]}," + str(self.priority) + ");"
     __repr__ = __str__
 
 
-class requestl2:
-    def __init__(self, Ol1, Ol2, priority):
-        self.Ol1 = Ol1
-        self.Ol2 = Ol2
+class request01:
+    def __init__(self, events, priority):
+        self.events = events
         self.priority = priority
 
     def __str__(self):
-        return "bp.sync({request:[" + str(self.Ol1) + "," + str(self.Ol2) + "]}," + str(self.priority) + ");"
-
+        code_str = ""
+        for event in self.events:
+            code_str += str(event)
+            code_str += ", "
+        code_str = code_str[:-2]
+        return "bp.sync({request:[" + code_str + "]}," + str(self.priority) + ");"
     __repr__ = __str__
 
 
-class requestl3:
-    def __init__(self, Ol1, Ol2, Ol3, priority):
-        self.Ol1 = Ol1
-        self.Ol2 = Ol2
-        self.Ol3 = Ol3
+class requestC:
+    def __init__(self, events, priority):
+        self.events = events
         self.priority = priority
 
     def __str__(self):
-        return "bp.sync({request:[" + str(self.Ol1) + "," + str(self.Ol2) + "," + str(self.Ol3) + "]}," + str(self.priority) + ");"
-
+        code_str = ""
+        for event in self.events:
+            code_str += str(event)
+            code_str += ", "
+        code_str = code_str[:-2]
+        return "bp.sync({request:[" + code_str + "]}," + str(self.priority) + ");"
     __repr__ = __str__
 
 
-class requestl4:
-    def __init__(self, Ol1, Ol2, Ol3, Ol4, priority):
-        self.Ol1 = Ol1
-        self.Ol2 = Ol2
-        self.Ol3 = Ol3
-        self.Ol4 = Ol4
-        self.priority = priority
+class Perm02:
+    def __init__(self, event):
+        self.event = event
 
     def __str__(self):
-        return "bp.sync({request:[" + str(self.Ol1) + "," + str(self.Ol2) + "," + str(self.Ol3) + "," + str(self.Ol4) + "]}," + str(self.priority) + ");"
-
+        return str(self.event)
     __repr__ = __str__
 
 
-class Xl:
+class Perm02_X:
+    def __init__(self, pos1):
+        self.pos1 = pos1
+
+    def __str__(self):
+        return "X(f[p[" + str(self.pos1) + "]].x,f[p[" + str(self.pos1) + "]].y)"
+    __repr__ = __str__
+
+
+class Perm02_O:
+    def __init__(self, pos1):
+        self.pos1 = pos1
+
+    def __str__(self):
+        return "O(f[p[" + str(self.pos1) + "]].x,f[p[" + str(self.pos1) + "]].y)"
+    __repr__ = __str__
+
+
+class Perm01:
+    def __init__(self, event):
+        self.event = event
+
+    def __str__(self):
+        return str(self.event)
+    __repr__ = __str__
+
+
+class Perm01_X:
+    def __init__(self, pos1):
+        self.pos1 = pos1
+
+    def __str__(self):
+        return "X(f[p[" + str(self.pos1) + "]].x,f[p[" + str(self.pos1) + "]].y)"
+    __repr__ = __str__
+
+
+class Perm01_O:
+    def __init__(self, pos1):
+        self.pos1 = pos1
+
+    def __str__(self):
+        return "O(f[p[" + str(self.pos1) + "]].x,f[p[" + str(self.pos1) + "]].y)"
+    __repr__ = __str__
+
+
+class Concrete:
+    def __init__(self, event):
+        self.event = event
+
+    def __str__(self):
+        return str(self.event)
+    __repr__ = __str__
+
+
+class Concrete_X:
     def __init__(self, pos1, pos2):
         self.pos1 = pos1
         self.pos2 = pos2
 
     def __str__(self):
-        return "X(f[p[" + str(self.pos1) + "]].x,f[p[" + str(self.pos2) + "]].y)"
+        return "X(" + str(self.pos1) + "," + str(self.pos2) + ")"
     __repr__ = __str__
 
 
-class Ol:
-    def __init__(self, pos1, pos2):
-        self.pos1 = pos1
-        self.pos2 = pos2
-
-    def __str__(self):
-        return "O(f[p[" + str(self.pos1) + "]].x,f[p[" + str(self.pos2) + "]].y)"
-    __repr__ = __str__
-
-
-class Xf:
-    def __init__(self, pos1, pos2):
-        self.pos1 = pos1
-        self.pos2 = pos2
-
-    def __str__(self):
-        return "X(f[p[" + str(self.pos1) + "]].x,f[p[" + str(self.pos2) + "]].y)"
-    __repr__ = __str__
-
-
-class request1:
-    def __init__(self, O, priority):
-        self.O = O
-        self.priority = priority
-
-    def __str__(self):
-        return "bp.sync({request:[" + str(self.O) + "]}," + str(self.priority) + ");"
-    __repr__ = __str__
-
-
-class request2:
-    def __init__(self, O1, O2, priority):
-        self.O1 = O1
-        self.O2 = O2
-        self.priority = priority
-
-    def __str__(self):
-        return "bp.sync({request:[" + str(self.O1) + "," + str(self.O2) + "]}," + str(self.priority) + ");"
-
-    __repr__ = __str__
-
-
-class request3:
-    def __init__(self, O1, O2, O3, priority):
-        self.O1 = O1
-        self.O2 = O2
-        self.O3 = O3
-        self.priority = priority
-
-    def __str__(self):
-        return "bp.sync({request:[" + str(self.O1) + "," + str(self.O2) + "," + str(self.O3) + "]}," + str(self.priority) + ");"
-
-    __repr__ = __str__
-
-
-class request4:
-    def __init__(self, O1, O2, O3, O4, priority):
-        self.O1 = O1
-        self.O2 = O2
-        self.O3 = O3
-        self.O4 = O4
-        self.priority = priority
-
-    def __str__(self):
-        return "bp.sync({request:[" + str(self.O1) + "," + str(self.O2) + "," + str(self.O3) + "," + str(self.O4) + "]}," + str(self.priority) + ");"
-
-    __repr__ = __str__
-
-
-class O:
+class Concrete_O:
     def __init__(self, pos1, pos2):
         self.pos1 = pos1
         self.pos2 = pos2
@@ -332,172 +341,184 @@ def rootFunc(btl1,btl2,btf1,btf2,btf3,btf4,btf5,bt1,bt2,bt3):
     return root(btl1,btl2,btf1,btf2,btf3,btf4,btf5,bt1,bt2,bt3)
 
 
-def btlFunc3(while_true_l3):
-    return btl(while_true_l3)
+def btAFunc(while_trueA):
+    return btA(while_trueA)
 
 
-def btfFunc1(while_true_f1):
-    return btf(while_true_f1)
+def btBFunc(while_trueB):
+    return btB(while_trueB)
 
 
-def btfFunc2(while_true_f2):
-    return btf(while_true_f2)
+def btCFunc(while_trueC):
+    return btC(while_trueC)
 
 
-def btfFunc3(while_true_f3):
-    return btf(while_true_f3)
+def while_trueA_0(request):
+    return while_trueA([], request)
 
 
-def btFunc(while_true):
-    return bt(while_true)
+def while_trueA_1(wait1, request):
+    return while_trueA([wait1], request)
 
-# while_truel3
-def while_truel3Func1(waitforl1, waitforl2, requestl):
-    return while_truel3(waitforl1, waitforl2, requestl)
 
+def while_trueA_2(wait1, wait2, request):
+    return while_trueA([wait1, wait2], request)
 
-def while_truel3Func2(waitforl1, waitforl2, requestl):
-    return while_truel3(waitforl1, waitforl2, requestl)
 
+def while_trueB_0(request):
+    return while_trueB([], request)
 
-def while_truel3Func3(waitforl1, waitforl2, requestl):
-    return while_truel3(waitforl1, waitforl2, requestl)
 
+def while_trueB_1(wait1, request):
+    return while_trueB([wait1], request)
 
-def while_truel3Func4(waitforl1, waitforl2, requestl):
-    return while_truel3(waitforl1, waitforl2, requestl)
-# done while_truel3
 
-# while_truef1
-def while_truef1Func1(request):
-    return while_truef1(request)
+def while_trueB_2(wait1, wait2, request):
+    return while_trueB([wait1, wait2], request)
 
 
-def while_truef1Func2(request):
-    return while_truef1(request)
+def while_trueC_0(request):
+    return while_trueC([], request)
 
 
-def while_truef1Func3(request):
-    return while_truef1(request)
+def while_trueC_1(wait1, request):
+    return while_trueC([wait1], request)
 
 
-def while_truef1Func4(request):
-    return while_truef1(request)
-# done while_truef1
+def while_trueC_2(wait1, wait2, request):
+    return while_trueC([wait1, wait2], request)
 
-# while_truef2
-def while_truef2Func1(waitforf, request):
-    return while_truef2(waitforf, request)
 
+def wait02_1(ev1):
+    return wait02([ev1])
 
-def while_truef2Func2(waitforf, request):
-    return while_truef2(waitforf, request)
 
+def wait02_2(ev1, ev2):
+    return wait02([ev1, ev2])
 
-def while_truef2Func3(waitforf, request):
-    return while_truef2(waitforf, request)
 
+def wait02_3(ev1, ev2, ev3):
+    return wait02([ev1, ev2, ev3])
 
-def while_truef2Func4(waitforf, request):
-    return while_truef2(waitforf, request)
-# done while_truef2
 
-# while_truef3
-def while_truef3Func1(waitforf1, waitforf2, request):
-    return while_truef3(waitforf1, waitforf2, request)
+def wait02_4(ev1, ev2, ev3, ev4):
+    return wait02([ev1, ev2, ev3, ev4])
 
 
-def while_truef3Func2(waitforf1, waitforf2, request):
-    return while_truef3(waitforf1, waitforf2, request)
+def wait01_1(ev1):
+    return wait01([ev1])
 
 
-def while_truef3Func3(waitforf1, waitforf2, request):
-    return while_truef3(waitforf1, waitforf2, request)
+def wait01_2(ev1, ev2):
+    return wait01([ev1, ev2])
 
 
-def while_truef3Func4(waitforf1, waitforf2, request):
-    return while_truef3(waitforf1, waitforf2, request)
-# done while_truef3
+def wait01_3(ev1, ev2, ev3):
+    return wait01([ev1, ev2, ev3])
 
 
-def while_trueFunc1(request):
-    return whiletrue(request)
+def wait01_4(ev1, ev2, ev3, ev4):
+    return wait01([ev1, ev2, ev3, ev4])
 
 
-def while_trueFunc2(request):
-    return whiletrue(request)
+def waitC_1(ev1):
+    return waitC([ev1])
 
 
-def while_trueFunc3(request):
-    return whiletrue(request)
+def waitC_2(ev1, ev2):
+    return waitC([ev1, ev2])
 
 
-def while_trueFunc4(request):
-    return whiletrue(request)
+def waitC_3(ev1, ev2, ev3):
+    return waitC([ev1, ev2, ev3])
 
 
-def wait_forlFuncX(xl):
-    return wait_forl(xl)
+def waitC_4(ev1, ev2, ev3, ev4):
+    return waitC([ev1, ev2, ev3, ev4])
 
 
-def wait_forlFuncO(ol):
-    return wait_forl(ol)
+def request02_1(ev1, prio):
+    return request02([ev1], prio)
 
 
-def wait_forfFuncX(xf):
-    return wait_forf(xf)
+def request02_2(ev1, ev2, prio):
+    return request02([ev1, ev2], prio)
 
 
-# request
-def request1Func(o, priority):
-    return request1(o, priority)
+def request02_3(ev1, ev2, ev3, prio):
+    return request02([ev1, ev2, ev3], prio)
 
 
-def request2Func(o1, o2, priority):
-    return request2(o1, o2, priority)
+def request02_4(ev1, ev2, ev3, ev4, prio):
+    return request02([ev1, ev2, ev3, ev4], prio)
 
 
-def request3Func(o1, o2, o3, priority):
-    return request3(o1, o2, o3, priority)
+def request01_1(ev1, prio):
+    return request01([ev1], prio)
 
 
-def request4Func(o1, o2, o3, o4, priority):
-    return request4(o1, o2, o3, o4, priority)
-# done request
+def request01_2(ev1, ev2, prio):
+    return request01([ev1, ev2], prio)
 
 
-# requestl
-def requestl1Func(o, priority):
-    return requestl1(o, priority)
+def request01_3(ev1, ev2, ev3, prio):
+    return request01([ev1, ev2, ev3], prio)
 
 
-def requestl2Func(o1, o2, priority):
-    return requestl2(o1, o2, priority)
+def request01_4(ev1, ev2, ev3, ev4, prio):
+    return request01([ev1, ev2, ev3, ev4], prio)
 
 
-def requestl3Func(o1, o2, o3, priority):
-    return requestl3(o1, o2, o3, priority)
+def requestC_1(ev1, prio):
+    return requestC([ev1], prio)
 
 
-def requestl4Func(o1, o2, o3, o4, priority):
-    return requestl4(o1, o2, o3, o4, priority)
-# done requestl
+def requestC_2(ev1, ev2, prio):
+    return requestC([ev1, ev2], prio)
 
 
-def xlFunc(pos1):
-    return Xl(pos1, pos1)
+def requestC_3(ev1, ev2, ev3, prio):
+    return requestC([ev1, ev2, ev3], prio)
 
 
-def xfFunc(pos1):
-    return Xf(pos1, pos1)
+def requestC_4(ev1, ev2, ev3, ev4, prio):
+    return requestC([ev1, ev2, ev3, ev4], prio)
 
 
-def olFunc(pos1):
-    return Ol(pos1, pos1)
+def Perm02_X_Func(pos1):
+    return Perm02_X(pos1)
 
 
-def oFunc(pos1, pos2):
-    return O(pos1, pos2)
+def Perm02_O_Func(pos1):
+    return Perm02_O(pos1)
+
+
+def Perm02_Func(other):
+    return Perm02(other)
+
+
+def Perm01_X_Func(pos1):
+    return Perm01_X(pos1)
+
+
+def Perm01_O_Func(pos1):
+    return Perm01_O(pos1)
+
+
+def Perm01_Func(other):
+    return Perm01(other)
+
+
+def Concrete_X_Func(pos1, pos2):
+    return Concrete_X(pos1, pos2)
+
+
+def Concrete_O_Func(pos1, pos2):
+    return Concrete_O(pos1, pos2)
+
+
+def Concrete_Func(other):
+    return Concrete(other)
 
 
 def posFunc(pos):

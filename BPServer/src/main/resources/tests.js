@@ -174,3 +174,68 @@ bp.registerBThread("Sides", function () {
 });
 
 
+bp.registerBThread("AddThirdO(<" + f[p[0]].x + "," + f[p[0]].y + ">," + "<" + f[p[1]].x + "," + f[p[1]].y + ">," + "<" + f[p[2]].x + "," + f[p[2]].y + ">)", function () {
+    while (true) {
+        bp.sync({waitFor: [O(2, 1), X(1, 0), O(0, 1)]});
+        bp.sync({request: [O(f[p[2]].x, f[p[2]].y), O(f[p[0]].x, f[p[0]].y), O(f[p[2]].x, f[p[2]].y)]}, 8);
+    }
+});
+bp.registerBThread("PreventThirdX(<" + f[p[0]].x + "," + f[p[0]].y + ">," + "<" + f[p[1]].x + "," + f[p[1]].y + ">," + "<" + f[p[2]].x + "," + f[p[2]].y + ">)", function () {
+    while (true) {
+        bp.sync({waitFor: [O(f[p[2]].x, f[p[2]].y)]});
+        bp.sync({waitFor: [O(2, 2), O(2, 1), O(2, 2), X(1, 2)]});
+        bp.sync({request: [O(2, 1)]}, 3);
+    }
+});
+bp.registerBThread("PreventFork22X(<" + f[p[0]].x + "," + f[p[0]].y + ">," + "<" + f[p[1]].x + "," + f[p[1]].y + ">)", function () {
+    while (true) {
+        bp.sync({waitFor: [O(f[p[1]].x, f[p[1]].y), X(f[p[0]].x, f[p[0]].y), O(f[p[1]].x, f[p[1]].y), X(f[p[0]].x, f[p[0]].y)]});
+        bp.sync({waitFor: [O(1, 0)]});
+        bp.sync({request: [O(0, 2), O(0, 1)]}, 10);
+    }
+});
+bp.registerBThread("PreventFork02X(<" + f[p[0]].x + "," + f[p[0]].y + ">," + "<" + f[p[1]].x + "," + f[p[1]].y + ">)", function () {
+    while (true) {
+        bp.sync({waitFor: [O(f[p[1]].x, f[p[1]].y), X(f[p[1]].x, f[p[1]].y)]});
+        bp.sync({waitFor: [O(f[p[1]].x, f[p[1]].y)]});
+        bp.sync({request: [O(f[p[1]].x, f[p[1]].y), O(f[p[0]].x, f[p[0]].y), O(f[p[1]].x, f[p[1]].y)]}, 9);
+    }
+});
+bp.registerBThread("PreventFork20X(<" + f[p[0]].x + "," + f[p[0]].y + ">," + "<" + f[p[1]].x + "," + f[p[1]].y + ">)", function () {
+    while (true) {
+        bp.sync({request: [O(1, 2), O(2, 1), O(2, 1), O(1, 0)]}, 3);
+    }
+});
+bp.registerBThread("PreventFork00X(<" + f[p[0]].x + "," + f[p[0]].y + ">," + "<" + f[p[1]].x + "," + f[p[1]].y + ">)", function () {
+    while (true) {
+        bp.sync({waitFor: [O(2, 1)]});
+        bp.sync({waitFor: [X(f[p[1]].x, f[p[1]].y), X(f[p[0]].x, f[p[0]].y)]});
+        bp.sync({request: [O(f[p[0]].x, f[p[0]].y), O(f[p[0]].x, f[p[0]].y)]}, 4);
+    }
+});
+bp.registerBThread("PreventForkdiagX(<" + f[p[0]].x + "," + f[p[0]].y + ">," + "<" + f[p[1]].x + "," + f[p[1]].y + ">)", function () {
+    while (true) {
+        bp.sync({waitFor: [O(0, 0), O(0, 1), X(2, 0)]});
+        bp.sync({waitFor: [O(f[p[1]].x, f[p[1]].y), X(f[p[1]].x, f[p[1]].y), X(f[p[0]].x, f[p[0]].y)]});
+        bp.sync({request: [O(f[p[1]].x, f[p[1]].y), O(f[p[0]].x, f[p[0]].y)]}, 3);
+    }
+});
+bp.registerBThread("Center", function () {
+    while (true) {
+        bp.sync({waitFor: [X(2, 2), X(1, 2), O(2, 2), X(1, 1)]});
+        bp.sync({waitFor: [O(2, 2), X(2, 1), O(2, 2)]});
+        bp.sync({request: [O(1, 1), O(1, 0), O(2, 0)]}, 10);
+    }
+});
+bp.registerBThread("Corners", function () {
+    while (true) {
+        bp.sync({request: [O(1, 2), O(0, 1)]}, 10);
+    }
+});
+bp.registerBThread("Sides", function () {
+    while (true) {
+        bp.sync({waitFor: [X(1, 1)]});
+        bp.sync({waitFor: [O(2, 1)]});
+        bp.sync({request: [O(0, 2), O(2, 1), O(1, 1), O(0, 0)]}, 11);
+    }
+});

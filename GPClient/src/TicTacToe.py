@@ -2,8 +2,6 @@ import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import List, Any
-#import pygraphviz as pgv
-import os
 import matplotlib.pyplot as plt
 import numpy
 from deap import algorithms
@@ -12,7 +10,7 @@ from deap import creator
 from deap import tools
 from deap import gp
 from deap.gp import PrimitiveSetTyped
-from Client import calculate_fitness, send_stop, send_proto_request
+from Client import send_proto_request
 from Client import send_request
 from TTTclasses import *
 import bp_pb2
@@ -20,7 +18,7 @@ import socket
 import pandas as pd
 
 # Define global arguments
-NUMBER_OF_GENERATIONS = 40
+NUMBER_OF_GENERATIONS = 300
 POPULATION_SIZE = 100
 AVERAGES = []
 MAXIMUMS = []
@@ -94,64 +92,117 @@ def eval_generator(individual):
     document_individual(individual, indv.id, fitness, results.wins, results.draws, results.losses, results.blocks_violations, results.misses, results.blocks, results.deadlocks, func_string)
     return fitness,
 
+
+# Grammar Setup
 pset = PrimitiveSetTyped("main", [root], root_wrapper)
 pset.addPrimitive(root_wrapperFunc, [root], root_wrapper)
-pset.addPrimitive(rootFunc, [btl, btl, btf, btf, btf, btf, btf, bt, bt, bt], root)
+pset.addPrimitive(rootFunc, [btA, btA, btB, btB, btB, btB, btB, btC, btC, btC], root)
 
-pset.addPrimitive(btlFunc3, [while_truel3], btl)
+# BThreads
+pset.addPrimitive(btAFunc, [while_trueA], btA)
+pset.addPrimitive(btBFunc, [while_trueB], btB)
+pset.addPrimitive(btCFunc, [while_trueC], btC)
 
-pset.addPrimitive(btfFunc1, [while_truef1], btf)
-pset.addPrimitive(btfFunc2, [while_truef2], btf)
-pset.addPrimitive(btfFunc3, [while_truef3], btf)
+# Loop for BT1
+# 0 Waits
+pset.addPrimitive(while_trueA_0, [request02], while_trueA)
+pset.addPrimitive(while_trueA_0, [requestC], while_trueA)
+# 1 Waits
+pset.addPrimitive(while_trueA_1, [wait02, request02], while_trueA)
+pset.addPrimitive(while_trueA_1, [wait02, requestC], while_trueA)
+pset.addPrimitive(while_trueA_1, [waitC, request02], while_trueA)
+pset.addPrimitive(while_trueA_1, [waitC, requestC], while_trueA)
+# 2 Waits
+pset.addPrimitive(while_trueA_2, [wait02, wait02, request02], while_trueA)
+pset.addPrimitive(while_trueA_2, [wait02, wait02, requestC], while_trueA)
+pset.addPrimitive(while_trueA_2, [wait02, waitC, request02], while_trueA)
+pset.addPrimitive(while_trueA_2, [wait02, waitC, requestC], while_trueA)
+pset.addPrimitive(while_trueA_2, [waitC, wait02, request02], while_trueA)
+pset.addPrimitive(while_trueA_2, [waitC, wait02, requestC], while_trueA)
+pset.addPrimitive(while_trueA_2, [waitC, waitC, request02], while_trueA)
+pset.addPrimitive(while_trueA_2, [waitC, waitC, requestC], while_trueA)
 
-pset.addPrimitive(btFunc, [whiletrue], bt)
+# Loop for BT2
+# 0 Waits
+pset.addPrimitive(while_trueB_0, [request01], while_trueB)
+pset.addPrimitive(while_trueB_0, [requestC], while_trueB)
+# 1 Waits
+pset.addPrimitive(while_trueB_1, [wait01, request01], while_trueB)
+pset.addPrimitive(while_trueB_1, [wait01, requestC], while_trueB)
+pset.addPrimitive(while_trueB_1, [waitC, request01], while_trueB)
+pset.addPrimitive(while_trueB_1, [waitC, requestC], while_trueB)
+# 2 Waits
+pset.addPrimitive(while_trueB_2, [wait01, wait01, request01], while_trueB)
+pset.addPrimitive(while_trueB_2, [wait01, wait01, requestC], while_trueB)
+pset.addPrimitive(while_trueB_2, [wait01, waitC, request01], while_trueB)
+pset.addPrimitive(while_trueB_2, [wait01, waitC, requestC], while_trueB)
+pset.addPrimitive(while_trueB_2, [waitC, wait01, request01], while_trueB)
+pset.addPrimitive(while_trueB_2, [waitC, wait01, requestC], while_trueB)
+pset.addPrimitive(while_trueB_2, [waitC, waitC, request01], while_trueB)
+pset.addPrimitive(while_trueB_2, [waitC, waitC, requestC], while_trueB)
 
-pset.addPrimitive(while_truel3Func1, [wait_forl, wait_forl, requestl1], while_truel3)
-pset.addPrimitive(while_truel3Func2, [wait_forl, wait_forl, requestl2], while_truel3)
-pset.addPrimitive(while_truel3Func3, [wait_forl, wait_forl, requestl3], while_truel3)
-pset.addPrimitive(while_truel3Func4, [wait_forl, wait_forl, requestl4], while_truel3)
+# Loop for BT3
+# 0 Waits
+pset.addPrimitive(while_trueC_0, [requestC], while_trueC)
+# 1 Waits
+pset.addPrimitive(while_trueC_1, [waitC, requestC], while_trueC)
+# 2 Waits
+pset.addPrimitive(while_trueC_2, [waitC, waitC, requestC], while_trueC)
 
-pset.addPrimitive(while_truef1Func1, [request1], while_truef1)
-pset.addPrimitive(while_truef1Func2, [request2], while_truef1)
-pset.addPrimitive(while_truef1Func3, [request3], while_truef1)
-pset.addPrimitive(while_truef1Func4, [request4], while_truef1)
+# Wait Permutation of 0-2:
+pset.addPrimitive(wait02_1, [Perm02], wait02)
+pset.addPrimitive(wait02_2, [Perm02, Perm02], wait02)
+pset.addPrimitive(wait02_3, [Perm02, Perm02, Perm02], wait02)
+pset.addPrimitive(wait02_4, [Perm02, Perm02, Perm02, Perm02], wait02)
 
-pset.addPrimitive(while_truef2Func1, [wait_forf, request1], while_truef2)
-pset.addPrimitive(while_truef2Func2, [wait_forf, request2], while_truef2)
-pset.addPrimitive(while_truef2Func3, [wait_forf, request3], while_truef2)
-pset.addPrimitive(while_truef2Func4, [wait_forf, request4], while_truef2)
+# Wait Permutation of 0-1
+pset.addPrimitive(wait01_1, [Perm01], wait01)
+pset.addPrimitive(wait01_2, [Perm01, Perm01], wait01)
+pset.addPrimitive(wait01_3, [Perm01, Perm01, Perm01], wait01)
+pset.addPrimitive(wait01_4, [Perm01, Perm01, Perm01, Perm01], wait01)
 
-pset.addPrimitive(while_truef3Func1, [wait_forf, wait_forf, request1], while_truef3)
-pset.addPrimitive(while_truef3Func2, [wait_forf, wait_forf, request2], while_truef3)
-pset.addPrimitive(while_truef3Func3, [wait_forf, wait_forf, request3], while_truef3)
-pset.addPrimitive(while_truef3Func4, [wait_forf, wait_forf, request4], while_truef3)
+# Wait Concrete
+pset.addPrimitive(waitC_1, [Concrete], waitC)
+pset.addPrimitive(waitC_2, [Concrete, Concrete], waitC)
+pset.addPrimitive(waitC_3, [Concrete, Concrete, Concrete], waitC)
+pset.addPrimitive(waitC_4, [Concrete, Concrete, Concrete, Concrete], waitC)
 
-pset.addPrimitive(while_trueFunc1, [request1], whiletrue)
-pset.addPrimitive(while_trueFunc2, [request2], whiletrue)
-pset.addPrimitive(while_trueFunc3, [request3], whiletrue)
-pset.addPrimitive(while_trueFunc4, [request4], whiletrue)
+# Request Permutation of 0-2
+pset.addPrimitive(request02_1, [Perm02_O, priority], request02)
+pset.addPrimitive(request02_2, [Perm02_O, Perm02_O, priority], request02)
+pset.addPrimitive(request02_3, [Perm02_O, Perm02_O, Perm02_O, priority], request02)
+pset.addPrimitive(request02_4, [Perm02_O, Perm02_O, Perm02_O, Perm02_O, priority], request02)
 
-pset.addPrimitive(wait_forlFuncX, [Xl], wait_forl)
-pset.addPrimitive(wait_forlFuncO, [Ol], wait_forl)
+# Request Permutation of 0-1
+pset.addPrimitive(request01_1, [Perm01_O, priority], request01)
+pset.addPrimitive(request01_2, [Perm01_O, Perm01_O, priority], request01)
+pset.addPrimitive(request01_3, [Perm01_O, Perm01_O, Perm01_O, priority], request01)
+pset.addPrimitive(request01_4, [Perm01_O, Perm01_O, Perm01_O, Perm01_O, priority], request01)
 
-pset.addPrimitive(wait_forfFuncX, [Xf], wait_forf)
+# Request Concrete
+pset.addPrimitive(requestC_1, [Concrete_O, priority], requestC)
+pset.addPrimitive(requestC_2, [Concrete_O, Concrete_O, priority], requestC)
+pset.addPrimitive(requestC_3, [Concrete_O, Concrete_O, Concrete_O, priority], requestC)
+pset.addPrimitive(requestC_4, [Concrete_O, Concrete_O, Concrete_O, Concrete_O, priority], requestC)
 
-pset.addPrimitive(request1Func, [O, priority], request1)
-pset.addPrimitive(request2Func, [O, O, priority], request2)
-pset.addPrimitive(request3Func, [O, O, O, priority], request3)
-pset.addPrimitive(request4Func, [O, O, O, O, priority], request4)
+# Permutation of 0-2
+pset.addPrimitive(Perm02_X_Func, [position], Perm02_X)
+pset.addPrimitive(Perm02_O_Func, [position], Perm02_O)
+pset.addPrimitive(Perm02_X_Func, [position], Perm02)
+pset.addPrimitive(Perm02_O_Func, [position], Perm02)
 
-pset.addPrimitive(requestl1Func, [Ol, priority], requestl1)
-pset.addPrimitive(requestl2Func, [Ol, Ol, priority], requestl2)
-pset.addPrimitive(requestl3Func, [Ol, Ol, Ol, priority], requestl3)
-pset.addPrimitive(requestl4Func, [Ol, Ol, Ol, Ol, priority], requestl4)
+# Permutation of 0-1
+pset.addPrimitive(Perm01_X_Func, [positionf], Perm01_X)
+pset.addPrimitive(Perm01_O_Func, [positionf], Perm01_O)
+pset.addPrimitive(Perm01_X_Func, [positionf], Perm01)
+pset.addPrimitive(Perm01_O_Func, [positionf], Perm01)
 
-pset.addPrimitive(xlFunc, [position], Xl)
-pset.addPrimitive(olFunc, [position], Ol)
+# Concrete of 0-2
+pset.addPrimitive(Concrete_X_Func, [position, position], Concrete_X)
+pset.addPrimitive(Concrete_O_Func, [position, position], Concrete_O)
+pset.addPrimitive(Concrete_X_Func, [position, position], Concrete)
+pset.addPrimitive(Concrete_O_Func, [position, position], Concrete)
 
-pset.addPrimitive(xfFunc, [positionf], Xf)
-
-pset.addPrimitive(oFunc, [position, position], O)
 
 pset.addPrimitive(posFunc, [position], position)
 pset.addPrimitive(posfFunc, [positionf], positionf)
@@ -321,6 +372,6 @@ if __name__ == "__main__":
     ip = socket.gethostbyname(socket.gethostname())
     print("Python IP - " + ip)
 
-    bla, log = run_experiment(0.7, 0.001, "TTT SimulationRunOrg3")
-    df.to_csv("log3.csv")
+    bla, log = run_experiment(0.7, 0.001, "TTT SimulationRunOrg4")
+    df.to_csv("log4.csv")
 

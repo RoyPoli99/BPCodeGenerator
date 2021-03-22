@@ -20,7 +20,7 @@ import socket
 import pandas as pd
 
 # Define global arguments
-NUMBER_OF_GENERATIONS = 400
+NUMBER_OF_GENERATIONS = 40
 POPULATION_SIZE = 100
 AVERAGES = []
 MAXIMUMS = []
@@ -39,16 +39,26 @@ df = pd.DataFrame({'Generation': [],
                    'Wins': [],
                    'Losses': [],
                    'Draws': [],
-                   'Blocks': [],
+                   'Block_Violations': [],
                    'Misses': [],
-                   'Length': [],
+                   'Blocks': [],
+                   'Deadlocks': [],
                    'Code': []})
 
-def results_to_fitness(wins, draws, losses, blocks, misses):
-    return 10 * (3 * wins + draws - losses - blocks - 2 * misses)
+
+def results_to_fitness(wins, wins_misses, blocks, block_misses, deadlocks):
+    try:
+        win_stat = wins / (wins + wins_misses)
+    except:
+        win_stat = 1
+    try:
+        block_stat = blocks / (blocks + block_misses)
+    except:
+        block_stat = 1
+    return 50 * win_stat + 50 * block_stat - deadlocks
 
 
-def document_individual(individual, curr_id, fitness, wins, draws, losses, blocks, misses, length, code):
+def document_individual(individual, curr_id, fitness, wins, draws, losses, blocks_v, misses, blocks, deadlocks, code):
     # tree
     #nodes, edges, labels = gp.graph(individual)
     #g = pgv.AGraph()
@@ -65,7 +75,7 @@ def document_individual(individual, curr_id, fitness, wins, draws, losses, block
     #g.draw(folder_name + "/" + img_name)
     # stats
     with lock:
-        df.loc[len(df)] = [CURR_GEN, curr_id, fitness, wins, draws, losses, blocks, misses, length, code]
+        df.loc[len(df)] = [CURR_GEN, curr_id, fitness, wins, draws, losses, blocks_v, misses, blocks, deadlocks, code]
 
 
 # Send to BPServer to evaluate
@@ -80,8 +90,8 @@ def eval_generator(individual):
         indv.id = INDV_ID
     indv.code.code = func_string
     results = send_proto_request(indv)
-    fitness = results_to_fitness(results.wins, results.draws, results.losses, results.blocks, results.misses)
-    document_individual(individual, indv.id, fitness, results.wins, results.draws, results.losses, results.blocks, results.misses, results.lengths, func_string)
+    fitness = results_to_fitness(results.wins, results.misses, results.blocks, results.blocks_violations, results.deadlocks)
+    document_individual(individual, indv.id, fitness, results.wins, results.draws, results.losses, results.blocks_violations, results.misses, results.blocks, results.deadlocks, func_string)
     return fitness,
 
 pset = PrimitiveSetTyped("main", [root], root_wrapper)
@@ -223,7 +233,7 @@ def save_results(log):
     x = 0
 
 
-def time_stat():
+def time_stat(indv):
     global prev_time
     curr = time.time()
     diff = curr - prev_time
@@ -239,7 +249,7 @@ def run_experiment(cross_over_p, mutation_p, experiment_name):
     stats.register("min", numpy.min)
     stats.register("max", numpy.max)
     prev_time = time.time()
-    stats.register("time", lambda x: time.time() - prev_time)
+    stats.register("time", time_stat)
     stats.register("plot", lambda x: real_time_plotter(experiment_name, x))
 
     # Run experiment
@@ -311,6 +321,6 @@ if __name__ == "__main__":
     ip = socket.gethostbyname(socket.gethostname())
     print("Python IP - " + ip)
 
-    bla, log = run_experiment(0.7, 0.001, "TTT SimulationRunOrg2")
-    df.to_csv("log2.csv")
+    bla, log = run_experiment(0.7, 0.001, "TTT SimulationRunOrg3")
+    df.to_csv("log3.csv")
 

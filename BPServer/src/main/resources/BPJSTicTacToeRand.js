@@ -263,6 +263,7 @@ function addAssertions(f, p) {
           bp.sync({request: bp.Event("BLOCK_VIOLATION")}, 110);
         } else {
           //blocked win
+          bp.sync({request: bp.Event("BLOCK")}, 110);
           return;
         }
       }

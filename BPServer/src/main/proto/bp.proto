@@ -19,9 +19,10 @@ message EvaluationResponse {
     double wins = 1;
     double draws = 2;
     double losses = 3;
-    double blocks = 4;
+    double blocks_violations = 4;
     double misses = 5;
-    double length = 6;
+    double blocks = 6;
+    double deadlocks = 7;
 }
 
 service EvaluationService {

@@ -3,10 +3,6 @@ package evoBP;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
-
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -16,7 +12,7 @@ public class RunnerEvaluatorOrg extends Evaluator {
     private static ExecutorService es = Executors.newCachedThreadPool();
 
     public RunnerEvaluatorOrg(String code, int gen, int id) {
-        super(code, gen, id, gen > 200 ? "opt" : "rand");
+        super(code, gen, id, gen > 500 ? "opt" : "rand");
     }
 
     @Override
@@ -26,9 +22,10 @@ public class RunnerEvaluatorOrg extends Evaluator {
                 .setWins(res[0])
                 .setLosses(res[1])
                 .setDraws(res[2])
-                .setBlocks(res[3])
+                .setBlocksViolations(res[3])
                 .setMisses(res[4])
-                .setLength(res[5])
+                .setBlocks(res[5])
+                .setDeadlocks(res[6])
                 .build();
     }
 
@@ -36,9 +33,9 @@ public class RunnerEvaluatorOrg extends Evaluator {
         AtomicInteger wins = new AtomicInteger();
         AtomicInteger losses = new AtomicInteger();
         AtomicInteger draws = new AtomicInteger();
-        AtomicInteger blocks = new AtomicInteger();
+        AtomicInteger blocks_violations = new AtomicInteger();
         AtomicInteger misses = new AtomicInteger();
-        AtomicInteger lengths = new AtomicInteger();
+        AtomicInteger blocks = new AtomicInteger();
         for (int i = 0; i < 50; i++) {
             InMemoryEventLoggingListener logger = new InMemoryEventLoggingListener();
             BProgramRunner brunner = new BProgramRunner(BProgramFactory());
@@ -59,20 +56,21 @@ public class RunnerEvaluatorOrg extends Evaluator {
                         draws.getAndIncrement();
                         break;
                     case "BLOCK_VIOLATION":
-                        blocks.getAndIncrement();
+                        blocks_violations.getAndIncrement();
                         break;
                     case "WIN_VIOLATION":
                         misses.getAndIncrement();
                         break;
+                    case "BLOCK":
+                        blocks.getAndIncrement();
+                        break;
                     case "X":
-                        lengths.getAndIncrement();
                         if(id == 1) {
                             Map<String, Number> data = (Map<String, Number>) ev.maybeData;
                             extra = "(" + data.get("row").intValue() + "," + data.get("col").intValue() + ")";
                         }
                         break;
                     case "O":
-                        lengths.getAndIncrement();
                         if(id == 1) {
                             Map<String, Number> data2 = (Map<String, Number>) ev.maybeData;
                             extra = "(" + data2.get("row").intValue() + "," + data2.get("col").intValue() + ")";
@@ -89,8 +87,8 @@ public class RunnerEvaluatorOrg extends Evaluator {
             }
         }
         //});
-        double traceNum = 50;
-        return new double[]{wins.get() / traceNum, losses.get() / traceNum, draws.get() / traceNum, blocks.get() / traceNum, misses.get() / traceNum, lengths.get() / traceNum};
+        double deadlocks = 50 - wins.get() - losses.get() - draws.get();
+        return new double[]{wins.get(), losses.get(), draws.get(), blocks_violations.get(), misses.get(), blocks.get(), deadlocks};
 
     }
 }

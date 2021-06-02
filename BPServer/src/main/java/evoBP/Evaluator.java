@@ -15,12 +15,12 @@ public abstract class Evaluator implements Callable<Bp.EvaluationResponse> {
     private static String opt_player;
     static {
         try {
-            rand_player = new Scanner(new File("resources/BPJSTicTacToeRand.js")).useDelimiter("\\Z").next();
+            rand_player = new Scanner(new File("resources/RandTicTacToeClean.js")).useDelimiter("\\Z").next();
             //rand_player = new Scanner(new File("resources/BPJSTicTacToe.js")).useDelimiter("\\Z").next();
             opt_player = new Scanner(new File("resources/BPJSTicTacToeOpt.js")).useDelimiter("\\Z").next();
         } catch (FileNotFoundException e) {
             try{
-                rand_player = new Scanner(new File("src/main/resources/BPJSTicTacToeRand.js")).useDelimiter("\\Z").next();
+                rand_player = new Scanner(new File("src/main/resources/RandTicTacToeClean.js")).useDelimiter("\\Z").next();
                 //rand_player = new Scanner(new File("src/main/resources/BPJSTicTacToe.js")).useDelimiter("\\Z").next();
                 opt_player = new Scanner(new File("src/main/resources/BPJSTicTacToeOpt.js")).useDelimiter("\\Z").next();
             } catch (FileNotFoundException e2) {
@@ -39,34 +39,25 @@ public abstract class Evaluator implements Callable<Bp.EvaluationResponse> {
         super();
         this.id = id;
         this.gen = gen;
-        String[] bthreads = code.split("\n");
         String player;
         if(playerType.equals("opt"))
             player = opt_player;
         else
             player = rand_player;
-        b_program = add_bthreads(bthreads, player);
-        /*
-        bprog = new StringBProgram(b_program);
-        var prio = new PrioritizedBSyncEventSelectionStrategy();
-        prio.setDefaultPriority(0);
-        bprog.setEventSelectionStrategy(prio);*/
+        b_program = add_bthreads(code, player);
     }
 
     protected abstract Bp.EvaluationResponse evaluate();
 
     @Override
     public final Bp.EvaluationResponse call() {
-        //System.out.println("Generation #" + gen + ": Evaluating individual #" + id);
         var res = evaluate();
-        //System.out.println("Generation #" + this.gen + ": Completed individual #" + this.id);
         return res;
     }
 
-    private static String add_bthreads(String[] btheads, String player_text) {
+    private static String add_bthreads(String code, String player_text) {
         String curr = player_text;
-        for(int i = 0; i <= 9; i++)
-            curr = curr.replaceAll("bThread" + i, btheads[i]);
+        curr = curr.replaceAll("CODE_GOES_HERE", code);
         return curr;
     }
 

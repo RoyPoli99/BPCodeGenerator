@@ -12,7 +12,7 @@ btNames = ["bp.registerBThread(\"AddThirdO(<\"+f[p[0]].x+\",\"+f[p[0]].y+\">,\"+
            "bp.registerBThread(\"Sides\",function(){"
            ]
 
-currentBtNameIndex = 0
+currentBtNameIndex = 1
 
 class root_wrapper:
     def __init__(self, root):
@@ -26,30 +26,35 @@ class root_wrapper:
 
 class root:
 
-    def __init__(self, btl1,btl2,btf1,btf2,btf3,btf4,btf5,bt1,bt2,bt3):
-        self.btl1 = btl1
-        self.btl2 = btl2
-        self.btf1 = btf1
-        self.btf2 = btf2
-        self.btf3 = btf3
-        self.btf4 = btf4
-        self.btf5 = btf5
-        self.bt1 = bt1
-        self.bt2 = bt2
-        self.bt3 = bt3
+    def __init__(self, bts):
+        num_of_bthreads = 0
+        for btG in bts:
+            num_of_bthreads += len(btG.bts)
+        self.num_of_bthreads = num_of_bthreads
+        self.bts = bts
 
     def __str__(self):
+        global currentBtNameIndex
+        currentBtNameIndex = 0
         res = ""
-        res += str(self.btl1)
-        res += str(self.btl2)
-        res += str(self.btf1)
-        res += str(self.btf2)
-        res += str(self.btf3)
-        res += str(self.btf4)
-        res += str(self.btf5)
-        res += str(self.bt1)
-        res += str(self.bt2)
-        res += str(self.bt3)
+        for btG in self.bts:
+            res += str(btG)
+
+        return str(res)
+
+    __repr__ = __str__
+
+
+class btGroup:
+
+    def __init__(self, bts):
+        self.bts = bts
+
+    def __str__(self):
+        global currentBtNameIndex
+        res = ""
+        for bt in self.bts:
+            res += str(bt)
         return str(res)
 
     __repr__ = __str__
@@ -87,8 +92,9 @@ class btC:
 
     def __str__(self):
         global currentBtNameIndex, btNames
-        currName = btNames[currentBtNameIndex]
-        currentBtNameIndex = (currentBtNameIndex + 1) % 10
+        x = currentBtNameIndex
+        currName = "bp.registerBThread(\"O_Player_Thread_" + str(currentBtNameIndex) + "\", function(){"
+        currentBtNameIndex = currentBtNameIndex + 1
         return currName + str(self.whiletrue) + "});\n"
 
     __repr__ = __str__
@@ -132,7 +138,7 @@ class while_trueC:
         for wait in self.waits:
             code_str += str(wait)
         code_str += str(self.request)
-        return "while(true){" + code_str + "}"
+        return code_str
     __repr__ = __str__
 
 
@@ -174,7 +180,7 @@ class waitC:
             code_str += str(event)
             code_str += ", "
         code_str = code_str[:-2]
-        return "bp.sync({waitFor:[" + code_str + "]});"
+        return "bp.sync({waitFor:[" + code_str + "]});\n"
     __repr__ = __str__
 
 
@@ -219,7 +225,7 @@ class requestC:
             code_str += str(event)
             code_str += ", "
         code_str = code_str[:-2]
-        return "bp.sync({request:[" + code_str + "]}," + str(self.priority) + ");"
+        return "bp.sync({request:[" + code_str + "]}," + str(self.priority) + ");\n"
     __repr__ = __str__
 
 
@@ -333,12 +339,32 @@ class priority:
     __repr__ = __str__
 
 
+class b_num:
+    def __init__(self, num):
+        self.num = num
+
+    def __str__(self):
+        return str(self.num)
+    __repr__ = __str__
+
+
 def root_wrapperFunc(root):
     return root_wrapper(root)
 
 
-def rootFunc(btl1,btl2,btf1,btf2,btf3,btf4,btf5,bt1,bt2,bt3):
-    return root(btl1,btl2,btf1,btf2,btf3,btf4,btf5,bt1,bt2,bt3)
+def rootFunc(*bts):
+    return root(bts)
+
+
+def btGroupFunc(*bts):
+    return btGroup(bts)
+
+
+def btGroupExpand(*groups):
+    bts = []
+    for group in groups:
+        bts = bts + list(group.bts)
+    return btGroup(bts)
 
 
 def btAFunc(while_trueA):
@@ -531,3 +557,7 @@ def posfFunc(pos):
 
 def priorityFunc(priority):
     return priority
+
+
+def b_numFunc(b_num):
+    return b_num

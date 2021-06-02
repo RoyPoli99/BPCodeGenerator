@@ -1,5 +1,10 @@
+import inspect
+import itertools
+import random
+import sys
 import threading
 import time
+from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from typing import List, Any
 import matplotlib.pyplot as plt
@@ -18,7 +23,7 @@ import socket
 import pandas as pd
 
 # Define global arguments
-NUMBER_OF_GENERATIONS = 300
+NUMBER_OF_GENERATIONS = 200
 POPULATION_SIZE = 100
 AVERAGES = []
 MAXIMUMS = []
@@ -33,6 +38,7 @@ prev_time = 0
 
 df = pd.DataFrame({'Generation': [],
                    'Individual': [],
+                   'BThreads_Number': [],
                    'Fitness': [],
                    'Wins': [],
                    'Losses': [],
@@ -56,24 +62,24 @@ def results_to_fitness(wins, wins_misses, blocks, block_misses, deadlocks):
     return 50 * win_stat + 50 * block_stat - deadlocks
 
 
-def document_individual(individual, curr_id, fitness, wins, draws, losses, blocks_v, misses, blocks, deadlocks, code):
+def document_individual(individual, curr_id, bthreads_num, fitness, wins, draws, losses, blocks_v, misses, blocks, deadlocks, code):
     # tree
-    #nodes, edges, labels = gp.graph(individual)
-    #g = pgv.AGraph()
-    #g.add_nodes_from(nodes)
-    #g.add_edges_from(edges)
-    #g.layout(prog="dot")
-    #for i in nodes:
+    # nodes, edges, labels = gp.graph(individual)
+    # g = pgv.AGraph()
+    # g.add_nodes_from(nodes)
+    # g.add_edges_from(edges)
+    # g.layout(prog="dot")
+    # for i in nodes:
     #    n = g.get_node(i)
     #    n.attr["label"] = labels[i]
-    #img_name = "gen_" + str(CURR_GEN) + ".png"
-    #folder_name = "../trees/Individual" + str(curr_id)
-    #if not os.path.exists(folder_name):
+    # img_name = "gen_" + str(CURR_GEN) + ".png"
+    # folder_name = "../trees/Individual" + str(curr_id)
+    # if not os.path.exists(folder_name):
     #    os.makedirs(folder_name)
-    #g.draw(folder_name + "/" + img_name)
+    # g.draw(folder_name + "/" + img_name)
     # stats
     with lock:
-        df.loc[len(df)] = [CURR_GEN, curr_id, fitness, wins, draws, losses, blocks_v, misses, blocks, deadlocks, code]
+        df.loc[len(df)] = [CURR_GEN, curr_id, bthreads_num, fitness, wins, draws, losses, blocks_v, misses, blocks, deadlocks, code]
 
 
 # Send to BPServer to evaluate
@@ -83,63 +89,132 @@ def eval_generator(individual):
     func_string = str(func(0).root)
     indv = bp_pb2.Individual()
     indv.generation = CURR_GEN
+    bthread_num = func(0).root.num_of_bthreads
     with lock:
         INDV_ID += 1
         indv.id = INDV_ID
     indv.code.code = func_string
     results = send_proto_request(indv)
     fitness = results_to_fitness(results.wins, results.misses, results.blocks, results.blocks_violations, results.deadlocks)
-    document_individual(individual, indv.id, fitness, results.wins, results.draws, results.losses, results.blocks_violations, results.misses, results.blocks, results.deadlocks, func_string)
+    document_individual(individual, indv.id, bthread_num, fitness, results.wins, results.draws, results.losses, results.blocks_violations, results.misses, results.blocks, results.deadlocks, func_string)
     return fitness,
+
+
+def generate_safe(pset, min_, max_, terminal_types, type_=None):
+    if type_ is None:
+        type_ = pset.ret
+    expr = []
+    height = random.randint(min_, max_)
+    stack = [(0, type_)]
+    while len(stack) != 0:
+        depth, type_ = stack.pop()
+
+        if type_ in terminal_types:
+            try:
+                term = random.choice(pset.terminals[type_])
+            except IndexError:
+                _, _, traceback = sys.exc_info()
+                raise IndexError("The gp.generate function tried to add "
+                                 "a terminal of type '%s', but there is "
+                                 "none available." % (type_,)).with_traceback(traceback)
+            if inspect.isclass(term):
+                term = term()
+            expr.append(term)
+        else:
+            try:
+                # Might not be respected if there is a type without terminal args
+                if height <= depth or (depth >= min_ and random.random() < pset.terminalRatio):
+                    primitives_with_only_terminal_args = [p for p in pset.primitives[type_] if
+                                                          all([arg in terminal_types for arg in p.args])]
+
+                    if len(primitives_with_only_terminal_args) == 0:
+                        prim = random.choice(pset.primitives[type_])
+                    else:
+                        prim = random.choice(primitives_with_only_terminal_args)
+                else:
+                    prim = random.choice(pset.primitives[type_])
+            except IndexError:
+                _, _, traceback = sys.exc_info()
+                raise IndexError("The gp.generate function tried to add "
+                                 "a primitive of type '%s', but there is "
+                                 "none available." % (type_,)).with_traceback(traceback)
+            expr.append(prim)
+            for arg in reversed(prim.args):
+                stack.append((depth + 1, arg))
+    return expr
+
+
+def cxOnePointBP(ind1, ind2):
+    """Randomly select crossover point in each individual and exchange each
+    subtree with the point as root between each individual.
+    :param ind1: First tree participating in the crossover.
+    :param ind2: Second tree participating in the crossover.
+    :returns: A tuple of two trees.
+    """
+    if len(ind1) < 2 or len(ind2) < 2:
+        # No crossover on single node tree
+        return ind1, ind2
+
+    # List all available primitive types in each individual
+    types1 = defaultdict(list)
+    types2 = defaultdict(list)
+    #if ind1.root.ret == __type__:
+        # Not STGP optimization
+     #   types1[__type__] = xrange(1, len(ind1))
+     #   types2[__type__] = xrange(1, len(ind2))
+     #   common_types = [__type__]
+    #else:
+    for idx, node in enumerate(ind1[1:], 1):
+        types1[node.ret].append(idx)
+    for idx, node in enumerate(ind2[1:], 1):
+        types2[node.ret].append(idx)
+    common_types = set(types1.keys()).intersection(set(types2.keys()))
+
+    if len(common_types) > 0:
+        # type_ = random.choice(list(common_types))
+        type_ = btC
+
+        index1 = random.choice(types1[type_])
+        index2 = random.choice(types2[type_])
+
+        slice1 = ind1.searchSubtree(index1)
+        slice2 = ind2.searchSubtree(index2)
+        ind1[slice1], ind2[slice2] = ind2[slice2], ind1[slice1]
+
+    return ind1, ind2
+
+
+def mutUniformBP(individual, expr, pset):
+    """Randomly select a point in the tree *individual*, then replace the
+    subtree at that point as a root by the expression generated using method
+    :func:`expr`.
+    :param individual: The tree to be mutated.
+    :param expr: A function object that can generate an expression when
+                 called.
+    :returns: A tuple of one tree.
+    """
+    index = random.randrange(len(individual))
+    slice_ = individual.searchSubtree(index)
+    type_ = individual[index].ret
+    individual[slice_] = expr(pset=pset, type_=type_)
+    return individual,
 
 
 # Grammar Setup
 pset = PrimitiveSetTyped("main", [root], root_wrapper)
 pset.addPrimitive(root_wrapperFunc, [root], root_wrapper)
-pset.addPrimitive(rootFunc, [btA, btA, btB, btB, btB, btB, btB, btC, btC, btC], root)
+pset.addPrimitive(rootFunc, [btGroup, btGroup, btGroup, btGroup, btGroup, btGroup, btGroup, btGroup, btGroup, btGroup], root)
+
+# bt Group
+#pset.addPrimitive(btGroupExpand, [btGroup, btGroup], btGroup)
+pset.addPrimitive(btGroupExpand, [btGroup, btGroup], btGroup)
+pset.addPrimitive(btGroupFunc, [btC], btGroup)
+pset.addPrimitive(btGroupFunc, [btC, btC, btC], btGroup)
+pset.addPrimitive(btGroupFunc, [btC, btC, btC, btC, btC], btGroup)
+#pset.addPrimitive(btGroupFunc, [btC, btC, btC, btC, btC, btC, btC, btC, btC, btC], btGroup)
 
 # BThreads
-pset.addPrimitive(btAFunc, [while_trueA], btA)
-pset.addPrimitive(btBFunc, [while_trueB], btB)
 pset.addPrimitive(btCFunc, [while_trueC], btC)
-
-# Loop for BT1
-# 0 Waits
-pset.addPrimitive(while_trueA_0, [request02], while_trueA)
-pset.addPrimitive(while_trueA_0, [requestC], while_trueA)
-# 1 Waits
-pset.addPrimitive(while_trueA_1, [wait02, request02], while_trueA)
-pset.addPrimitive(while_trueA_1, [wait02, requestC], while_trueA)
-pset.addPrimitive(while_trueA_1, [waitC, request02], while_trueA)
-pset.addPrimitive(while_trueA_1, [waitC, requestC], while_trueA)
-# 2 Waits
-pset.addPrimitive(while_trueA_2, [wait02, wait02, request02], while_trueA)
-pset.addPrimitive(while_trueA_2, [wait02, wait02, requestC], while_trueA)
-pset.addPrimitive(while_trueA_2, [wait02, waitC, request02], while_trueA)
-pset.addPrimitive(while_trueA_2, [wait02, waitC, requestC], while_trueA)
-pset.addPrimitive(while_trueA_2, [waitC, wait02, request02], while_trueA)
-pset.addPrimitive(while_trueA_2, [waitC, wait02, requestC], while_trueA)
-pset.addPrimitive(while_trueA_2, [waitC, waitC, request02], while_trueA)
-pset.addPrimitive(while_trueA_2, [waitC, waitC, requestC], while_trueA)
-
-# Loop for BT2
-# 0 Waits
-pset.addPrimitive(while_trueB_0, [request01], while_trueB)
-pset.addPrimitive(while_trueB_0, [requestC], while_trueB)
-# 1 Waits
-pset.addPrimitive(while_trueB_1, [wait01, request01], while_trueB)
-pset.addPrimitive(while_trueB_1, [wait01, requestC], while_trueB)
-pset.addPrimitive(while_trueB_1, [waitC, request01], while_trueB)
-pset.addPrimitive(while_trueB_1, [waitC, requestC], while_trueB)
-# 2 Waits
-pset.addPrimitive(while_trueB_2, [wait01, wait01, request01], while_trueB)
-pset.addPrimitive(while_trueB_2, [wait01, wait01, requestC], while_trueB)
-pset.addPrimitive(while_trueB_2, [wait01, waitC, request01], while_trueB)
-pset.addPrimitive(while_trueB_2, [wait01, waitC, requestC], while_trueB)
-pset.addPrimitive(while_trueB_2, [waitC, wait01, request01], while_trueB)
-pset.addPrimitive(while_trueB_2, [waitC, wait01, requestC], while_trueB)
-pset.addPrimitive(while_trueB_2, [waitC, waitC, request01], while_trueB)
-pset.addPrimitive(while_trueB_2, [waitC, waitC, requestC], while_trueB)
 
 # Loop for BT3
 # 0 Waits
@@ -149,35 +224,11 @@ pset.addPrimitive(while_trueC_1, [waitC, requestC], while_trueC)
 # 2 Waits
 pset.addPrimitive(while_trueC_2, [waitC, waitC, requestC], while_trueC)
 
-# Wait Permutation of 0-2:
-pset.addPrimitive(wait02_1, [Perm02], wait02)
-pset.addPrimitive(wait02_2, [Perm02, Perm02], wait02)
-pset.addPrimitive(wait02_3, [Perm02, Perm02, Perm02], wait02)
-pset.addPrimitive(wait02_4, [Perm02, Perm02, Perm02, Perm02], wait02)
-
-# Wait Permutation of 0-1
-pset.addPrimitive(wait01_1, [Perm01], wait01)
-pset.addPrimitive(wait01_2, [Perm01, Perm01], wait01)
-pset.addPrimitive(wait01_3, [Perm01, Perm01, Perm01], wait01)
-pset.addPrimitive(wait01_4, [Perm01, Perm01, Perm01, Perm01], wait01)
-
 # Wait Concrete
 pset.addPrimitive(waitC_1, [Concrete], waitC)
 pset.addPrimitive(waitC_2, [Concrete, Concrete], waitC)
 pset.addPrimitive(waitC_3, [Concrete, Concrete, Concrete], waitC)
 pset.addPrimitive(waitC_4, [Concrete, Concrete, Concrete, Concrete], waitC)
-
-# Request Permutation of 0-2
-pset.addPrimitive(request02_1, [Perm02_O, priority], request02)
-pset.addPrimitive(request02_2, [Perm02_O, Perm02_O, priority], request02)
-pset.addPrimitive(request02_3, [Perm02_O, Perm02_O, Perm02_O, priority], request02)
-pset.addPrimitive(request02_4, [Perm02_O, Perm02_O, Perm02_O, Perm02_O, priority], request02)
-
-# Request Permutation of 0-1
-pset.addPrimitive(request01_1, [Perm01_O, priority], request01)
-pset.addPrimitive(request01_2, [Perm01_O, Perm01_O, priority], request01)
-pset.addPrimitive(request01_3, [Perm01_O, Perm01_O, Perm01_O, priority], request01)
-pset.addPrimitive(request01_4, [Perm01_O, Perm01_O, Perm01_O, Perm01_O, priority], request01)
 
 # Request Concrete
 pset.addPrimitive(requestC_1, [Concrete_O, priority], requestC)
@@ -185,19 +236,8 @@ pset.addPrimitive(requestC_2, [Concrete_O, Concrete_O, priority], requestC)
 pset.addPrimitive(requestC_3, [Concrete_O, Concrete_O, Concrete_O, priority], requestC)
 pset.addPrimitive(requestC_4, [Concrete_O, Concrete_O, Concrete_O, Concrete_O, priority], requestC)
 
-# Permutation of 0-2
-pset.addPrimitive(Perm02_X_Func, [position], Perm02_X)
-pset.addPrimitive(Perm02_O_Func, [position], Perm02_O)
-pset.addPrimitive(Perm02_X_Func, [position], Perm02)
-pset.addPrimitive(Perm02_O_Func, [position], Perm02)
 
-# Permutation of 0-1
-pset.addPrimitive(Perm01_X_Func, [positionf], Perm01_X)
-pset.addPrimitive(Perm01_O_Func, [positionf], Perm01_O)
-pset.addPrimitive(Perm01_X_Func, [positionf], Perm01)
-pset.addPrimitive(Perm01_O_Func, [positionf], Perm01)
-
-# Concrete of 0-2
+# Concrete
 pset.addPrimitive(Concrete_X_Func, [position, position], Concrete_X)
 pset.addPrimitive(Concrete_O_Func, [position, position], Concrete_O)
 pset.addPrimitive(Concrete_X_Func, [position, position], Concrete)
@@ -207,6 +247,7 @@ pset.addPrimitive(Concrete_O_Func, [position, position], Concrete)
 pset.addPrimitive(posFunc, [position], position)
 pset.addPrimitive(posfFunc, [positionf], positionf)
 pset.addPrimitive(priorityFunc, [priority], priority)
+pset.addPrimitive(b_numFunc, [b_num], b_num)
 
 pset.addTerminal(0, position)
 pset.addTerminal(1, position)
@@ -215,17 +256,9 @@ pset.addTerminal(2, position)
 pset.addTerminal(0, positionf)
 pset.addTerminal(1, positionf)
 
-pset.addTerminal(1, priority)
-pset.addTerminal(2, priority)
-pset.addTerminal(3, priority)
-pset.addTerminal(4, priority)
-pset.addTerminal(5, priority)
-pset.addTerminal(6, priority)
-pset.addTerminal(7, priority)
-pset.addTerminal(8, priority)
-pset.addTerminal(9, priority)
-pset.addTerminal(10, priority)
-pset.addTerminal(11, priority)
+pset.addEphemeralConstant("rand100", lambda: random.randint(0, 99), priority)
+pset.addEphemeralConstant("rand50_150", lambda: random.randint(50, 150), b_num)
+
 
 
 # Define Individual and Fitness
@@ -234,7 +267,8 @@ creator.create("Individual", gp.PrimitiveTree, fitness=creator.FitnessMax, pset=
 
 # Define Toolbox
 toolbox = base.Toolbox()
-toolbox.register("expr", gp.genGrow, pset=pset, min_=6, max_=6)
+terminal_types = [positionf, position, priority]
+toolbox.register("expr", generate_safe, pset=pset, min_=4, max_=8, terminal_types=terminal_types)
 toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.expr)
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("compile", gp.compile, pset=pset)
@@ -246,13 +280,14 @@ toolbox.register("compile", gp.compile, pset=pset)
 
 # Define GP Operators
 toolbox.register("evaluate", eval_generator)
+# toolbox.register("select", tools.selRoulette)
 toolbox.register("select", tools.selTournament, tournsize=3)
-toolbox.register("mate", gp.cxOnePoint)
-toolbox.register("expr_mut", gp.genGrow, min_=6, max_=6)
-toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
+toolbox.register("mate", cxOnePointBP)
+toolbox.register("expr_mut", generate_safe, min_=4, max_=8, terminal_types=terminal_types)
+toolbox.register("mutate", mutUniformBP, expr=toolbox.expr_mut, pset=pset)
 
-executor = ThreadPoolExecutor()
-toolbox.register("map", executor.map)
+#executor = ThreadPoolExecutor()
+#toolbox.register("map", executor.map)
 
 
 def real_time_plotter(name, plot):
@@ -294,6 +329,7 @@ def time_stat(indv):
 def run_experiment(cross_over_p, mutation_p, experiment_name):
     global prev_time
     pop = toolbox.population(n=POPULATION_SIZE)
+    hof = tools.HallOfFame(3)
     stats = tools.Statistics(lambda ind: ind.fitness.values)
     stats.register("avg", numpy.mean)
     stats.register("std", numpy.std)
@@ -304,8 +340,11 @@ def run_experiment(cross_over_p, mutation_p, experiment_name):
     stats.register("plot", lambda x: real_time_plotter(experiment_name, x))
 
     # Run experiment
-    bla, log = algorithms.eaSimple(pop, toolbox, cxpb=cross_over_p, mutpb=mutation_p, ngen=NUMBER_OF_GENERATIONS,
-                                   stats=stats)
+    #bla, log = algorithms.eaSimple(pop, toolbox, cxpb=cross_over_p, mutpb=mutation_p, ngen=NUMBER_OF_GENERATIONS,
+    #                               stats=stats)
+
+    bla, log = eaSimpleWithElitism(pop, toolbox, cxpb=cross_over_p, mutpb=mutation_p, ngen=NUMBER_OF_GENERATIONS,
+                                   stats=stats, halloffame=hof)
 
     # Save results
     # save_results(log)
@@ -331,40 +370,64 @@ def normalize_str(string: str) -> List[str]:
     return str_norm
 
 
-# Generate abstract syntax tree from normalized input.
-def get_ast(input_norm: List[str]) -> List[Any]:
-    ast = []
-    # Go through each element in the input:
-    # - if it is an open parenthesis, find matching parenthesis and make recursive
-    #   call for content in-between. Add the result as an element to the current list.
-    # - if it is an atom, just add it to the current list.
-    i = 0
-    while i < len(input_norm):
-        symbol = input_norm[i]
-        if symbol == '(':
-            list_content = []
-            match_ctr = 1 # If 0, parenthesis has been matched.
-            while match_ctr != 0:
-                i += 1
-                if i >= len(input_norm):
-                    raise ValueError("Invalid input: Unmatched open parenthesis.")
-                symbol = input_norm[i]
-                if symbol == '(':
-                    match_ctr += 1
-                elif symbol == ')':
-                    match_ctr -= 1
-                if match_ctr != 0:
-                    list_content.append(symbol)
-            ast.append(get_ast(list_content))
-        elif symbol == ')':
-                raise ValueError("Invalid input: Unmatched close parenthesis.")
-        else:
-            try:
-                ast.append(int(symbol))
-            except ValueError:
-                ast.append(symbol)
-        i += 1
-    return ast
+def eaSimpleWithElitism(population, toolbox, cxpb, mutpb, ngen, stats=None,
+             halloffame=None, verbose=__debug__):
+    """This algorithm is similar to DEAP eaSimple() algorithm, with the modification that
+    halloffame is used to implement an elitism mechanism. The individuals contained in the
+    halloffame are directly injected into the next generation and are not subject to the
+    genetic operators of selection, crossover and mutation.
+    """
+    logbook = tools.Logbook()
+    logbook.header = ['gen', 'nevals'] + (stats.fields if stats else [])
+
+    # Evaluate the individuals with an invalid fitness
+    invalid_ind = [ind for ind in population if not ind.fitness.valid]
+    fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
+    for ind, fit in zip(invalid_ind, fitnesses):
+        ind.fitness.values = fit
+
+    if halloffame is None:
+        raise ValueError("halloffame parameter must not be empty!")
+
+    halloffame.update(population)
+    hof_size = len(halloffame.items) if halloffame.items else 0
+
+    record = stats.compile(population) if stats else {}
+    logbook.record(gen=0, nevals=len(invalid_ind), **record)
+    if verbose:
+        print(logbook.stream)
+
+    # Begin the generational process
+    for gen in range(1, ngen + 1):
+
+        # Select the next generation individuals
+        offspring = toolbox.select(population, len(population) - hof_size)
+
+        # Vary the pool of individuals
+        offspring = algorithms.varAnd(offspring, toolbox, cxpb, mutpb)
+
+        # Evaluate the individuals with an invalid fitness
+        invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
+        fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
+        for ind, fit in zip(invalid_ind, fitnesses):
+            ind.fitness.values = fit
+
+        # add the best back to population:
+        offspring.extend(halloffame.items)
+
+        # Update the hall of fame with the generated individuals
+        halloffame.update(offspring)
+
+        # Replace the current population by the offspring
+        population[:] = offspring
+
+        # Append the current generation statistics to the logbook
+        record = stats.compile(population) if stats else {}
+        logbook.record(gen=gen, nevals=len(invalid_ind), **record)
+        if verbose:
+            print(logbook.stream)
+
+    return population, logbook
 
 
 if __name__ == "__main__":
@@ -372,6 +435,6 @@ if __name__ == "__main__":
     ip = socket.gethostbyname(socket.gethostname())
     print("Python IP - " + ip)
 
-    bla, log = run_experiment(0.7, 0.001, "TTT SimulationRunOrg4")
-    df.to_csv("log4.csv")
+    bla, log = run_experiment(0.7, 0.001, "TTT SimulationRunOrg14")
+    df.to_csv("log14.csv")
 

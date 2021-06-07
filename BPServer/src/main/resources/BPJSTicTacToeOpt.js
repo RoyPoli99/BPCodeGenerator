@@ -376,6 +376,10 @@ function addAssertions(f, p) {
 	});
 }
 
+
+
+
+
 lines.forEach(function (l) {
 	perms.forEach(function (p) {
 		addAssertions(l, p);

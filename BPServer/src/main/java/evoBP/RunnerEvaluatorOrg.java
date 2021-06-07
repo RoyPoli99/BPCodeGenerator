@@ -26,6 +26,7 @@ public class RunnerEvaluatorOrg extends Evaluator {
                 .setMisses(res[4])
                 .setBlocks(res[5])
                 .setDeadlocks(res[6])
+                .setForks(res[7])
                 .build();
     }
 
@@ -36,6 +37,7 @@ public class RunnerEvaluatorOrg extends Evaluator {
         AtomicInteger blocks_violations = new AtomicInteger();
         AtomicInteger misses = new AtomicInteger();
         AtomicInteger blocks = new AtomicInteger();
+        AtomicInteger forks = new AtomicInteger();
         for (int i = 0; i < 50; i++) {
             InMemoryEventLoggingListener logger = new InMemoryEventLoggingListener();
             BProgramRunner brunner = new BProgramRunner(BProgramFactory());
@@ -60,6 +62,9 @@ public class RunnerEvaluatorOrg extends Evaluator {
                         break;
                     case "WIN_VIOLATION":
                         misses.getAndIncrement();
+                        break;
+                    case "FORK_VIOLATION":
+                        forks.getAndIncrement();
                         break;
                     case "BLOCK":
                         blocks.getAndIncrement();
@@ -88,7 +93,7 @@ public class RunnerEvaluatorOrg extends Evaluator {
         }
         //});
         double deadlocks = 50 - wins.get() - losses.get() - draws.get();
-        return new double[]{wins.get(), losses.get(), draws.get(), blocks_violations.get(), misses.get(), blocks.get(), deadlocks};
+        return new double[]{wins.get(), losses.get(), draws.get(), blocks_violations.get(), misses.get(), blocks.get(), deadlocks, forks.get()};
 
     }
 }

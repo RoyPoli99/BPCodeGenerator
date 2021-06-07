@@ -26,6 +26,7 @@ MINIMUMS = []
 MEDIANS = []
 CURR_GEN = 1
 INDV_ID = 0
+anomaly_dict = {}
 
 lock = threading.Lock()
 prev_time = 0
@@ -41,6 +42,7 @@ df = pd.DataFrame({'Generation': [],
                    'Misses': [],
                    'Blocks': [],
                    'Deadlocks': [],
+                   'Forks': [],
                    'Code': []})
 
 
@@ -56,7 +58,7 @@ def results_to_fitness(wins, wins_misses, blocks, block_misses, deadlocks):
     return 50 * win_stat + 50 * block_stat - deadlocks
 
 
-def document_individual(individual, curr_id, fitness, wins, draws, losses, blocks_v, misses, blocks, deadlocks, code):
+def document_individual(individual, curr_id, fitness, wins, draws, losses, blocks_v, misses, blocks, deadlocks, forks, code):
     # tree
     #nodes, edges, labels = gp.graph(individual)
     #g = pgv.AGraph()
@@ -73,7 +75,7 @@ def document_individual(individual, curr_id, fitness, wins, draws, losses, block
     #g.draw(folder_name + "/" + img_name)
     # stats
     with lock:
-        df.loc[len(df)] = [CURR_GEN, curr_id, fitness, wins, draws, losses, blocks_v, misses, blocks, deadlocks, code]
+        df.loc[len(df)] = [CURR_GEN, curr_id, fitness, wins, draws, losses, blocks_v, misses, blocks, deadlocks, forks, code]
 
 
 # Send to BPServer to evaluate
@@ -88,8 +90,9 @@ def eval_generator(individual):
         indv.id = INDV_ID
     indv.code.code = func_string
     results = send_proto_request(indv)
+    #anomaly_dict[""]
     fitness = results_to_fitness(results.wins, results.misses, results.blocks, results.blocks_violations, results.deadlocks)
-    document_individual(individual, indv.id, fitness, results.wins, results.draws, results.losses, results.blocks_violations, results.misses, results.blocks, results.deadlocks, func_string)
+    document_individual(individual, indv.id, fitness, results.wins, results.draws, results.losses, results.blocks_violations, results.misses, results.blocks, results.deadlocks, results.forks, func_string)
     return fitness,
 
 
@@ -226,6 +229,41 @@ pset.addTerminal(8, priority)
 pset.addTerminal(9, priority)
 pset.addTerminal(10, priority)
 pset.addTerminal(11, priority)
+
+
+def cxOnePoint(ind1, ind2):
+    if len(ind1) < 2 or len(ind2) < 2:
+        # No crossover on single node tree
+        return ind1, ind2
+
+    # List all available primitive types in each individual
+    types1 = defaultdict(list)
+    types2 = defaultdict(list)
+    if ind1.root.ret == __type__:
+        # Not STGP optimization
+        types1[__type__] = xrange(1, len(ind1))
+        types2[__type__] = xrange(1, len(ind2))
+        common_types = [__type__]
+    else:
+        for idx, node in enumerate(ind1[1:], 1):
+            types1[node.ret].append(idx)
+        for idx, node in enumerate(ind2[1:], 1):
+            types2[node.ret].append(idx)
+        common_types = set(types1.keys()).intersection(set(types2.keys()))
+
+    if len(common_types) > 0:
+        type_ = random.choice(list(common_types))
+
+        index1 = random.choice(types1[type_])
+        index2 = random.choice(types2[type_])
+
+        slice1 = ind1.searchSubtree(index1)
+        slice2 = ind2.searchSubtree(index2)
+        ind1[slice1], ind2[slice2] = ind2[slice2], ind1[slice1]
+
+    return ind1, ind2
+
+
 
 
 # Define Individual and Fitness

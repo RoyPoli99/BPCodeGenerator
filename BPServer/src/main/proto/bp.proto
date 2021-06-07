@@ -23,6 +23,7 @@ message EvaluationResponse {
     double misses = 5;
     double blocks = 6;
     double deadlocks = 7;
+    double forks = 8;
 }
 
 service EvaluationService {

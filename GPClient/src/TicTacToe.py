@@ -1,6 +1,8 @@
 import threading
 import time
+from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
+import random
 from typing import List, Any
 import matplotlib.pyplot as plt
 import numpy
@@ -18,7 +20,7 @@ import socket
 import pandas as pd
 
 # Define global arguments
-NUMBER_OF_GENERATIONS = 300
+NUMBER_OF_GENERATIONS = 100
 POPULATION_SIZE = 100
 AVERAGES = []
 MAXIMUMS = []
@@ -90,7 +92,7 @@ def eval_generator(individual):
         indv.id = INDV_ID
     indv.code.code = func_string
     results = send_proto_request(indv)
-    #anomaly_dict[""]
+    anomaly_dict[func_string] = (results.blocks_violations, results.misses, results.forks)
     fitness = results_to_fitness(results.wins, results.misses, results.blocks, results.blocks_violations, results.deadlocks)
     document_individual(individual, indv.id, fitness, results.wins, results.draws, results.losses, results.blocks_violations, results.misses, results.blocks, results.deadlocks, results.forks, func_string)
     return fitness,
@@ -231,7 +233,13 @@ pset.addTerminal(10, priority)
 pset.addTerminal(11, priority)
 
 
-def cxOnePoint(ind1, ind2):
+def cxOnePointBP(ind1, ind2):
+    """Randomly select crossover point in each individual and exchange each
+    subtree with the point as root between each individual.
+    :param ind1: First tree participating in the crossover.
+    :param ind2: Second tree participating in the crossover.
+    :returns: A tuple of two trees.
+    """
     if len(ind1) < 2 or len(ind2) < 2:
         # No crossover on single node tree
         return ind1, ind2
@@ -239,30 +247,83 @@ def cxOnePoint(ind1, ind2):
     # List all available primitive types in each individual
     types1 = defaultdict(list)
     types2 = defaultdict(list)
-    if ind1.root.ret == __type__:
-        # Not STGP optimization
-        types1[__type__] = xrange(1, len(ind1))
-        types2[__type__] = xrange(1, len(ind2))
-        common_types = [__type__]
-    else:
-        for idx, node in enumerate(ind1[1:], 1):
-            types1[node.ret].append(idx)
-        for idx, node in enumerate(ind2[1:], 1):
-            types2[node.ret].append(idx)
-        common_types = set(types1.keys()).intersection(set(types2.keys()))
+
+    for idx, node in enumerate(ind1[1:], 1):
+        types1[node.ret].append(idx)
+    for idx, node in enumerate(ind2[1:], 1):
+        types2[node.ret].append(idx)
+    # common_types = set(types1.keys()).intersection(set(types2.keys()))
+    common_types = [btA, btB, btC]
 
     if len(common_types) > 0:
-        type_ = random.choice(list(common_types))
+        func1 = toolbox.compile(expr=ind1)
+        func_string1 = str(func1(0).root)
+        func2 = toolbox.compile(expr=ind2)
+        func_string2 = str(func2(0).root)
+        try:
+            anomalies1 = anomaly_dict[func_string1]
+            anomalies2 = anomaly_dict[func_string2]
+            prob_weights1 = [50 - (anomalies1[0] + anomalies1[1]) / 4, 50 - anomalies1[2], 40]
+            prob_weights2 = [50 - (anomalies2[0] + anomalies2[1]) / 4, 50 - anomalies2[2], 40]
+            type1_ = random.choices(list(common_types), weights=prob_weights1)
+            type2_ = random.choices(list(common_types), weights=prob_weights2)
 
-        index1 = random.choice(types1[type_])
-        index2 = random.choice(types2[type_])
+            index1_1 = random.choice(types1[type1_])
+            index2_1 = random.choice(types2[type1_])
+            slice1_1 = ind1.searchSubtree(index1_1)
+            slice2_1 = ind2.searchSubtree(index2_1)
 
-        slice1 = ind1.searchSubtree(index1)
-        slice2 = ind2.searchSubtree(index2)
-        ind1[slice1], ind2[slice2] = ind2[slice2], ind1[slice1]
+            index1_2 = random.choice(types1[type2_])
+            index2_2 = random.choice(types2[type2_])
+            slice1_2 = ind1.searchSubtree(index1_2)
+            slice2_2 = ind2.searchSubtree(index2_2)
+
+            ind2[slice2_1], ind1[slice1_2] = ind1[slice1_1], ind2[slice2_2]
+            # ind1[slice1_2] = ind2[slice2_2]
+        except:
+            return ind1, ind2
+            # type_ = random.choice(list(common_types))
+            # type_ = btC
+
+            # index1 = random.choice(types1[type_])
+            # index2 = random.choice(types2[type_])
+
+            # slice1 = ind1.searchSubtree(index1)
+            # slice2 = ind2.searchSubtree(index2)
+            # ind1[slice1], ind2[slice2] = ind2[slice2], ind1[slice1]
 
     return ind1, ind2
 
+
+def mutUniformAnomaly(individual, expr, pset):
+    """Randomly select a point in the tree *individual*, then replace the
+    subtree at that point as a root by the expression generated using method
+    :func:`expr`.
+    :param individual: The tree to be mutated.
+    :param expr: A function object that can generate an expression when
+                 called.
+    :returns: A tuple of one tree.
+    """
+    func = toolbox.compile(expr=individual)
+    func_string = str(func(0).root)
+    try:
+        anomalies = anomaly_dict[func_string]
+        list_indv = list(individual)
+        startA_index = 2
+        startB_index = [i for i, node in enumerate(list_indv) if node.name == "btBFunc"][0]
+        startC_index = [i for i, node in enumerate(list_indv) if node.name == "btCFunc"][0]
+        a_range = list(range(startA_index, startB_index))
+        b_range = list(range(startB_index, startC_index))
+        c_range = list(range(startC_index, len(individual)))
+        prob_weights = [(anomalies[0] + anomalies[1]) / 4, anomalies[2], 10]
+        index_range = random.choices([a_range, b_range, c_range], weights=prob_weights)
+        index = random.choice(index_range[0])
+        slice_ = individual.searchSubtree(index)
+        type_ = individual[index].ret
+        individual[slice_] = expr(pset=pset, type_=type_)
+        return individual,
+    except:
+        return individual,
 
 
 
@@ -287,7 +348,7 @@ toolbox.register("evaluate", eval_generator)
 toolbox.register("select", tools.selTournament, tournsize=3)
 toolbox.register("mate", gp.cxOnePoint)
 toolbox.register("expr_mut", gp.genGrow, min_=6, max_=6)
-toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
+toolbox.register("mutate", mutUniformAnomaly, expr=toolbox.expr_mut, pset=pset)
 
 executor = ThreadPoolExecutor()
 toolbox.register("map", executor.map)
@@ -347,6 +408,8 @@ def run_experiment(cross_over_p, mutation_p, experiment_name):
 
     # Save results
     # save_results(log)
+    df.to_csv(experiment_name + ".csv")
+    clear_enviorment()
     return bla, log
 
 
@@ -405,11 +468,44 @@ def get_ast(input_norm: List[str]) -> List[Any]:
     return ast
 
 
-if __name__ == "__main__":
-    print("start")
-    ip = socket.gethostbyname(socket.gethostname())
-    print("Python IP - " + ip)
+def clear_enviorment():
+    global AVERAGES, MAXIMUMS, MINIMUMS, MEDIANS, CURR_GEN, INDV_ID, anomaly_dict, df
+    AVERAGES = []
+    MAXIMUMS = []
+    MINIMUMS = []
+    MEDIANS = []
+    CURR_GEN = 1
+    INDV_ID = 0
+    anomaly_dict = {}
+    df = pd.DataFrame({'Generation': [],
+                       'Individual': [],
+                       'Fitness': [],
+                       'Wins': [],
+                       'Losses': [],
+                       'Draws': [],
+                       'Block_Violations': [],
+                       'Misses': [],
+                       'Blocks': [],
+                       'Deadlocks': [],
+                       'Forks': [],
+                       'Code': []})
 
-    bla, log = run_experiment(0.7, 0.001, "TTT SimulationRunOrg4")
-    df.to_csv("log4.csv")
+
+if __name__ == "__main__":
+    run_experiment(0.2, 0.01, "OldCxNewMut_cx20%_mt1%_V1")
+    run_experiment(0.2, 0.01, "OldCxNewMut_cx20%_mt1%_V2")
+    run_experiment(0.2, 0.1, "OldCxNewMut_cx20%_mt10%_V1")
+    run_experiment(0.2, 0.1, "OldCxNewMut_cx20%_mt10%_V2")
+    run_experiment(0.2, 0.2, "OldCxNewMut_cx20%_mt20%_V1")
+    run_experiment(0.2, 0.2, "OldCxNewMut_cx20%_mt20%_V2")
+    run_experiment(0.2, 0.3, "OldCxNewMut_cx20%_mt30%_V1")
+    run_experiment(0.2, 0.3, "OldCxNewMut_cx20%_mt30%_V2")
+    run_experiment(0.2, 0.4, "OldCxNewMut_cx20%_mt40%_V1")
+    run_experiment(0.2, 0.4, "OldCxNewMut_cx20%_mt40%_V2")
+    run_experiment(0.2, 0.5, "OldCxNewMut_cx20%_mt50%_V1")
+    run_experiment(0.2, 0.5, "OldCxNewMut_cx20%_mt50%_V2")
+    run_experiment(0.2, 0.6, "OldCxNewMut_cx20%_mt60%_V1")
+    run_experiment(0.2, 0.6, "OldCxNewMut_cx20%_mt60%_V2")
+    run_experiment(0.2, 0.7, "OldCxNewMut_cx20%_mt70%_V1")
+    run_experiment(0.2, 0.7, "OldCxNewMut_cx20%_mt70%_V2")
 

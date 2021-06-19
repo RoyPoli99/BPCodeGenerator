@@ -159,10 +159,11 @@ function addFork22PermutationBthreads(f, p) {
 	bp.registerBThread("PreventFork22O(<" + f[p[0]].x + "," + f[p[0]].y + ">," + "<" + f[p[1]].x + "," + f[p[1]].y + ">)", function() {
 		while (true) {
 			bp.sync({ waitFor:[ O(f[p[0]].x, f[p[0]].y) ] });
-
+			bp.log.info("bthread advanced {0}", bp.thread.name)
 			bp.sync({ waitFor:[ O(f[p[1]].x, f[p[1]].y) ] });
-
+			bp.log.info("bthread advanced {0}", bp.thread.name)
 			bp.sync({ request:[ X(2, 2), X(0,2), X(2,0) ] }, 30);
+			bp.log.info("bthread advanced {0}", bp.thread.name)
 		}
 	});
 

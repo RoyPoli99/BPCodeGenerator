@@ -29,6 +29,7 @@ MEDIANS = []
 CURR_GEN = 1
 INDV_ID = 0
 anomaly_dict = {}
+anomaly_dict_v2 = {}
 
 lock = threading.Lock()
 prev_time = 0
@@ -93,6 +94,7 @@ def eval_generator(individual):
     indv.code.code = func_string
     results = send_proto_request(indv)
     anomaly_dict[func_string] = (results.blocks_violations, results.misses, results.forks)
+    anomaly_dict_v2[func_string] = (results.block_v, results.win_v, results.fork_v, results.requests)
     fitness = results_to_fitness(results.wins, results.misses, results.blocks, results.blocks_violations, results.deadlocks)
     document_individual(individual, indv.id, fitness, results.wins, results.draws, results.losses, results.blocks_violations, results.misses, results.blocks, results.deadlocks, results.forks, func_string)
     return fitness,
@@ -296,14 +298,6 @@ def cxOnePointBP(ind1, ind2):
 
 
 def mutUniformAnomaly(individual, expr, pset):
-    """Randomly select a point in the tree *individual*, then replace the
-    subtree at that point as a root by the expression generated using method
-    :func:`expr`.
-    :param individual: The tree to be mutated.
-    :param expr: A function object that can generate an expression when
-                 called.
-    :returns: A tuple of one tree.
-    """
     func = toolbox.compile(expr=individual)
     func_string = str(func(0).root)
     try:
@@ -326,6 +320,31 @@ def mutUniformAnomaly(individual, expr, pset):
         return individual,
 
 
+def thread_score(blocks, misses, forks, requests):
+    # high score is bad
+    score = blocks / 2 + misses + forks + 50 - requests / 3
+    return max(score, 1)
+
+
+def mutUniformAnomalyV2(individual, expr, pset):
+    func = toolbox.compile(expr=individual)
+    func_string = str(func(0).root)
+    try:
+        anomalies = anomaly_dict_v2[func_string]
+        list_indv = list(individual)
+        index_list = [i for i, node in enumerate(list_indv) if node.name == "btAFunc" or node.name == "btBFunc" or node.name == "btCFunc"]
+        index_list.append(len(list_indv))
+        ranges_list = [list(range(index_list[i], index_list[i+1])) for i in range(10)]
+        bthread_scores = [thread_score(anomalies[0][i], anomalies[1][i], anomalies[2][i], anomalies[3][i]) for i in range(10)]
+        index_range = random.choices(ranges_list, weights=bthread_scores)
+        index = random.choice(index_range[0])
+        slice_ = individual.searchSubtree(index)
+        type_ = individual[index].ret
+        individual[slice_] = expr(pset=pset, type_=type_)
+        return individual,
+    except:
+        return individual,
+
 
 # Define Individual and Fitness
 creator.create("FitnessMax", base.Fitness, weights=(1.0,))
@@ -346,9 +365,9 @@ toolbox.register("compile", gp.compile, pset=pset)
 # Define GP Operators
 toolbox.register("evaluate", eval_generator)
 toolbox.register("select", tools.selTournament, tournsize=3)
-toolbox.register("mate", gp.cxOnePoint)
+toolbox.register("mate", cxOnePointBP)
 toolbox.register("expr_mut", gp.genGrow, min_=6, max_=6)
-toolbox.register("mutate", mutUniformAnomaly, expr=toolbox.expr_mut, pset=pset)
+toolbox.register("mutate", mutUniformAnomalyV2, expr=toolbox.expr_mut, pset=pset)
 
 executor = ThreadPoolExecutor()
 toolbox.register("map", executor.map)
@@ -469,7 +488,7 @@ def get_ast(input_norm: List[str]) -> List[Any]:
 
 
 def clear_enviorment():
-    global AVERAGES, MAXIMUMS, MINIMUMS, MEDIANS, CURR_GEN, INDV_ID, anomaly_dict, df
+    global AVERAGES, MAXIMUMS, MINIMUMS, MEDIANS, CURR_GEN, INDV_ID, anomaly_dict, anomaly_dict_v2, df
     AVERAGES = []
     MAXIMUMS = []
     MINIMUMS = []
@@ -477,6 +496,7 @@ def clear_enviorment():
     CURR_GEN = 1
     INDV_ID = 0
     anomaly_dict = {}
+    anomaly_dict_v2 = {}
     df = pd.DataFrame({'Generation': [],
                        'Individual': [],
                        'Fitness': [],
@@ -492,20 +512,9 @@ def clear_enviorment():
 
 
 if __name__ == "__main__":
-    run_experiment(0.2, 0.01, "OldCxNewMut_cx20%_mt1%_V1")
-    run_experiment(0.2, 0.01, "OldCxNewMut_cx20%_mt1%_V2")
-    run_experiment(0.2, 0.1, "OldCxNewMut_cx20%_mt10%_V1")
-    run_experiment(0.2, 0.1, "OldCxNewMut_cx20%_mt10%_V2")
-    run_experiment(0.2, 0.2, "OldCxNewMut_cx20%_mt20%_V1")
-    run_experiment(0.2, 0.2, "OldCxNewMut_cx20%_mt20%_V2")
-    run_experiment(0.2, 0.3, "OldCxNewMut_cx20%_mt30%_V1")
-    run_experiment(0.2, 0.3, "OldCxNewMut_cx20%_mt30%_V2")
-    run_experiment(0.2, 0.4, "OldCxNewMut_cx20%_mt40%_V1")
-    run_experiment(0.2, 0.4, "OldCxNewMut_cx20%_mt40%_V2")
-    run_experiment(0.2, 0.5, "OldCxNewMut_cx20%_mt50%_V1")
-    run_experiment(0.2, 0.5, "OldCxNewMut_cx20%_mt50%_V2")
-    run_experiment(0.2, 0.6, "OldCxNewMut_cx20%_mt60%_V1")
-    run_experiment(0.2, 0.6, "OldCxNewMut_cx20%_mt60%_V2")
-    run_experiment(0.2, 0.7, "OldCxNewMut_cx20%_mt70%_V1")
-    run_experiment(0.2, 0.7, "OldCxNewMut_cx20%_mt70%_V2")
+    run_experiment(0.3, 0.2, "OldCxNewMutV2_1_cx30%_mt20%_V1")
+    run_experiment(0.3, 0.2, "OldCxNewMutV2_1_cx30%_mt20%_V2")
+    run_experiment(0.3, 0.2, "OldCxNewMutV2_1_cx30%_mt20%_V3")
+    run_experiment(0.3, 0.2, "OldCxNewMutV2_1_cx30%_mt20%_V4")
+
 

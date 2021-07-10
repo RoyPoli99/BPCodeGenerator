@@ -24,6 +24,10 @@ message EvaluationResponse {
     double blocks = 6;
     double deadlocks = 7;
     double forks = 8;
+    repeated double block_v = 9;
+    repeated double win_v = 10;
+    repeated double fork_v = 11;
+    repeated double requests = 12;
 }
 
 service EvaluationService {

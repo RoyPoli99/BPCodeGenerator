@@ -41,15 +41,25 @@ class root:
     def __str__(self):
         res = ""
         res += str(self.btl1)
+        res += "bp.sync({request: bp.Event(\"THREAD0\")}, 120);}});\n"
         res += str(self.btl2)
+        res += "bp.sync({request: bp.Event(\"THREAD1\")}, 120);}});\n"
         res += str(self.btf1)
+        res += "bp.sync({request: bp.Event(\"THREAD2\")}, 120);}});\n"
         res += str(self.btf2)
+        res += "bp.sync({request: bp.Event(\"THREAD3\")}, 120);}});\n"
         res += str(self.btf3)
+        res += "bp.sync({request: bp.Event(\"THREAD4\")}, 120);}});\n"
         res += str(self.btf4)
+        res += "bp.sync({request: bp.Event(\"THREAD5\")}, 120);}});\n"
         res += str(self.btf5)
+        res += "bp.sync({request: bp.Event(\"THREAD6\")}, 120);}});\n"
         res += str(self.bt1)
+        res += "bp.sync({request: bp.Event(\"THREAD7\")}, 120);}});\n"
         res += str(self.bt2)
+        res += "bp.sync({request: bp.Event(\"THREAD8\")}, 120);}});\n"
         res += str(self.bt3)
+        res += "bp.sync({request: bp.Event(\"THREAD9\")}, 120);}});\n"
         return str(res)
 
     __repr__ = __str__
@@ -63,7 +73,7 @@ class btA:
         global currentBtNameIndex, btNames
         currName = btNames[currentBtNameIndex]
         currentBtNameIndex = (currentBtNameIndex + 1) % 10
-        return currName + str(self.whiletrue) + "});\n"
+        return currName + str(self.whiletrue)# + "});\n"
 
     __repr__ = __str__
 
@@ -76,7 +86,7 @@ class btB:
         global currentBtNameIndex, btNames
         currName = btNames[currentBtNameIndex]
         currentBtNameIndex = (currentBtNameIndex + 1) % 10
-        return currName + str(self.whiletrue) + "});\n"
+        return currName + str(self.whiletrue)# + "});\n"
 
     __repr__ = __str__
 
@@ -89,7 +99,7 @@ class btC:
         global currentBtNameIndex, btNames
         currName = btNames[currentBtNameIndex]
         currentBtNameIndex = (currentBtNameIndex + 1) % 10
-        return currName + str(self.whiletrue) + "});\n"
+        return currName + str(self.whiletrue)# + "});\n"
 
     __repr__ = __str__
 
@@ -104,7 +114,7 @@ class while_trueA:
         for wait in self.waits:
             code_str += str(wait)
         code_str += str(self.request)
-        return "while(true){" + code_str + "}"
+        return "while(true){" + code_str# + "}"
     __repr__ = __str__
 
 
@@ -118,7 +128,7 @@ class while_trueB:
         for wait in self.waits:
             code_str += str(wait)
         code_str += str(self.request)
-        return "while(true){" + code_str + "}"
+        return "while(true){" + code_str# + "}"
     __repr__ = __str__
 
 
@@ -132,7 +142,7 @@ class while_trueC:
         for wait in self.waits:
             code_str += str(wait)
         code_str += str(self.request)
-        return "while(true){" + code_str + "}"
+        return "while(true){" + code_str# + "}"
     __repr__ = __str__
 
 

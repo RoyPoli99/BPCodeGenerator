@@ -8,8 +8,8 @@ import java.util.Collection;
 import java.util.List;
 
 public class VerificationEvaluator extends Evaluator {
-    public VerificationEvaluator(String code, int gen, int id) {
-        super(code,gen,id, "rand");
+    public VerificationEvaluator(String code, int gen, int id, int threads) {
+        super(code,gen,id, "rand", threads);
     }
 
     @Override

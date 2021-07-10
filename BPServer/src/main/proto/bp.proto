@@ -9,6 +9,7 @@ message Individual {
     int32 generation = 1;
     int32 id = 2;
     bprog code = 3;
+    int32 threads = 4;
 }
 
 message EvaluationRequest {
@@ -23,6 +24,14 @@ message EvaluationResponse {
     double misses = 5;
     double blocks = 6;
     double deadlocks = 7;
+    double forks = 8;
+    repeated double block_v = 9;
+    repeated double win_v = 10;
+    repeated double fork_v = 11;
+    repeated double block_g = 12;
+    repeated double win_g = 13;
+    repeated double fork_g = 14;
+    repeated double requests = 15;
 }
 
 service EvaluationService {

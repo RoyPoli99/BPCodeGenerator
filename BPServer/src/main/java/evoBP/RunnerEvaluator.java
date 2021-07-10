@@ -12,8 +12,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class RunnerEvaluator extends Evaluator {
   private static ExecutorService es = Executors.newCachedThreadPool();
 
-  public RunnerEvaluator(String code, int gen, int id) {
-    super(code, gen, id, gen > 100 ? "opt" : "rand");
+  public RunnerEvaluator(String code, int gen, int id, int threads) {
+    super(code, gen, id, gen > 100 ? "opt" : "rand", threads);
   }
 
   @Override

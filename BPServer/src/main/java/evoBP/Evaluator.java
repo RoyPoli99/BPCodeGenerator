@@ -31,14 +31,16 @@ public abstract class Evaluator implements Callable<Bp.EvaluationResponse> {
 
     protected final int gen;
     protected final int id;
+    protected final int threads;
     //protected final BProgram bprog;
     protected final String b_program;
 
 
-    protected Evaluator(String code, int gen, int id, String playerType){
+    protected Evaluator(String code, int gen, int id, String playerType, int threads){
         super();
         this.id = id;
         this.gen = gen;
+        this.threads = threads;
         String player;
         if(playerType.equals("opt"))
             player = opt_player;

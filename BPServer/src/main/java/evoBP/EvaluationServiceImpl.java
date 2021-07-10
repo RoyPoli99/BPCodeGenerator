@@ -14,7 +14,8 @@ public class EvaluationServiceImpl extends EvaluationServiceGrpc.EvaluationServi
     String code = request.getIndividual().getCode().getCode();
     int gen = request.getIndividual().getGeneration();
     int id = request.getIndividual().getId();
-    var evaluator = new RunnerEvaluatorOrg(code, gen, id);
+    int threads = request.getIndividual().getThreads();
+    var evaluator = new RunnerEvaluatorOrg(code, gen, id, threads);
     responseObserver.onNext(evaluator.call()); //take future
     responseObserver.onCompleted();
   }

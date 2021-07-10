@@ -21,9 +21,11 @@ from TTTclasses import *
 import bp_pb2
 import socket
 import pandas as pd
+import TTTclasses
 
 # Define global arguments
-NUMBER_OF_GENERATIONS = 200
+
+NUMBER_OF_GENERATIONS = 100
 POPULATION_SIZE = 100
 AVERAGES = []
 MAXIMUMS = []
@@ -34,19 +36,21 @@ INDV_ID = 0
 
 lock = threading.Lock()
 prev_time = 0
+individual_stats = {}
 
 
 df = pd.DataFrame({'Generation': [],
                    'Individual': [],
-                   'BThreads_Number': [],
+                   'Bthread_Num': [],
                    'Fitness': [],
                    'Wins': [],
-                   'Losses': [],
                    'Draws': [],
+                   'Losses': [],
                    'Block_Violations': [],
                    'Misses': [],
                    'Blocks': [],
                    'Deadlocks': [],
+                   'Forks': [],
                    'Code': []})
 
 
@@ -62,7 +66,7 @@ def results_to_fitness(wins, wins_misses, blocks, block_misses, deadlocks):
     return 50 * win_stat + 50 * block_stat - deadlocks
 
 
-def document_individual(individual, curr_id, bthreads_num, fitness, wins, draws, losses, blocks_v, misses, blocks, deadlocks, code):
+def document_individual(individual, curr_id, bthreads_num, fitness, wins, draws, losses, blocks_v, misses, blocks, deadlocks, forks, code):
     # tree
     # nodes, edges, labels = gp.graph(individual)
     # g = pgv.AGraph()
@@ -79,7 +83,7 @@ def document_individual(individual, curr_id, bthreads_num, fitness, wins, draws,
     # g.draw(folder_name + "/" + img_name)
     # stats
     with lock:
-        df.loc[len(df)] = [CURR_GEN, curr_id, bthreads_num, fitness, wins, draws, losses, blocks_v, misses, blocks, deadlocks, code]
+        df.loc[len(df)] = [CURR_GEN, curr_id, bthreads_num, fitness, wins, draws, losses, blocks_v, misses, blocks, deadlocks, forks, code]
 
 
 # Send to BPServer to evaluate
@@ -90,13 +94,15 @@ def eval_generator(individual):
     indv = bp_pb2.Individual()
     indv.generation = CURR_GEN
     bthread_num = func(0).root.num_of_bthreads
+    indv.threads = bthread_num
     with lock:
         INDV_ID += 1
         indv.id = INDV_ID
     indv.code.code = func_string
     results = send_proto_request(indv)
+    individual_stats[func_string] = (results.block_v, results.win_v, results.fork_v, results.block_g, results.win_g, results.fork_g, results.requests)
     fitness = results_to_fitness(results.wins, results.misses, results.blocks, results.blocks_violations, results.deadlocks)
-    document_individual(individual, indv.id, bthread_num, fitness, results.wins, results.draws, results.losses, results.blocks_violations, results.misses, results.blocks, results.deadlocks, func_string)
+    document_individual(individual, indv.id, bthread_num, fitness, results.wins, results.draws, results.losses, results.blocks_violations, results.misses, results.blocks, results.deadlocks, results.forks, func_string)
     return fitness,
 
 
@@ -158,12 +164,6 @@ def cxOnePointBP(ind1, ind2):
     # List all available primitive types in each individual
     types1 = defaultdict(list)
     types2 = defaultdict(list)
-    #if ind1.root.ret == __type__:
-        # Not STGP optimization
-     #   types1[__type__] = xrange(1, len(ind1))
-     #   types2[__type__] = xrange(1, len(ind2))
-     #   common_types = [__type__]
-    #else:
     for idx, node in enumerate(ind1[1:], 1):
         types1[node.ret].append(idx)
     for idx, node in enumerate(ind2[1:], 1):
@@ -184,20 +184,101 @@ def cxOnePointBP(ind1, ind2):
     return ind1, ind2
 
 
-def mutUniformBP(individual, expr, pset):
-    """Randomly select a point in the tree *individual*, then replace the
-    subtree at that point as a root by the expression generated using method
-    :func:`expr`.
-    :param individual: The tree to be mutated.
-    :param expr: A function object that can generate an expression when
-                 called.
-    :returns: A tuple of one tree.
-    """
-    index = random.randrange(len(individual))
-    slice_ = individual.searchSubtree(index)
-    type_ = individual[index].ret
-    individual[slice_] = expr(pset=pset, type_=type_)
-    return individual,
+def thread_score(block_v, win_v, fork_v, block_g, win_g, fork_g, requests):
+    # high score is bad
+    score = 2 * block_v + 4 * win_v + 4 * fork_v - block_g - 2 * win_g - 2 * fork_g - requests / 2
+    return max(score, 1)
+
+
+def reverse_thread_score(block_v, win_v, fork_v, block_g, win_g, fork_g, requests):
+    # high score is good
+    score = 2 * block_v + 4 * win_v + 4 * fork_v - block_g - 2 * win_g - 2 * fork_g - requests / 2
+    return 200 - score
+
+
+def mutThreadSpecific(individual, expr, pset):
+    func = toolbox.compile(expr=individual)
+    func_string = str(func(0).root)
+    try:
+        stats = individual_stats[func_string]
+        list_indv = list(individual)
+        index_list = [i for i, node in enumerate(list_indv) if node.name == "btCFunc"]
+        index_list.append(len(list_indv))
+        ranges_list = [list(range(index_list[i], index_list[i+1])) for i in range(len(index_list) - 1)]
+        bthread_scores = [thread_score(stats[0][i], stats[1][i], stats[2][i], stats[3][i], stats[4][i], stats[5][i], stats[6][i]) for i in range(len(index_list) - 1)]
+        index_range = random.choices(ranges_list, weights=bthread_scores)
+        while True:
+            index = random.choice(index_range[0])
+            slice_ = individual.searchSubtree(index)
+            type_ = individual[index].ret
+            if type_ != TTTclasses.btGroup:
+                break
+        individual[slice_] = expr(pset=pset, type_=type_)
+        return individual,
+    except:
+        return individual,
+
+
+def cxThreadSpecific(ind1, ind2):
+    if len(ind1) < 2 or len(ind2) < 2:
+        return ind1, ind2
+    # List all available primitive types in each individual
+    types1 = defaultdict(list)
+    types2 = defaultdict(list)
+
+    for idx, node in enumerate(ind1[1:], 1):
+        types1[node.ret].append(idx)
+    for idx, node in enumerate(ind2[1:], 1):
+        types2[node.ret].append(idx)
+    common_types = [btGroup, btC]
+
+    if len(common_types) > 0:
+        func1 = toolbox.compile(expr=ind1)
+        func_string1 = str(func1(0).root)
+        func2 = toolbox.compile(expr=ind2)
+        func_string2 = str(func2(0).root)
+        try:
+            stats1 = individual_stats[func_string1]
+            stats2 = individual_stats[func_string2]
+
+            list_indv1 = list(ind1)
+            list_indv2 = list(ind2)
+            index_list1 = [i for i, node in enumerate(list_indv1) if node.name == "btCFunc"]
+            index_list2 = [i for i, node in enumerate(list_indv2) if node.name == "btCFunc"]
+            bthread_scores1_good = [reverse_thread_score(stats1[0][i], stats1[1][i], stats1[2][i], stats1[3][i], stats1[4][i], stats1[5][i], stats1[6][i]) for i in range(len(index_list1))]
+            bthread_scores1_bad = [thread_score(stats1[0][i], stats1[1][i], stats1[2][i], stats1[3][i], stats1[4][i], stats1[5][i], stats1[6][i]) for i in range(len(index_list1))]
+            bthread_scores2_good = [reverse_thread_score(stats2[0][i], stats2[1][i], stats2[2][i], stats2[3][i], stats2[4][i], stats2[5][i], stats2[6][i]) for i in range(len(index_list2))]
+            bthread_scores2_bad = [thread_score(stats2[0][i], stats2[1][i], stats2[2][i], stats2[3][i], stats2[4][i], stats2[5][i], stats2[6][i]) for i in range(len(index_list2))]
+            index1_1 = random.choices(index_list1, weights=bthread_scores1_good)
+            index2_1 = random.choices(index_list1, weights=bthread_scores2_bad)
+            index1_2 = random.choices(index_list1, weights=bthread_scores2_good)
+            index2_2 = random.choices(index_list1, weights=bthread_scores1_bad)
+
+            # index1_1 = random.choice(types1[type1_])
+            # index2_1 = random.choice(types2[type1_])
+            slice1_1 = ind1.searchSubtree(index1_1)
+            slice2_1 = ind2.searchSubtree(index2_1)
+
+            # index1_2 = random.choice(types1[type2_])
+            # index2_2 = random.choice(types2[type2_])
+            slice1_2 = ind1.searchSubtree(index1_2)
+            slice2_2 = ind2.searchSubtree(index2_2)
+
+            ind2[slice2_1], ind1[slice1_2] = ind1[slice1_1], ind2[slice2_2]
+            # ind1[slice1_2] = ind2[slice2_2]
+        except:
+            return ind1, ind2
+            # type_ = random.choice(list(common_types))
+            # type_ = btC
+
+            # index1 = random.choice(types1[type_])
+            # index2 = random.choice(types2[type_])
+
+            # slice1 = ind1.searchSubtree(index1)
+            # slice2 = ind2.searchSubtree(index2)
+            # ind1[slice1], ind2[slice2] = ind2[slice2], ind1[slice1]
+
+    return ind1, ind2
 
 
 # Grammar Setup
@@ -282,9 +363,9 @@ toolbox.register("compile", gp.compile, pset=pset)
 toolbox.register("evaluate", eval_generator)
 # toolbox.register("select", tools.selRoulette)
 toolbox.register("select", tools.selTournament, tournsize=3)
-toolbox.register("mate", cxOnePointBP)
+toolbox.register("mate", cxThreadSpecific)
 toolbox.register("expr_mut", generate_safe, min_=4, max_=8, terminal_types=terminal_types)
-toolbox.register("mutate", mutUniformBP, expr=toolbox.expr_mut, pset=pset)
+toolbox.register("mutate", mutThreadSpecific, expr=toolbox.expr_mut, pset=pset)
 
 #executor = ThreadPoolExecutor()
 #toolbox.register("map", executor.map)
@@ -329,7 +410,7 @@ def time_stat(indv):
 def run_experiment(cross_over_p, mutation_p, experiment_name):
     global prev_time
     pop = toolbox.population(n=POPULATION_SIZE)
-    hof = tools.HallOfFame(3)
+    # hof = tools.HallOfFame(3)
     stats = tools.Statistics(lambda ind: ind.fitness.values)
     stats.register("avg", numpy.mean)
     stats.register("std", numpy.std)
@@ -340,15 +421,41 @@ def run_experiment(cross_over_p, mutation_p, experiment_name):
     stats.register("plot", lambda x: real_time_plotter(experiment_name, x))
 
     # Run experiment
-    #bla, log = algorithms.eaSimple(pop, toolbox, cxpb=cross_over_p, mutpb=mutation_p, ngen=NUMBER_OF_GENERATIONS,
-    #                               stats=stats)
+    bla, log = algorithms.eaSimple(pop, toolbox, cxpb=cross_over_p, mutpb=mutation_p, ngen=NUMBER_OF_GENERATIONS,
+                                   stats=stats)
 
-    bla, log = eaSimpleWithElitism(pop, toolbox, cxpb=cross_over_p, mutpb=mutation_p, ngen=NUMBER_OF_GENERATIONS,
-                                   stats=stats, halloffame=hof)
+    #bla, log = eaSimpleWithElitism(pop, toolbox, cxpb=cross_over_p, mutpb=mutation_p, ngen=NUMBER_OF_GENERATIONS,
+    #                               stats=stats, halloffame=hof)
 
     # Save results
     # save_results(log)
+    df.to_csv(experiment_name + ".csv")
+    clear_enviorment()
     return bla, log
+
+
+def clear_enviorment():
+    global AVERAGES, MAXIMUMS, MINIMUMS, MEDIANS, CURR_GEN, INDV_ID, individual_stats, df
+    AVERAGES = []
+    MAXIMUMS = []
+    MINIMUMS = []
+    MEDIANS = []
+    CURR_GEN = 1
+    INDV_ID = 0
+    individual_stats = {}
+    df = pd.DataFrame({'Generation': [],
+                       'Individual': [],
+                       'Bthread_Num': [],
+                       'Fitness': [],
+                       'Wins': [],
+                       'Draws': [],
+                       'Losses': [],
+                       'Block_Violations': [],
+                       'Misses': [],
+                       'Blocks': [],
+                       'Deadlocks': [],
+                       'Forks': [],
+                       'Code': []})
 
 
 def thread_check(arg):
@@ -431,10 +538,8 @@ def eaSimpleWithElitism(population, toolbox, cxpb, mutpb, ngen, stats=None,
 
 
 if __name__ == "__main__":
-    print("start")
-    ip = socket.gethostbyname(socket.gethostname())
-    print("Python IP - " + ip)
-
-    bla, log = run_experiment(0.7, 0.001, "TTT SimulationRunOrg14")
-    df.to_csv("log14.csv")
+    run_experiment(0.3, 0.2, "no_domain_knowledge_V1")
+    run_experiment(0.3, 0.2, "no_domain_knowledge_V1")
+    run_experiment(0.3, 0.2, "no_domain_knowledge_V3")
+    run_experiment(0.3, 0.2, "no_domain_knowledge_V4")
 

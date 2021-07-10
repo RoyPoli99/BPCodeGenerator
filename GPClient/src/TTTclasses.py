@@ -94,8 +94,9 @@ class btC:
         global currentBtNameIndex, btNames
         x = currentBtNameIndex
         currName = "bp.registerBThread(\"O_Player_Thread_" + str(currentBtNameIndex) + "\", function(){"
+        bthreadDetector = "bp.sync({request: bp.Event(\"THREAD" + str(currentBtNameIndex) + "\")}, 120);\n"
         currentBtNameIndex = currentBtNameIndex + 1
-        return currName + str(self.whiletrue) + "});\n"
+        return currName + "\n" + str(self.whiletrue) + bthreadDetector + "});\n"
 
     __repr__ = __str__
 

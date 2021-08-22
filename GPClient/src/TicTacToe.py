@@ -20,8 +20,8 @@ import socket
 import pandas as pd
 
 # Define global arguments
-NUMBER_OF_GENERATIONS = 100
-POPULATION_SIZE = 100
+NUMBER_OF_GENERATIONS = 10
+POPULATION_SIZE = 10
 AVERAGES = []
 MAXIMUMS = []
 MINIMUMS = []
@@ -30,6 +30,7 @@ CURR_GEN = 1
 INDV_ID = 0
 anomaly_dict = {}
 anomaly_dict_v2 = {}
+exp_type = 2
 
 lock = threading.Lock()
 prev_time = 0
@@ -236,12 +237,8 @@ pset.addTerminal(11, priority)
 
 
 def cxOnePointBP(ind1, ind2):
-    """Randomly select crossover point in each individual and exchange each
-    subtree with the point as root between each individual.
-    :param ind1: First tree participating in the crossover.
-    :param ind2: Second tree participating in the crossover.
-    :returns: A tuple of two trees.
-    """
+    if exp_type == 1:
+        return gp.cxOnePoint(ind1, ind2)
     if len(ind1) < 2 or len(ind2) < 2:
         # No crossover on single node tree
         return ind1, ind2
@@ -267,6 +264,8 @@ def cxOnePointBP(ind1, ind2):
             anomalies2 = anomaly_dict[func_string2]
             prob_weights1 = [50 - (anomalies1[0] + anomalies1[1]) / 4, 50 - anomalies1[2], 40]
             prob_weights2 = [50 - (anomalies2[0] + anomalies2[1]) / 4, 50 - anomalies2[2], 40]
+            prob_weights1 = thread_weights_reverse(anomalies1[0], anomalies1[1], anomalies1[2])
+            prob_weights2 = thread_weights_reverse(anomalies2[0], anomalies2[1], anomalies2[2])
             type1_ = random.choices(list(common_types), weights=prob_weights1)
             type2_ = random.choices(list(common_types), weights=prob_weights2)
 
@@ -281,23 +280,22 @@ def cxOnePointBP(ind1, ind2):
             slice2_2 = ind2.searchSubtree(index2_2)
 
             ind2[slice2_1], ind1[slice1_2] = ind1[slice1_1], ind2[slice2_2]
-            # ind1[slice1_2] = ind2[slice2_2]
         except:
             return ind1, ind2
-            # type_ = random.choice(list(common_types))
-            # type_ = btC
-
-            # index1 = random.choice(types1[type_])
-            # index2 = random.choice(types2[type_])
-
-            # slice1 = ind1.searchSubtree(index1)
-            # slice2 = ind2.searchSubtree(index2)
-            # ind1[slice1], ind2[slice2] = ind2[slice2], ind1[slice1]
-
     return ind1, ind2
 
 
+def thread_weights(blocks_v, wins_v, forks_v):
+    return [(blocks_v + wins_v) * line_weight, forks_v * fork_weight, cell_weight]
+
+
+def thread_weights_reverse(blocks_v, wins_v, forks_v):
+    return [1 / ((blocks_v + wins_v) * line_weight), 1 / (forks_v * fork_weight), 1 / cell_weight]
+
+
 def mutUniformAnomaly(individual, expr, pset):
+    if exp_type == 1:
+        return gp.mutUniform(individual, expr, pset)
     func = toolbox.compile(expr=individual)
     func_string = str(func(0).root)
     try:
@@ -309,7 +307,7 @@ def mutUniformAnomaly(individual, expr, pset):
         a_range = list(range(startA_index, startB_index))
         b_range = list(range(startB_index, startC_index))
         c_range = list(range(startC_index, len(individual)))
-        prob_weights = [(anomalies[0] + anomalies[1]) / 4, anomalies[2], 10]
+        prob_weights = thread_weights(anomalies[0], anomalies[1], anomalies[2])
         index_range = random.choices([a_range, b_range, c_range], weights=prob_weights)
         index = random.choice(index_range[0])
         slice_ = individual.searchSubtree(index)
@@ -367,7 +365,7 @@ toolbox.register("evaluate", eval_generator)
 toolbox.register("select", tools.selTournament, tournsize=3)
 toolbox.register("mate", cxOnePointBP)
 toolbox.register("expr_mut", gp.genGrow, min_=6, max_=6)
-toolbox.register("mutate", mutUniformAnomalyV2, expr=toolbox.expr_mut, pset=pset)
+toolbox.register("mutate", mutUniformAnomaly, expr=toolbox.expr_mut, pset=pset)
 
 executor = ThreadPoolExecutor()
 toolbox.register("map", executor.map)
@@ -512,9 +510,91 @@ def clear_enviorment():
 
 
 if __name__ == "__main__":
-    run_experiment(0.3, 0.2, "OldCxNewMutV2_1_cx30%_mt20%_V1")
-    run_experiment(0.3, 0.2, "OldCxNewMutV2_1_cx30%_mt20%_V2")
-    run_experiment(0.3, 0.2, "OldCxNewMutV2_1_cx30%_mt20%_V3")
-    run_experiment(0.3, 0.2, "OldCxNewMutV2_1_cx30%_mt20%_V4")
+    global line_weight, fork_weight, cell_weight
+    line_weight, fork_weight, cell_weight = 0.1, 0.25, 5
+    run_experiment(0.3, 0.2, "01_025_5_V1")
+    run_experiment(0.3, 0.2, "01_025_5_V2")
+    run_experiment(0.3, 0.2, "01_025_5_V3")
+    line_weight, fork_weight, cell_weight = 0.2, 0.25, 5
+    run_experiment(0.3, 0.2, "02_025_5_V1")
+    run_experiment(0.3, 0.2, "02_025_5_V2")
+    run_experiment(0.3, 0.2, "02_025_5_V3")
+    line_weight, fork_weight, cell_weight = 0.25, 0.25, 5
+    run_experiment(0.3, 0.2, "025_025_5_V1")
+    run_experiment(0.3, 0.2, "025_025_5_V2")
+    run_experiment(0.3, 0.2, "025_025_5_V3")
+    line_weight, fork_weight, cell_weight = 0.5, 0.25, 5
+    run_experiment(0.3, 0.2, "05_025_5_V1")
+    run_experiment(0.3, 0.2, "05_025_5_V2")
+    run_experiment(0.3, 0.2, "05_025_5_V3")
+    line_weight, fork_weight, cell_weight = 1, 0.25, 5
+    run_experiment(0.3, 0.2, "1_025_5_V1")
+    run_experiment(0.3, 0.2, "1_025_5_V2")
+    run_experiment(0.3, 0.2, "1_025_5_V3")
+
+    line_weight, fork_weight, cell_weight = 0.1, 0.5, 5
+    run_experiment(0.3, 0.2, "01_05_5_V1")
+    run_experiment(0.3, 0.2, "01_05_5_V2")
+    run_experiment(0.3, 0.2, "01_05_5_V3")
+    line_weight, fork_weight, cell_weight = 0.2, 0.5, 5
+    run_experiment(0.3, 0.2, "02_05_5_V1")
+    run_experiment(0.3, 0.2, "02_05_5_V2")
+    run_experiment(0.3, 0.2, "02_05_5_V3")
+    line_weight, fork_weight, cell_weight = 0.25, 0.5, 5
+    run_experiment(0.3, 0.2, "025_05_5_V1")
+    run_experiment(0.3, 0.2, "025_05_5_V2")
+    run_experiment(0.3, 0.2, "025_05_5_V3")
+    line_weight, fork_weight, cell_weight = 0.5, 0.5, 5
+    run_experiment(0.3, 0.2, "05_05_5_V1")
+    run_experiment(0.3, 0.2, "05_05_5_V2")
+    run_experiment(0.3, 0.2, "05_05_5_V3")
+    line_weight, fork_weight, cell_weight = 1, 0.5, 5
+    run_experiment(0.3, 0.2, "1_05_5_V1")
+    run_experiment(0.3, 0.2, "1_05_5_V2")
+    run_experiment(0.3, 0.2, "1_05_5_V3")
+
+    line_weight, fork_weight, cell_weight = 0.1, 1, 5
+    run_experiment(0.3, 0.2, "01_1_5_V1")
+    run_experiment(0.3, 0.2, "01_1_5_V2")
+    run_experiment(0.3, 0.2, "01_1_5_V3")
+    line_weight, fork_weight, cell_weight = 0.2, 1, 5
+    run_experiment(0.3, 0.2, "02_1_5_V1")
+    run_experiment(0.3, 0.2, "02_1_5_V2")
+    run_experiment(0.3, 0.2, "02_1_5_V3")
+    line_weight, fork_weight, cell_weight = 0.25, 1, 5
+    run_experiment(0.3, 0.2, "025_1_5_V1")
+    run_experiment(0.3, 0.2, "025_1_5_V2")
+    run_experiment(0.3, 0.2, "025_1_5_V3")
+    line_weight, fork_weight, cell_weight = 0.5, 1, 5
+    run_experiment(0.3, 0.2, "05_1_5_V1")
+    run_experiment(0.3, 0.2, "05_1_5_V2")
+    run_experiment(0.3, 0.2, "05_1_5_V3")
+    line_weight, fork_weight, cell_weight = 1, 1, 5
+    run_experiment(0.3, 0.2, "1_1_5_V1")
+    run_experiment(0.3, 0.2, "1_1_5_V2")
+    run_experiment(0.3, 0.2, "1_1_5_V3")
+
+    line_weight, fork_weight, cell_weight = 0.1, 2, 5
+    run_experiment(0.3, 0.2, "01_2_5_V1")
+    run_experiment(0.3, 0.2, "01_2_5_V2")
+    run_experiment(0.3, 0.2, "01_2_5_V3")
+    line_weight, fork_weight, cell_weight = 0.2, 2, 5
+    run_experiment(0.3, 0.2, "02_2_5_V1")
+    run_experiment(0.3, 0.2, "02_2_5_V2")
+    run_experiment(0.3, 0.2, "02_2_5_V3")
+    line_weight, fork_weight, cell_weight = 0.25, 2, 5
+    run_experiment(0.3, 0.2, "025_2_5_V1")
+    run_experiment(0.3, 0.2, "025_2_5_V2")
+    run_experiment(0.3, 0.2, "025_2_5_V3")
+    line_weight, fork_weight, cell_weight = 0.5, 2, 5
+    run_experiment(0.3, 0.2, "05_2_5_V1")
+    run_experiment(0.3, 0.2, "05_2_5_V2")
+    run_experiment(0.3, 0.2, "05_2_5_V3")
+    line_weight, fork_weight, cell_weight = 1, 2, 5
+    run_experiment(0.3, 0.2, "1_2_5_V1")
+    run_experiment(0.3, 0.2, "1_2_5_V2")
+    run_experiment(0.3, 0.2, "1_2_5_V3")
+
+
 
 

@@ -12,7 +12,8 @@ btNames = ["bp.registerBThread(\"AddThirdO(<\"+f[p[0]].x+\",\"+f[p[0]].y+\">,\"+
            "bp.registerBThread(\"Sides\",function(){"
            ]
 
-currentBtNameIndex = 0
+currentBtLineIndex = 1
+currentBtOtherIndex = 1
 
 class root_wrapper:
     def __init__(self, root):
@@ -26,67 +27,72 @@ class root_wrapper:
 
 class root:
 
-    def __init__(self, btl1,btl2,btf1,btf2,btf3,btf4,btf5,bt1,bt2,bt3):
-        self.btl1 = btl1
-        self.btl2 = btl2
-        self.btf1 = btf1
-        self.btf2 = btf2
-        self.btf3 = btf3
-        self.btf4 = btf4
-        self.btf5 = btf5
-        self.bt1 = bt1
-        self.bt2 = bt2
-        self.bt3 = bt3
+    def __init__(self, btgLine,btgOther):
+        self.btgLine = btgLine
+        self.btgOther = btgOther
 
     def __str__(self):
+        global currentBtLineIndex, currentBtOtherIndex
+        currentBtLineIndex = 1
+        currentBtOtherIndex = 1
         res = ""
-        res += str(self.btl1)
-        res += "bp.sync({request: bp.Event(\"THREAD0\")}, 120);}});\n"
-        res += str(self.btl2)
-        res += "bp.sync({request: bp.Event(\"THREAD1\")}, 120);}});\n"
-        res += str(self.btf1)
-        res += "bp.sync({request: bp.Event(\"THREAD2\")}, 120);}});\n"
-        res += str(self.btf2)
-        res += "bp.sync({request: bp.Event(\"THREAD3\")}, 120);}});\n"
-        res += str(self.btf3)
-        res += "bp.sync({request: bp.Event(\"THREAD4\")}, 120);}});\n"
-        res += str(self.btf4)
-        res += "bp.sync({request: bp.Event(\"THREAD5\")}, 120);}});\n"
-        res += str(self.btf5)
-        res += "bp.sync({request: bp.Event(\"THREAD6\")}, 120);}});\n"
-        res += str(self.bt1)
-        res += "bp.sync({request: bp.Event(\"THREAD7\")}, 120);}});\n"
-        res += str(self.bt2)
-        res += "bp.sync({request: bp.Event(\"THREAD8\")}, 120);}});\n"
-        res += str(self.bt3)
-        res += "bp.sync({request: bp.Event(\"THREAD9\")}, 120);}});\n"
+        res += str(self.btgLine)
+        # res += "bp.sync({request: bp.Event(\"THREAD0\")}, 120);}});\n"
+        res += str(self.btgOther)
+        # res += "bp.sync({request: bp.Event(\"THREAD1\")}, 120);}});\n"
         return str(res)
 
     __repr__ = __str__
 
 
-class btA:
-    def __init__(self, whiletrue):
-        self.whiletrue = whiletrue
+class btGroupLine:
+    def __init__(self, bts):
+        self.bts = bts
 
     def __str__(self):
-        global currentBtNameIndex, btNames
-        currName = btNames[currentBtNameIndex]
-        currentBtNameIndex = (currentBtNameIndex + 1) % 10
-        return currName + str(self.whiletrue)# + "});\n"
+        code_str = ""
+        for bt in self.bts:
+            code_str += str(bt) + "\n"
+        return code_str
 
     __repr__ = __str__
 
 
-class btB:
+class btGroupOther:
+    def __init__(self, bts):
+        self.bts = bts
+
+    def __str__(self):
+        code_str = ""
+        for bt in self.bts:
+            code_str += str(bt) + "\n"
+        return code_str
+
+    __repr__ = __str__
+
+
+class btLine:
     def __init__(self, whiletrue):
         self.whiletrue = whiletrue
 
     def __str__(self):
-        global currentBtNameIndex, btNames
-        currName = btNames[currentBtNameIndex]
-        currentBtNameIndex = (currentBtNameIndex + 1) % 10
-        return currName + str(self.whiletrue)# + "});\n"
+        global currentBtLineIndex
+        currName = "bp.registerBThread(\"O_Player_Line_" + str(currentBtLineIndex) + "\", function(){"
+        currentBtLineIndex = currentBtLineIndex + 1
+        return currName + "\n" + str(self.whiletrue)# + "});\n"
+
+    __repr__ = __str__
+
+
+class btOther:
+    def __init__(self, whiletrue):
+        self.whiletrue = whiletrue
+
+    def __str__(self):
+        global currentBtOtherIndex
+        currName ="bp.registerBThread(\"O_Player_Other_" + str(currentBtOtherIndex) + "\", function(){"
+        currentBtOtherIndex = currentBtOtherIndex + 1
+        return currName + "\n" + str(self.whiletrue)# + "});\n"
 
     __repr__ = __str__
 
@@ -104,7 +110,7 @@ class btC:
     __repr__ = __str__
 
 
-class while_trueA:
+class while_trueLine:
     def __init__(self, waits, request):
         self.request = request
         self.waits = waits
@@ -112,9 +118,9 @@ class while_trueA:
     def __str__(self):
         code_str = ""
         for wait in self.waits:
-            code_str += str(wait)
-        code_str += str(self.request)
-        return "while(true){" + code_str# + "}"
+            code_str += str(wait) + "\n"
+        code_str += str(self.request) + "\n"
+        return "while(true){\n" + code_str + "}\n});"
     __repr__ = __str__
 
 
@@ -132,7 +138,7 @@ class while_trueB:
     __repr__ = __str__
 
 
-class while_trueC:
+class while_trueOther:
     def __init__(self, waits, request):
         self.request = request
         self.waits = waits
@@ -140,9 +146,9 @@ class while_trueC:
     def __str__(self):
         code_str = ""
         for wait in self.waits:
-            code_str += str(wait)
-        code_str += str(self.request)
-        return "while(true){" + code_str# + "}"
+            code_str += str(wait) + "\n"
+        code_str += str(self.request) + "\n"
+        return "while(true){\n" + code_str + "}\n});"
     __repr__ = __str__
 
 
@@ -247,7 +253,7 @@ class Perm02_X:
         self.pos1 = pos1
 
     def __str__(self):
-        return "X(f[p[" + str(self.pos1) + "]].x,f[p[" + str(self.pos1) + "]].y)"
+        return "X(l[" + str(self.pos1) + "].x,l[" + str(self.pos1) + "].y)"
     __repr__ = __str__
 
 
@@ -256,7 +262,7 @@ class Perm02_O:
         self.pos1 = pos1
 
     def __str__(self):
-        return "O(f[p[" + str(self.pos1) + "]].x,f[p[" + str(self.pos1) + "]].y)"
+        return "O(l[" + str(self.pos1) + "].x,l[" + str(self.pos1) + "].y)"
     __repr__ = __str__
 
 
@@ -347,32 +353,40 @@ def root_wrapperFunc(root):
     return root_wrapper(root)
 
 
-def rootFunc(btl1,btl2,btf1,btf2,btf3,btf4,btf5,bt1,bt2,bt3):
-    return root(btl1,btl2,btf1,btf2,btf3,btf4,btf5,bt1,bt2,bt3)
+def rootFunc(btgLine, btgOther):
+    return root(btgLine,btgOther)
 
 
-def btAFunc(while_trueA):
-    return btA(while_trueA)
+def btLineGroupFunc(*bts):
+    return btGroupLine(bts)
 
 
-def btBFunc(while_trueB):
-    return btB(while_trueB)
+def btOtherGroupFunc(*bts):
+    return btGroupOther(bts)
+
+
+def btLineFunc(while_trueA):
+    return btLine(while_trueA)
+
+
+def btOtherFunc(while_trueB):
+    return btOther(while_trueB)
 
 
 def btCFunc(while_trueC):
     return btC(while_trueC)
 
 
-def while_trueA_0(request):
-    return while_trueA([], request)
+def while_trueLine_0(request):
+    return while_trueLine([], request)
 
 
-def while_trueA_1(wait1, request):
-    return while_trueA([wait1], request)
+def while_trueLine_1(wait1, request):
+    return while_trueLine([wait1], request)
 
 
-def while_trueA_2(wait1, wait2, request):
-    return while_trueA([wait1, wait2], request)
+def while_trueLine_2(wait1, wait2, request):
+    return while_trueLine([wait1, wait2], request)
 
 
 def while_trueB_0(request):
@@ -387,16 +401,16 @@ def while_trueB_2(wait1, wait2, request):
     return while_trueB([wait1, wait2], request)
 
 
-def while_trueC_0(request):
-    return while_trueC([], request)
+def while_trueOther_0(request):
+    return while_trueOther([], request)
 
 
-def while_trueC_1(wait1, request):
-    return while_trueC([wait1], request)
+def while_trueOther_1(wait1, request):
+    return while_trueOther([wait1], request)
 
 
-def while_trueC_2(wait1, wait2, request):
-    return while_trueC([wait1, wait2], request)
+def while_trueOther_2(wait1, wait2, request):
+    return while_trueOther([wait1, wait2], request)
 
 
 def wait02_1(ev1):

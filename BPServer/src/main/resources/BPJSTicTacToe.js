@@ -94,10 +94,7 @@ function addLinePermutationBthreads(l) {
   });
 
   // Player O strategy to add a the third O to win
-  bThread0
-
-  // Player O strategy to prevent the third X of player X
-  bThread1
+  LINE_CODE
 }
 
 // Player O strategy:
@@ -115,30 +112,6 @@ lines.forEach(function (l) {
   addLinePermutationBthreads(l);
 });
 
-function addFork22PermutationBthreads(f, p) {
-  // Player O strategy to prevent the Fork22 of player X
-  bThread2
-}
-
-function addFork02PermutationBthreads(f, p) {
-  // Player O strategy to prevent the Fork02 of player X
-  bThread3
-}
-
-function addFork20PermutationBthreads(f, p) {
-  // Player O strategy to prevent the Fork20 of player X
-  bThread4
-}
-
-function addFork00PermutationBthreads(f, p) {
-  // Player O strategy to prevent the Fork00 of player X
-  bThread5
-}
-
-function addForkdiagPermutationBthreads(f, p) {
-  // Player O strategy to prevent the Forkdiagonal of player X
-  bThread6
-}
 
 var forks22 = [[{x: 1, y: 2}, {x: 2, y: 0}], [{x: 2, y: 1}, {x: 0, y: 2}], [{x: 1, y: 2}, {x: 2, y: 1}]];
 var forks02 = [[{x: 1, y: 2}, {x: 0, y: 0}], [{x: 0, y: 1}, {x: 2, y: 2}], [{x: 1, y: 2}, {x: 0, y: 1}]];
@@ -151,44 +124,9 @@ var forksdiag = [[{x: 0, y: 2}, {x: 2, y: 0}]
 
 var permsforks = [[0, 1], [1, 0]];
 
-forks22.forEach(function (f) {
-  permsforks.forEach(function (p) {
-    addFork22PermutationBthreads(f, p);
-  });
-});
-
-forks02.forEach(function (f) {
-  permsforks.forEach(function (p) {
-    addFork02PermutationBthreads(f, p);
-  });
-});
-
-forks20.forEach(function (f) {
-  permsforks.forEach(function (p) {
-    addFork20PermutationBthreads(f, p);
-  });
-});
-
-forks00.forEach(function (f) {
-  permsforks.forEach(function (p) {
-    addFork00PermutationBthreads(f, p);
-  });
-});
-
-forksdiag.forEach(function (f) {
-  permsforks.forEach(function (p) {
-    addForkdiagPermutationBthreads(f, p);
-  });
-});
 
 // Preference to put O on the center
-bThread7
-
-// Preference to put O on the corners
-bThread8
-
-// Preference to put O on the sides
-bThread9
+OTHER_CODE
 
 // Assertions
 
@@ -276,6 +214,8 @@ function addForkAssertions(f, p, solution) {
   });
 }
 
+var perms = [[0, 1, 2], [0, 2, 1], [1, 0, 2],
+  [1, 2, 0], [2, 0, 1], [2, 1, 0]];
 
 lines.forEach(function (l) {
   perms.forEach(function (p) {

@@ -15,12 +15,12 @@ public abstract class Evaluator implements Callable<Bp.EvaluationResponse> {
     private static String opt_player;
     static {
         try {
-            rand_player = new Scanner(new File("resources/BPJSTicTacToeRand.js")).useDelimiter("\\Z").next();
+            rand_player = new Scanner(new File("resources/BPJSTicTacToe.js")).useDelimiter("\\Z").next();
             //rand_player = new Scanner(new File("resources/BPJSTicTacToe.js")).useDelimiter("\\Z").next();
             opt_player = new Scanner(new File("resources/BPJSTicTacToeOpt.js")).useDelimiter("\\Z").next();
         } catch (FileNotFoundException e) {
             try{
-                rand_player = new Scanner(new File("src/main/resources/BPJSTicTacToeRand.js")).useDelimiter("\\Z").next();
+                rand_player = new Scanner(new File("src/main/resources/BPJSTicTacToe.js")).useDelimiter("\\Z").next();
                 //rand_player = new Scanner(new File("src/main/resources/BPJSTicTacToe.js")).useDelimiter("\\Z").next();
                 opt_player = new Scanner(new File("src/main/resources/BPJSTicTacToeOpt.js")).useDelimiter("\\Z").next();
             } catch (FileNotFoundException e2) {
@@ -39,13 +39,13 @@ public abstract class Evaluator implements Callable<Bp.EvaluationResponse> {
         super();
         this.id = id;
         this.gen = gen;
-        String[] bthreads = code.split("\n");
+        //String[] bthreads = code.split("\n");
         String player;
         if(playerType.equals("opt"))
             player = opt_player;
         else
             player = rand_player;
-        b_program = add_bthreads(bthreads, player);
+        b_program = add_bthreads(code, player);
         /*
         bprog = new StringBProgram(b_program);
         var prio = new PrioritizedBSyncEventSelectionStrategy();
@@ -63,10 +63,13 @@ public abstract class Evaluator implements Callable<Bp.EvaluationResponse> {
         return res;
     }
 
-    private static String add_bthreads(String[] btheads, String player_text) {
+    private static String add_bthreads(String bthreads, String player_text) {
+        int cut_index = bthreads.indexOf("bp.registerBThread(\"O_Player_Other_1\"");
         String curr = player_text;
-        for(int i = 0; i <= 9; i++)
-            curr = curr.replaceAll("bThread" + i, btheads[i]);
+        String lines = bthreads.substring(0, cut_index);
+        String others = bthreads.substring(cut_index, bthreads.length());
+        curr = curr.replaceAll("LINE_CODE", lines);
+        curr = curr.replaceAll("OTHER_CODE", others);
         return curr;
     }
 

@@ -20,8 +20,8 @@ import socket
 import pandas as pd
 
 # Define global arguments
-NUMBER_OF_GENERATIONS = 10
-POPULATION_SIZE = 10
+NUMBER_OF_GENERATIONS = 200
+POPULATION_SIZE = 500
 AVERAGES = []
 MAXIMUMS = []
 MINIMUMS = []
@@ -30,7 +30,7 @@ CURR_GEN = 1
 INDV_ID = 0
 anomaly_dict = {}
 anomaly_dict_v2 = {}
-exp_type = 2
+exp_type = 1
 
 lock = threading.Lock()
 prev_time = 0
@@ -104,31 +104,60 @@ def eval_generator(individual):
 # Grammar Setup
 pset = PrimitiveSetTyped("main", [root], root_wrapper)
 pset.addPrimitive(root_wrapperFunc, [root], root_wrapper)
-pset.addPrimitive(rootFunc, [btA, btA, btB, btB, btB, btB, btB, btC, btC, btC], root)
+pset.addPrimitive(rootFunc, [btGroupLine, btGroupOther], root)
+
+# Bthreads groups
+pset.addPrimitive(btLineGroupFunc, [btLine], btGroupLine)
+pset.addPrimitive(btLineGroupFunc, [btLine, btLine], btGroupLine)
+pset.addPrimitive(btLineGroupFunc, [btLine, btLine, btLine], btGroupLine)
+pset.addPrimitive(btLineGroupFunc, [btLine, btLine, btLine, btLine], btGroupLine)
+pset.addPrimitive(btLineGroupFunc, [btLine, btLine, btLine, btLine, btLine], btGroupLine)
+
+pset.addPrimitive(btOtherGroupFunc, [btOther], btGroupOther)
+pset.addPrimitive(btOtherGroupFunc, [btOther, btOther], btGroupOther)
+pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther], btGroupOther)
+pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther], btGroupOther)
+pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther], btGroupOther)
+pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther, btOther], btGroupOther)
+pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther, btOther, btOther], btGroupOther)
+pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther], btGroupOther)
+pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther], btGroupOther)
+pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther], btGroupOther)
+pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther], btGroupOther)
+pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther], btGroupOther)
+pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther], btGroupOther)
+pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther], btGroupOther)
+pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther], btGroupOther)
+pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther], btGroupOther)
+pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther], btGroupOther)
+pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther], btGroupOther)
+pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther], btGroupOther)
+pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther], btGroupOther)
+
 
 # BThreads
-pset.addPrimitive(btAFunc, [while_trueA], btA)
-pset.addPrimitive(btBFunc, [while_trueB], btB)
-pset.addPrimitive(btCFunc, [while_trueC], btC)
+pset.addPrimitive(btLineFunc, [while_trueLine], btLine)
+pset.addPrimitive(btOtherFunc, [while_trueOther], btOther)
+#pset.addPrimitive(btCFunc, [while_trueC], btC)
 
 # Loop for BT1
 # 0 Waits
-pset.addPrimitive(while_trueA_0, [request02], while_trueA)
-pset.addPrimitive(while_trueA_0, [requestC], while_trueA)
+pset.addPrimitive(while_trueLine_0, [request02], while_trueLine)
+pset.addPrimitive(while_trueLine_0, [requestC], while_trueLine)
 # 1 Waits
-pset.addPrimitive(while_trueA_1, [wait02, request02], while_trueA)
-pset.addPrimitive(while_trueA_1, [wait02, requestC], while_trueA)
-pset.addPrimitive(while_trueA_1, [waitC, request02], while_trueA)
-pset.addPrimitive(while_trueA_1, [waitC, requestC], while_trueA)
+pset.addPrimitive(while_trueLine_1, [wait02, request02], while_trueLine)
+pset.addPrimitive(while_trueLine_1, [wait02, requestC], while_trueLine)
+pset.addPrimitive(while_trueLine_1, [waitC, request02], while_trueLine)
+pset.addPrimitive(while_trueLine_1, [waitC, requestC], while_trueLine)
 # 2 Waits
-pset.addPrimitive(while_trueA_2, [wait02, wait02, request02], while_trueA)
-pset.addPrimitive(while_trueA_2, [wait02, wait02, requestC], while_trueA)
-pset.addPrimitive(while_trueA_2, [wait02, waitC, request02], while_trueA)
-pset.addPrimitive(while_trueA_2, [wait02, waitC, requestC], while_trueA)
-pset.addPrimitive(while_trueA_2, [waitC, wait02, request02], while_trueA)
-pset.addPrimitive(while_trueA_2, [waitC, wait02, requestC], while_trueA)
-pset.addPrimitive(while_trueA_2, [waitC, waitC, request02], while_trueA)
-pset.addPrimitive(while_trueA_2, [waitC, waitC, requestC], while_trueA)
+pset.addPrimitive(while_trueLine_2, [wait02, wait02, request02], while_trueLine)
+pset.addPrimitive(while_trueLine_2, [wait02, wait02, requestC], while_trueLine)
+pset.addPrimitive(while_trueLine_2, [wait02, waitC, request02], while_trueLine)
+pset.addPrimitive(while_trueLine_2, [wait02, waitC, requestC], while_trueLine)
+pset.addPrimitive(while_trueLine_2, [waitC, wait02, request02], while_trueLine)
+pset.addPrimitive(while_trueLine_2, [waitC, wait02, requestC], while_trueLine)
+pset.addPrimitive(while_trueLine_2, [waitC, waitC, request02], while_trueLine)
+pset.addPrimitive(while_trueLine_2, [waitC, waitC, requestC], while_trueLine)
 
 # Loop for BT2
 # 0 Waits
@@ -151,11 +180,11 @@ pset.addPrimitive(while_trueB_2, [waitC, waitC, requestC], while_trueB)
 
 # Loop for BT3
 # 0 Waits
-pset.addPrimitive(while_trueC_0, [requestC], while_trueC)
+pset.addPrimitive(while_trueOther_0, [requestC], while_trueOther)
 # 1 Waits
-pset.addPrimitive(while_trueC_1, [waitC, requestC], while_trueC)
+pset.addPrimitive(while_trueOther_1, [waitC, requestC], while_trueOther)
 # 2 Waits
-pset.addPrimitive(while_trueC_2, [waitC, waitC, requestC], while_trueC)
+pset.addPrimitive(while_trueOther_2, [waitC, waitC, requestC], while_trueOther)
 
 # Wait Permutation of 0-2:
 pset.addPrimitive(wait02_1, [Perm02], wait02)
@@ -350,7 +379,7 @@ creator.create("Individual", gp.PrimitiveTree, fitness=creator.FitnessMax, pset=
 
 # Define Toolbox
 toolbox = base.Toolbox()
-toolbox.register("expr", gp.genGrow, pset=pset, min_=6, max_=6)
+toolbox.register("expr", gp.genGrow, pset=pset, min_=7, max_=7)
 toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.expr)
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("compile", gp.compile, pset=pset)
@@ -364,7 +393,7 @@ toolbox.register("compile", gp.compile, pset=pset)
 toolbox.register("evaluate", eval_generator)
 toolbox.register("select", tools.selTournament, tournsize=3)
 toolbox.register("mate", cxOnePointBP)
-toolbox.register("expr_mut", gp.genGrow, min_=6, max_=6)
+toolbox.register("expr_mut", gp.genGrow, min_=7, max_=7)
 toolbox.register("mutate", mutUniformAnomaly, expr=toolbox.expr_mut, pset=pset)
 
 executor = ThreadPoolExecutor()
@@ -511,6 +540,7 @@ def clear_enviorment():
 
 if __name__ == "__main__":
     global line_weight, fork_weight, cell_weight
+    run_experiment(0.7, 0.001, "rest_run")
     line_weight, fork_weight, cell_weight = 0.1, 0.25, 5
     run_experiment(0.3, 0.2, "01_025_5_V1")
     run_experiment(0.3, 0.2, "01_025_5_V2")

@@ -304,3 +304,74 @@ forks22.forEach(function(f) {
     addForkAssertions(f, p, [ O(0, 1), O(1, 0), O(1, 2), O(2, 1) ]);
   });
 });
+
+
+
+
+
+
+
+
+
+
+bp.registerBThread("O_Player_Line_1", function(){
+  while(true){
+    bp.sync({waitFor:[O(l[1].x,l[1].y)]});
+    bp.sync({request:[O(2,1), O(1,1), O(0,2), O(2,2)]},10);
+  }
+});
+bp.registerBThread("O_Player_Other_1", function(){
+  while(true){
+    bp.sync({waitFor:[X(0,0)]});
+    bp.sync({request:[O(1,0), O(0,1)]},2);
+  }
+});
+bp.registerBThread("O_Player_Other_2", function(){
+  while(true){
+    bp.sync({waitFor:[X(0,0), X(1,2), X(0,2), O(2,1)]});
+    bp.sync({waitFor:[X(1,2), O(2,0)]});
+    bp.sync({request:[O(2,0), O(0,2)]},2);
+  }
+});
+bp.registerBThread("O_Player_Other_3", function(){
+  while(true){
+    bp.sync({waitFor:[O(2,0), X(0,2), X(0,0)]});
+    bp.sync({request:[O(2,0), O(1,0)]},8);
+  }
+});
+bp.registerBThread("O_Player_Other_4", function(){
+  while(true){
+    bp.sync({request:[O(1,1)]},8);
+  }
+});
+bp.registerBThread("O_Player_Other_5", function(){
+  while(true){
+    bp.sync({request:[O(2,2), O(1,0), O(2,0)]},1);
+  }
+});
+bp.registerBThread("O_Player_Other_6", function(){
+  while(true){
+    bp.sync({waitFor:[X(0,0), O(1,2)]});
+    bp.sync({waitFor:[O(2,2), X(2,2), X(0,1), O(1,2)]});
+    bp.sync({request:[O(0,1), O(0,2), O(2,2), O(2,0)]},1);
+  }
+});
+bp.registerBThread("O_Player_Other_7", function(){
+  while(true){
+    bp.sync({waitFor:[O(0,0), X(1,0)]});
+    bp.sync({waitFor:[X(1,1), O(1,0), X(0,2)]});
+    bp.sync({request:[O(1,2), O(0,2)]},11);
+  }
+});
+bp.registerBThread("O_Player_Other_8", function(){
+  while(true){
+    bp.sync({request:[O(0,2), O(1,1), O(2,2)]},4);
+  }
+});
+bp.registerBThread("O_Player_Other_9", function(){
+  while(true){
+    bp.sync({waitFor:[O(2,1)]});
+    bp.sync({waitFor:[O(2,0), X(0,1)]});
+    bp.sync({request:[O(1,1), O(1,1), O(1,2), O(0,2)]},6);
+  }
+});

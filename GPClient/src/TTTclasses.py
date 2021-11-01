@@ -1,4 +1,5 @@
 import json
+import threading
 
 btNames = ["bp.registerBThread(\"AddThirdO(<\"+f[p[0]].x+\",\"+f[p[0]].y+\">,\"+\"<\"+f[p[1]].x+\",\"+f[p[1]].y+\">,\"+\"<\"+f[p[2]].x+\",\"+f[p[2]].y+\">)\",function(){",
            "bp.registerBThread(\"PreventThirdX(<\"+f[p[0]].x+\",\"+f[p[0]].y+\">,\"+\"<\"+f[p[1]].x+\",\"+f[p[1]].y+\">,\"+\"<\"+f[p[2]].x+\",\"+f[p[2]].y+\">)\",function(){",
@@ -12,8 +13,9 @@ btNames = ["bp.registerBThread(\"AddThirdO(<\"+f[p[0]].x+\",\"+f[p[0]].y+\">,\"+
            "bp.registerBThread(\"Sides\",function(){"
            ]
 
-currentBtLineIndex = 1
-currentBtOtherIndex = 1
+currentBehaviorSetIndex = 1
+currentBehaviorIndex = 1
+lock = threading.Lock()
 
 class root_wrapper:
     def __init__(self, root):
@@ -26,220 +28,574 @@ class root_wrapper:
 
 
 class root:
-
-    def __init__(self, btgLine,btgOther):
-        self.btgLine = btgLine
-        self.btgOther = btgOther
+    def __init__(self, *ctxs):
+        self.ctxs = ctxs[0]
 
     def __str__(self):
-        global currentBtLineIndex, currentBtOtherIndex
-        currentBtLineIndex = 1
-        currentBtOtherIndex = 1
-        res = ""
-        res += str(self.btgLine)
-        # res += "bp.sync({request: bp.Event(\"THREAD0\")}, 120);}});\n"
-        res += str(self.btgOther)
-        # res += "bp.sync({request: bp.Event(\"THREAD1\")}, 120);}});\n"
-        return str(res)
+        global currentBehaviorSetIndex, currentBehaviorIndex
+        code = ""
+        currentBehaviorSetIndex = 1
+        currentBehaviorIndex = 1
+        for ctx in self.ctxs:
+            code += str(ctx) + "\n"
+        currentBehaviorSetIndex = 1
+        currentBehaviorIndex = 1
+        return str(code)
 
     __repr__ = __str__
 
 
-class btGroupLine:
-    def __init__(self, bts):
-        self.bts = bts
+class CTX:
+    def __init__(self, single_inputs, behavior_sets):
+        self.single_inputs = single_inputs
+        self.behavior_sets = behavior_sets
 
     def __str__(self):
-        code_str = ""
-        for bt in self.bts:
-            code_str += str(bt) + "\n"
-        return code_str
+        global currentBehaviorSetIndex, currentBehaviorIndex
+        code_behaviors = str(self.behavior_sets)
+        code = "var inputs_" + str(currentBehaviorSetIndex) + " = ["
+        for single_input in self.single_inputs:
+            code += str(single_input) + ",\n"
+        code = code[:-2] + "]\n"
+        code += "inputs_" + str(currentBehaviorSetIndex) + ".forEach(function (input) {\n"
+        code += "behaviorSet" + str(currentBehaviorSetIndex) + "(input);\n"
+        code += "});\n"
+        currentBehaviorIndex = 1
+        currentBehaviorSetIndex += 1
+        return code_behaviors + code
+    __repr__ = __str__
+
+
+class BehaviorSet1:
+    def __init__(self, behaviors):
+        self.behaviors = behaviors
+
+    def __str__(self):
+        code = "function behaviorSet" + str(currentBehaviorSetIndex) + "(input) {\n"
+        for behavior in self.behaviors:
+            code += str(behavior) + "\n"
+        return code + "}\n"
+    __repr__ = __str__
+
+
+class BehaviorSet2:
+    def __init__(self, behaviors):
+        self.behaviors = behaviors
+
+    def __str__(self):
+        code = "function behaviorSet" + str(currentBehaviorSetIndex) + "(input) {\n"
+        for behavior in self.behaviors:
+            code += str(behavior) + "\n"
+        return code + "}\n"
+    __repr__ = __str__
+
+
+class BehaviorSet3:
+    def __init__(self, behaviors):
+        self.behaviors = behaviors
+
+    def __str__(self):
+        code = "function behaviorSet" + str(currentBehaviorSetIndex) + "(input) {\n"
+        for behavior in self.behaviors:
+            code += str(behavior) + "\n"
+        return code + "}\n"
 
     __repr__ = __str__
 
 
-class btGroupOther:
-    def __init__(self, bts):
-        self.bts = bts
+class BehaviorSet4:
+    def __init__(self, behaviors):
+        self.behaviors = behaviors
 
     def __str__(self):
-        code_str = ""
-        for bt in self.bts:
-            code_str += str(bt) + "\n"
-        return code_str
+        code = "function behaviorSet" + str(currentBehaviorSetIndex) + "(input) {\n"
+        for behavior in self.behaviors:
+            code += str(behavior) + "\n"
+        return code + "}\n"
 
     __repr__ = __str__
 
 
-class btLine:
-    def __init__(self, whiletrue):
-        self.whiletrue = whiletrue
+class BehaviorSet5:
+    def __init__(self, behaviors):
+        self.behaviors = behaviors
 
     def __str__(self):
-        global currentBtLineIndex
-        currName = "bp.registerBThread(\"O_Player_Line_" + str(currentBtLineIndex) + "\", function(){"
-        currentBtLineIndex = currentBtLineIndex + 1
-        return currName + "\n" + str(self.whiletrue)# + "});\n"
+        code = "function behaviorSet" + str(currentBehaviorSetIndex) + "(input) {\n"
+        for behavior in self.behaviors:
+            code += str(behavior) + "\n"
+        return code + "}\n"
 
     __repr__ = __str__
 
 
-class btOther:
-    def __init__(self, whiletrue):
-        self.whiletrue = whiletrue
+class BehaviorSet6:
+    def __init__(self, behaviors):
+        self.behaviors = behaviors
 
     def __str__(self):
-        global currentBtOtherIndex
-        currName ="bp.registerBThread(\"O_Player_Other_" + str(currentBtOtherIndex) + "\", function(){"
-        currentBtOtherIndex = currentBtOtherIndex + 1
-        return currName + "\n" + str(self.whiletrue)# + "});\n"
+        code = "function behaviorSet" + str(currentBehaviorSetIndex) + "(input) {\n"
+        for behavior in self.behaviors:
+            code += str(behavior) + "\n"
+        return code + "}\n"
 
     __repr__ = __str__
 
 
-class btC:
-    def __init__(self, whiletrue):
-        self.whiletrue = whiletrue
+class BehaviorSet7:
+    def __init__(self, behaviors):
+        self.behaviors = behaviors
 
     def __str__(self):
-        global currentBtNameIndex, btNames
-        currName = btNames[currentBtNameIndex]
-        currentBtNameIndex = (currentBtNameIndex + 1) % 10
-        return currName + str(self.whiletrue)# + "});\n"
+        code = "function behaviorSet" + str(currentBehaviorSetIndex) + "(input) {\n"
+        for behavior in self.behaviors:
+            code += str(behavior) + "\n"
+        return code + "}\n"
 
     __repr__ = __str__
 
 
-class while_trueLine:
-    def __init__(self, waits, request):
+class BehaviorSet8:
+    def __init__(self, behaviors):
+        self.behaviors = behaviors
+
+    def __str__(self):
+        code = "function behaviorSet" + str(currentBehaviorSetIndex) + "(input) {\n"
+        for behavior in self.behaviors:
+            code += str(behavior) + "\n"
+        return code + "}\n"
+
+    __repr__ = __str__
+
+
+class BehaviorSet9:
+    def __init__(self, behaviors):
+        self.behaviors = behaviors
+
+    def __str__(self):
+        code = "function behaviorSet" + str(currentBehaviorSetIndex) + "(input) {\n"
+        for behavior in self.behaviors:
+            code += str(behavior) + "\n"
+        return code + "}\n"
+
+    __repr__ = __str__
+
+
+class Behavior1:
+    def __init__(self, request, waits):
         self.request = request
         self.waits = waits
 
     def __str__(self):
-        code_str = ""
+        code = ""
         for wait in self.waits:
-            code_str += str(wait) + "\n"
-        code_str += str(self.request) + "\n"
-        return "while(true){\n" + code_str + "}\n});"
+            code += str(wait) + "\n"
+        code += str(self.request) + "\n"
+        global currentBehaviorIndex
+        curr_name = "bp.registerBThread(\"O_Player_Thread_" + str(currentBehaviorSetIndex) + "_" + str(currentBehaviorIndex) + "\", function(){\n"
+        currentBehaviorIndex = currentBehaviorIndex + 1
+        return curr_name + code + "});\n"
     __repr__ = __str__
 
 
-class while_trueB:
-    def __init__(self, waits, request):
+class Behavior2:
+    def __init__(self, request, waits):
         self.request = request
         self.waits = waits
 
     def __str__(self):
-        code_str = ""
+        code = ""
         for wait in self.waits:
-            code_str += str(wait)
-        code_str += str(self.request)
-        return "while(true){" + code_str# + "}"
+            code += str(wait) + "\n"
+        code += str(self.request) + "\n"
+        global currentBehaviorIndex
+        curr_name = "bp.registerBThread(\"O_Player_Thread_" + str(currentBehaviorSetIndex) + "_" + str(currentBehaviorIndex) + "\", function(){\n"
+        currentBehaviorIndex = currentBehaviorIndex + 1
+        return curr_name + code + "});\n"
     __repr__ = __str__
 
 
-class while_trueOther:
-    def __init__(self, waits, request):
+class Behavior3:
+    def __init__(self, request, waits):
         self.request = request
         self.waits = waits
 
     def __str__(self):
-        code_str = ""
+        code = ""
         for wait in self.waits:
-            code_str += str(wait) + "\n"
-        code_str += str(self.request) + "\n"
-        return "while(true){\n" + code_str + "}\n});"
+            code += str(wait) + "\n"
+        code += str(self.request) + "\n"
+        global currentBehaviorIndex
+        curr_name = "bp.registerBThread(\"O_Player_Thread_" + str(currentBehaviorSetIndex) + "_" + str(currentBehaviorIndex) + "\", function(){\n"
+        currentBehaviorIndex = currentBehaviorIndex + 1
+        return curr_name + code + "});\n"
     __repr__ = __str__
 
 
-class wait02:
-    def __init__(self, events):
-        self.events = events
+class Behavior4:
+    def __init__(self, request, waits):
+        self.request = request
+        self.waits = waits
 
     def __str__(self):
-        code_str = ""
-        for event in self.events:
-            code_str += str(event)
-            code_str += ", "
-        code_str = code_str[:-2]
-        return "bp.sync({waitFor:[" + code_str + "]});"
+        code = ""
+        for wait in self.waits:
+            code += str(wait) + "\n"
+        code += str(self.request) + "\n"
+        global currentBehaviorIndex
+        curr_name = "bp.registerBThread(\"O_Player_Thread_" + str(currentBehaviorSetIndex) + "_" + str(currentBehaviorIndex) + "\", function(){\n"
+        currentBehaviorIndex = currentBehaviorIndex + 1
+        return curr_name + code + "});\n"
     __repr__ = __str__
 
 
-class wait01:
-    def __init__(self, events):
-        self.events = events
+class Behavior5:
+    def __init__(self, request, waits):
+        self.request = request
+        self.waits = waits
 
     def __str__(self):
-        code_str = ""
-        for event in self.events:
-            code_str += str(event)
-            code_str += ", "
-        code_str = code_str[:-2]
-        return "bp.sync({waitFor:[" + code_str + "]});"
+        code = ""
+        for wait in self.waits:
+            code += str(wait) + "\n"
+        code += str(self.request) + "\n"
+        global currentBehaviorIndex
+        curr_name = "bp.registerBThread(\"O_Player_Thread_" + str(currentBehaviorSetIndex) + "_" + str(currentBehaviorIndex) + "\", function(){\n"
+        currentBehaviorIndex = currentBehaviorIndex + 1
+        return curr_name + code + "});\n"
     __repr__ = __str__
 
 
-class waitC:
-    def __init__(self, events):
-        self.events = events
+class Behavior6:
+    def __init__(self, request, waits):
+        self.request = request
+        self.waits = waits
 
     def __str__(self):
-        code_str = ""
-        for event in self.events:
-            code_str += str(event)
-            code_str += ", "
-        code_str = code_str[:-2]
-        return "bp.sync({waitFor:[" + code_str + "]});"
+        code = ""
+        for wait in self.waits:
+            code += str(wait) + "\n"
+        code += str(self.request) + "\n"
+        global currentBehaviorIndex
+        curr_name = "bp.registerBThread(\"O_Player_Thread_" + str(currentBehaviorSetIndex) + "_" + str(currentBehaviorIndex) + "\", function(){\n"
+        currentBehaviorIndex = currentBehaviorIndex + 1
+        return curr_name + code + "});\n"
     __repr__ = __str__
 
 
-class request02:
+class Behavior7:
+    def __init__(self, request, waits):
+        self.request = request
+        self.waits = waits
+
+    def __str__(self):
+        code = ""
+        for wait in self.waits:
+            code += str(wait) + "\n"
+        code += str(self.request) + "\n"
+        global currentBehaviorIndex
+        curr_name = "bp.registerBThread(\"O_Player_Thread_" + str(currentBehaviorSetIndex) + "_" + str(currentBehaviorIndex) + "\", function(){\n"
+        currentBehaviorIndex = currentBehaviorIndex + 1
+        return curr_name + code + "});\n"
+    __repr__ = __str__
+
+
+class Behavior8:
+    def __init__(self, request, waits):
+        self.request = request
+        self.waits = waits
+
+    def __str__(self):
+        code = ""
+        for wait in self.waits:
+            code += str(wait) + "\n"
+        code += str(self.request) + "\n"
+        global currentBehaviorIndex
+        curr_name = "bp.registerBThread(\"O_Player_Thread_" + str(currentBehaviorSetIndex) + "_" + str(currentBehaviorIndex) + "\", function(){\n"
+        currentBehaviorIndex = currentBehaviorIndex + 1
+        return curr_name + code + "});\n"
+    __repr__ = __str__
+
+
+class Behavior9:
+    def __init__(self, request, waits):
+        self.request = request
+        self.waits = waits
+
+    def __str__(self):
+        code = ""
+        for wait in self.waits:
+            code += str(wait) + "\n"
+        code += str(self.request) + "\n"
+        global currentBehaviorIndex
+        curr_name = "bp.registerBThread(\"O_Player_Thread_" + str(currentBehaviorSetIndex) + "_" + str(currentBehaviorIndex) + "\", function(){\n"
+        currentBehaviorIndex = currentBehaviorIndex + 1
+        return curr_name + code + "});\n"
+    __repr__ = __str__
+
+
+class Request1:
     def __init__(self, events, priority):
         self.events = events
         self.priority = priority
 
     def __str__(self):
-        code_str = ""
+        code = ""
         for event in self.events:
-            code_str += str(event)
-            code_str += ", "
-        code_str = code_str[:-2]
-        return "bp.sync({request:[" + code_str + "]}," + str(self.priority) + ");"
+            code += str(event)
+            code += ", "
+        code = code[:-2]
+        return "bp.sync({request:[" + code + "]}," + str(self.priority) + ");"
     __repr__ = __str__
 
 
-class request01:
+class Request2:
     def __init__(self, events, priority):
         self.events = events
         self.priority = priority
 
     def __str__(self):
-        code_str = ""
+        code = ""
         for event in self.events:
-            code_str += str(event)
-            code_str += ", "
-        code_str = code_str[:-2]
-        return "bp.sync({request:[" + code_str + "]}," + str(self.priority) + ");"
+            code += str(event)
+            code += ", "
+        code = code[:-2]
+        return "bp.sync({request:[" + code + "]}," + str(self.priority) + ");"
     __repr__ = __str__
 
 
-class requestC:
+class Request3:
     def __init__(self, events, priority):
         self.events = events
         self.priority = priority
 
     def __str__(self):
-        code_str = ""
+        code = ""
         for event in self.events:
-            code_str += str(event)
-            code_str += ", "
-        code_str = code_str[:-2]
-        return "bp.sync({request:[" + code_str + "]}," + str(self.priority) + ");"
+            code += str(event)
+            code += ", "
+        code = code[:-2]
+        return "bp.sync({request:[" + code + "]}," + str(self.priority) + ");"
     __repr__ = __str__
 
 
-class Perm02:
+class Request4:
+    def __init__(self, events, priority):
+        self.events = events
+        self.priority = priority
+
+    def __str__(self):
+        code = ""
+        for event in self.events:
+            code += str(event)
+            code += ", "
+        code = code[:-2]
+        return "bp.sync({request:[" + code + "]}," + str(self.priority) + ");"
+    __repr__ = __str__
+
+
+class Request5:
+    def __init__(self, events, priority):
+        self.events = events
+        self.priority = priority
+
+    def __str__(self):
+        code = ""
+        for event in self.events:
+            code += str(event)
+            code += ", "
+        code = code[:-2]
+        return "bp.sync({request:[" + code + "]}," + str(self.priority) + ");"
+    __repr__ = __str__
+
+
+class Request6:
+    def __init__(self, events, priority):
+        self.events = events
+        self.priority = priority
+
+    def __str__(self):
+        code = ""
+        for event in self.events:
+            code += str(event)
+            code += ", "
+        code = code[:-2]
+        return "bp.sync({request:[" + code + "]}," + str(self.priority) + ");"
+    __repr__ = __str__
+
+
+class Request7:
+    def __init__(self, events, priority):
+        self.events = events
+        self.priority = priority
+
+    def __str__(self):
+        code = ""
+        for event in self.events:
+            code += str(event)
+            code += ", "
+        code = code[:-2]
+        return "bp.sync({request:[" + code + "]}," + str(self.priority) + ");"
+    __repr__ = __str__
+
+
+class Request8:
+    def __init__(self, events, priority):
+        self.events = events
+        self.priority = priority
+
+    def __str__(self):
+        code = ""
+        for event in self.events:
+            code += str(event)
+            code += ", "
+        code = code[:-2]
+        return "bp.sync({request:[" + code + "]}," + str(self.priority) + ");"
+    __repr__ = __str__
+
+
+class Request9:
+    def __init__(self, events, priority):
+        self.events = events
+        self.priority = priority
+
+    def __str__(self):
+        code = ""
+        for event in self.events:
+            code += str(event)
+            code += ", "
+        code = code[:-2]
+        return "bp.sync({request:[" + code + "]}," + str(self.priority) + ");"
+    __repr__ = __str__
+
+
+class Wait1:
+    def __init__(self, events):
+        self.events = events
+
+    def __str__(self):
+        code = ""
+        for event in self.events:
+            code += str(event)
+            code += ", "
+        code = code[:-2]
+        return "bp.sync({waitFor:[" + code + "]});"
+    __repr__ = __str__
+
+
+class Wait2:
+    def __init__(self, events):
+        self.events = events
+
+    def __str__(self):
+        code = ""
+        for event in self.events:
+            code += str(event)
+            code += ", "
+        code = code[:-2]
+        return "bp.sync({waitFor:[" + code + "]});"
+    __repr__ = __str__
+
+
+class Wait3:
+    def __init__(self, events):
+        self.events = events
+
+    def __str__(self):
+        code = ""
+        for event in self.events:
+            code += str(event)
+            code += ", "
+        code = code[:-2]
+        return "bp.sync({waitFor:[" + code + "]});"
+    __repr__ = __str__
+
+
+class Wait4:
+    def __init__(self, events):
+        self.events = events
+
+    def __str__(self):
+        code = ""
+        for event in self.events:
+            code += str(event)
+            code += ", "
+        code = code[:-2]
+        return "bp.sync({waitFor:[" + code + "]});"
+    __repr__ = __str__
+
+
+class Wait5:
+    def __init__(self, events):
+        self.events = events
+
+    def __str__(self):
+        code = ""
+        for event in self.events:
+            code += str(event)
+            code += ", "
+        code = code[:-2]
+        return "bp.sync({waitFor:[" + code + "]});"
+    __repr__ = __str__
+
+
+class Wait6:
+    def __init__(self, events):
+        self.events = events
+
+    def __str__(self):
+        code = ""
+        for event in self.events:
+            code += str(event)
+            code += ", "
+        code = code[:-2]
+        return "bp.sync({waitFor:[" + code + "]});"
+    __repr__ = __str__
+
+
+class Wait7:
+    def __init__(self, events):
+        self.events = events
+
+    def __str__(self):
+        code = ""
+        for event in self.events:
+            code += str(event)
+            code += ", "
+        code = code[:-2]
+        return "bp.sync({waitFor:[" + code + "]});"
+    __repr__ = __str__
+
+
+class Wait8:
+    def __init__(self, events):
+        self.events = events
+
+    def __str__(self):
+        code = ""
+        for event in self.events:
+            code += str(event)
+            code += ", "
+        code = code[:-2]
+        return "bp.sync({waitFor:[" + code + "]});"
+    __repr__ = __str__
+
+
+class Wait9:
+    def __init__(self, events):
+        self.events = events
+
+    def __str__(self):
+        code = ""
+        for event in self.events:
+            code += str(event)
+            code += ", "
+        code = code[:-2]
+        return "bp.sync({waitFor:[" + code + "]});"
+    __repr__ = __str__
+
+
+class Event1:
     def __init__(self, event):
         self.event = event
 
@@ -248,25 +604,7 @@ class Perm02:
     __repr__ = __str__
 
 
-class Perm02_X:
-    def __init__(self, pos1):
-        self.pos1 = pos1
-
-    def __str__(self):
-        return "X(l[" + str(self.pos1) + "].x,l[" + str(self.pos1) + "].y)"
-    __repr__ = __str__
-
-
-class Perm02_O:
-    def __init__(self, pos1):
-        self.pos1 = pos1
-
-    def __str__(self):
-        return "O(l[" + str(self.pos1) + "].x,l[" + str(self.pos1) + "].y)"
-    __repr__ = __str__
-
-
-class Perm01:
+class Event2:
     def __init__(self, event):
         self.event = event
 
@@ -275,25 +613,7 @@ class Perm01:
     __repr__ = __str__
 
 
-class Perm01_X:
-    def __init__(self, pos1):
-        self.pos1 = pos1
-
-    def __str__(self):
-        return "X(f[p[" + str(self.pos1) + "]].x,f[p[" + str(self.pos1) + "]].y)"
-    __repr__ = __str__
-
-
-class Perm01_O:
-    def __init__(self, pos1):
-        self.pos1 = pos1
-
-    def __str__(self):
-        return "O(f[p[" + str(self.pos1) + "]].x,f[p[" + str(self.pos1) + "]].y)"
-    __repr__ = __str__
-
-
-class Concrete:
+class Event3:
     def __init__(self, event):
         self.event = event
 
@@ -302,27 +622,350 @@ class Concrete:
     __repr__ = __str__
 
 
-class Concrete_X:
+class Event4:
+    def __init__(self, event):
+        self.event = event
+
+    def __str__(self):
+        return str(self.event)
+    __repr__ = __str__
+
+
+class Event5:
+    def __init__(self, event):
+        self.event = event
+
+    def __str__(self):
+        return str(self.event)
+    __repr__ = __str__
+
+
+class Event6:
+    def __init__(self, event):
+        self.event = event
+
+    def __str__(self):
+        return str(self.event)
+    __repr__ = __str__
+
+
+class Event7:
+    def __init__(self, event):
+        self.event = event
+
+    def __str__(self):
+        return str(self.event)
+    __repr__ = __str__
+
+
+class Event8:
+    def __init__(self, event):
+        self.event = event
+
+    def __str__(self):
+        return str(self.event)
+    __repr__ = __str__
+
+
+class Event9:
+    def __init__(self, event):
+        self.event = event
+
+    def __str__(self):
+        return str(self.event)
+    __repr__ = __str__
+
+
+class XEvent1:
+    def __init__(self, indx):
+        self.indx = indx
+
+    def __str__(self):
+        return "X(input[" + str(self.indx) + "].x, input[" + str(self.indx) + "].y)"
+    __repr__ = __str__
+
+
+class XEvent2:
+    def __init__(self, indx):
+        self.indx = indx
+
+    def __str__(self):
+        return "X(input[" + str(self.indx) + "].x, input[" + str(self.indx) + "].y)"
+    __repr__ = __str__
+
+
+class XEvent3:
+    def __init__(self, indx):
+        self.indx = indx
+
+    def __str__(self):
+        return "X(input[" + str(self.indx) + "].x, input[" + str(self.indx) + "].y)"
+    __repr__ = __str__
+
+
+class XEvent4:
+    def __init__(self, indx):
+        self.indx = indx
+
+    def __str__(self):
+        return "X(input[" + str(self.indx) + "].x, input[" + str(self.indx) + "].y)"
+    __repr__ = __str__
+
+
+class XEvent5:
+    def __init__(self, indx):
+        self.indx = indx
+
+    def __str__(self):
+        return "X(input[" + str(self.indx) + "].x, input[" + str(self.indx) + "].y)"
+    __repr__ = __str__
+
+
+class XEvent6:
+    def __init__(self, indx):
+        self.indx = indx
+
+    def __str__(self):
+        return "X(input[" + str(self.indx) + "].x, input[" + str(self.indx) + "].y)"
+    __repr__ = __str__
+
+
+class XEvent7:
+    def __init__(self, indx):
+        self.indx = indx
+
+    def __str__(self):
+        return "X(input[" + str(self.indx) + "].x, input[" + str(self.indx) + "].y)"
+    __repr__ = __str__
+
+
+class XEvent8:
+    def __init__(self, indx):
+        self.indx = indx
+
+    def __str__(self):
+        return "X(input[" + str(self.indx) + "].x, input[" + str(self.indx) + "].y)"
+    __repr__ = __str__
+
+
+class XEvent9:
+    def __init__(self, indx):
+        self.indx = indx
+
+    def __str__(self):
+        return "X(input[" + str(self.indx) + "].x, input[" + str(self.indx) + "].y)"
+    __repr__ = __str__
+
+
+class OEvent1:
+    def __init__(self, indx):
+        self.indx = indx
+
+    def __str__(self):
+        return "O(input[" + str(self.indx) + "].x, input[" + str(self.indx) + "].y)"
+    __repr__ = __str__
+
+
+class OEvent2:
+    def __init__(self, indx):
+        self.indx = indx
+
+    def __str__(self):
+        return "O(input[" + str(self.indx) + "].x, input[" + str(self.indx) + "].y)"
+    __repr__ = __str__
+
+
+class OEvent3:
+    def __init__(self, indx):
+        self.indx = indx
+
+    def __str__(self):
+        return "O(input[" + str(self.indx) + "].x, input[" + str(self.indx) + "].y)"
+    __repr__ = __str__
+
+
+class OEvent4:
+    def __init__(self, indx):
+        self.indx = indx
+
+    def __str__(self):
+        return "O(input[" + str(self.indx) + "].x, input[" + str(self.indx) + "].y)"
+    __repr__ = __str__
+
+
+class OEvent5:
+    def __init__(self, indx):
+        self.indx = indx
+
+    def __str__(self):
+        return "O(input[" + str(self.indx) + "].x, input[" + str(self.indx) + "].y)"
+    __repr__ = __str__
+
+
+class OEvent6:
+    def __init__(self, indx):
+        self.indx = indx
+
+    def __str__(self):
+        return "O(input[" + str(self.indx) + "].x, input[" + str(self.indx) + "].y)"
+    __repr__ = __str__
+
+
+class OEvent7:
+    def __init__(self, indx):
+        self.indx = indx
+
+    def __str__(self):
+        return "O(input[" + str(self.indx) + "].x, input[" + str(self.indx) + "].y)"
+    __repr__ = __str__
+
+
+class OEvent8:
+    def __init__(self, indx):
+        self.indx = indx
+
+    def __str__(self):
+        return "O(input[" + str(self.indx) + "].x, input[" + str(self.indx) + "].y)"
+    __repr__ = __str__
+
+
+class OEvent9:
+    def __init__(self, indx):
+        self.indx = indx
+
+    def __str__(self):
+        return "O(input[" + str(self.indx) + "].x, input[" + str(self.indx) + "].y)"
+    __repr__ = __str__
+
+
+class SingleInput1:
+    def __init__(self, cells):
+        self.cells = cells
+
+    def __str__(self):
+        code = "["
+        for cell in self.cells[:-1]:
+            code += str(cell) + ", "
+        code += str(self.cells[len(self.cells) - 1]) + "]"
+        return code
+    __repr__ = __str__
+
+
+class SingleInput2:
+    def __init__(self, cells):
+        self.cells = cells
+
+    def __str__(self):
+        code = "["
+        for cell in self.cells[:-1]:
+            code += str(cell) + ", "
+        code += str(self.cells[len(self.cells) - 1]) + "]"
+        return code
+    __repr__ = __str__
+
+
+class SingleInput3:
+    def __init__(self, cells):
+        self.cells = cells
+
+    def __str__(self):
+        code = "["
+        for cell in self.cells[:-1]:
+            code += str(cell) + ", "
+        code += str(self.cells[len(self.cells) - 1]) + "]"
+        return code
+    __repr__ = __str__
+
+
+class SingleInput4:
+    def __init__(self, cells):
+        self.cells = cells
+
+    def __str__(self):
+        code = "["
+        for cell in self.cells[:-1]:
+            code += str(cell) + ", "
+        code += str(self.cells[len(self.cells) - 1]) + "]"
+        return code
+    __repr__ = __str__
+
+
+class SingleInput5:
+    def __init__(self, cells):
+        self.cells = cells
+
+    def __str__(self):
+        code = "["
+        for cell in self.cells[:-1]:
+            code += str(cell) + ", "
+        code += str(self.cells[len(self.cells) - 1]) + "]"
+        return code
+    __repr__ = __str__
+
+
+class SingleInput6:
+    def __init__(self, cells):
+        self.cells = cells
+
+    def __str__(self):
+        code = "["
+        for cell in self.cells[:-1]:
+            code += str(cell) + ", "
+        code += str(self.cells[len(self.cells) - 1]) + "]"
+        return code
+    __repr__ = __str__
+
+
+class SingleInput7:
+    def __init__(self, cells):
+        self.cells = cells
+
+    def __str__(self):
+        code = "["
+        for cell in self.cells[:-1]:
+            code += str(cell) + ", "
+        code += str(self.cells[len(self.cells) - 1]) + "]"
+        return code
+    __repr__ = __str__
+
+
+class SingleInput8:
+    def __init__(self, cells):
+        self.cells = cells
+
+    def __str__(self):
+        code = "["
+        for cell in self.cells[:-1]:
+            code += str(cell) + ", "
+        code += str(self.cells[len(self.cells) - 1]) + "]"
+        return code
+    __repr__ = __str__
+
+
+class SingleInput9:
+    def __init__(self, cells):
+        self.cells = cells
+
+    def __str__(self):
+        code = "["
+        for cell in self.cells[:-1]:
+            code += str(cell) + ", "
+        code += str(self.cells[len(self.cells) - 1]) + "]"
+        return code
+    __repr__ = __str__
+
+
+class Cell:
     def __init__(self, pos1, pos2):
         self.pos1 = pos1
         self.pos2 = pos2
 
     def __str__(self):
-        return "X(" + str(self.pos1) + "," + str(self.pos2) + ")"
+        return "{x: " + str(self.pos1) + ", y: " + str(self.pos2) + "}"
     __repr__ = __str__
 
 
-class Concrete_O:
-    def __init__(self, pos1, pos2):
-        self.pos1 = pos1
-        self.pos2 = pos2
-
-    def __str__(self):
-        return "O(" + str(self.pos1) + "," + str(self.pos2) + ")"
-    __repr__ = __str__
-
-
-class position:
+class Position:
     def __init__(self, num):
         self.num = num
 
@@ -331,7 +974,7 @@ class position:
     __repr__ = __str__
 
 
-class positionf:
+class Index1:
     def __init__(self, num):
         self.num = num
 
@@ -340,7 +983,7 @@ class positionf:
     __repr__ = __str__
 
 
-class priority:
+class Index2:
     def __init__(self, num):
         self.num = num
 
@@ -349,209 +992,389 @@ class priority:
     __repr__ = __str__
 
 
-def root_wrapperFunc(root):
+class Index3:
+    def __init__(self, num):
+        self.num = num
+
+    def __str__(self):
+        return str(self.num)
+    __repr__ = __str__
+
+
+class Index4:
+    def __init__(self, num):
+        self.num = num
+
+    def __str__(self):
+        return str(self.num)
+    __repr__ = __str__
+
+
+class Index5:
+    def __init__(self, num):
+        self.num = num
+
+    def __str__(self):
+        return str(self.num)
+    __repr__ = __str__
+
+
+class Index6:
+    def __init__(self, num):
+        self.num = num
+
+    def __str__(self):
+        return str(self.num)
+    __repr__ = __str__
+
+
+class Index7:
+    def __init__(self, num):
+        self.num = num
+
+    def __str__(self):
+        return str(self.num)
+    __repr__ = __str__
+
+
+class Index8:
+    def __init__(self, num):
+        self.num = num
+
+    def __str__(self):
+        return str(self.num)
+    __repr__ = __str__
+
+
+class Index9:
+    def __init__(self, num):
+        self.num = num
+
+    def __str__(self):
+        return str(self.num)
+    __repr__ = __str__
+
+
+class Priority:
+    def __init__(self, num):
+        self.num = num
+
+    def __str__(self):
+        return str(self.num)
+    __repr__ = __str__
+
+
+def root_wrapper_func(root):
     return root_wrapper(root)
 
 
-def rootFunc(btgLine, btgOther):
-    return root(btgLine,btgOther)
+def root_func(*ctxes):
+    return root(ctxes)
 
 
-def btLineGroupFunc(*bts):
-    return btGroupLine(bts)
+def ctx_func(behavior_set, *single_inputs):
+    return CTX(single_inputs, behavior_set)
 
 
-def btOtherGroupFunc(*bts):
-    return btGroupOther(bts)
+def behavior_set_func1(*behaviors):
+    return BehaviorSet1(behaviors)
 
 
-def btLineFunc(while_trueA):
-    return btLine(while_trueA)
+def behavior_set_func2(*behaviors):
+    return BehaviorSet2(behaviors)
 
 
-def btOtherFunc(while_trueB):
-    return btOther(while_trueB)
+def behavior_set_func3(*behaviors):
+    return BehaviorSet3(behaviors)
 
 
-def btCFunc(while_trueC):
-    return btC(while_trueC)
+def behavior_set_func4(*behaviors):
+    return BehaviorSet4(behaviors)
 
 
-def while_trueLine_0(request):
-    return while_trueLine([], request)
+def behavior_set_func5(*behaviors):
+    return BehaviorSet5(behaviors)
 
 
-def while_trueLine_1(wait1, request):
-    return while_trueLine([wait1], request)
+def behavior_set_func6(*behaviors):
+    return BehaviorSet6(behaviors)
 
 
-def while_trueLine_2(wait1, wait2, request):
-    return while_trueLine([wait1, wait2], request)
+def behavior_set_func7(*behaviors):
+    return BehaviorSet7(behaviors)
 
 
-def while_trueB_0(request):
-    return while_trueB([], request)
+def behavior_set_func8(*behaviors):
+    return BehaviorSet8(behaviors)
 
 
-def while_trueB_1(wait1, request):
-    return while_trueB([wait1], request)
+def behavior_set_func9(*behaviors):
+    return BehaviorSet9(behaviors)
 
 
-def while_trueB_2(wait1, wait2, request):
-    return while_trueB([wait1, wait2], request)
+def behavior_func1(request, *waits):
+    return Behavior1(request, waits)
 
 
-def while_trueOther_0(request):
-    return while_trueOther([], request)
+def behavior_func2(request, *waits):
+    return Behavior2(request, waits)
 
 
-def while_trueOther_1(wait1, request):
-    return while_trueOther([wait1], request)
+def behavior_func3(request, *waits):
+    return Behavior3(request, waits)
 
 
-def while_trueOther_2(wait1, wait2, request):
-    return while_trueOther([wait1, wait2], request)
+def behavior_func4(request, *waits):
+    return Behavior4(request, waits)
 
 
-def wait02_1(ev1):
-    return wait02([ev1])
+def behavior_func5(request, *waits):
+    return Behavior5(request, waits)
 
 
-def wait02_2(ev1, ev2):
-    return wait02([ev1, ev2])
+def behavior_func6(request, *waits):
+    return Behavior6(request, waits)
 
 
-def wait02_3(ev1, ev2, ev3):
-    return wait02([ev1, ev2, ev3])
+def behavior_func7(request, *waits):
+    return Behavior7(request, waits)
 
 
-def wait02_4(ev1, ev2, ev3, ev4):
-    return wait02([ev1, ev2, ev3, ev4])
+def behavior_func8(request, *waits):
+    return Behavior8(request, waits)
 
 
-def wait01_1(ev1):
-    return wait01([ev1])
+def behavior_func9(request, *waits):
+    return Behavior9(request, waits)
 
 
-def wait01_2(ev1, ev2):
-    return wait01([ev1, ev2])
+def request_func1(priority, *events):
+    return Request1(events, priority)
 
 
-def wait01_3(ev1, ev2, ev3):
-    return wait01([ev1, ev2, ev3])
+def request_func2(priority, *events):
+    return Request2(events, priority)
 
 
-def wait01_4(ev1, ev2, ev3, ev4):
-    return wait01([ev1, ev2, ev3, ev4])
+def request_func3(priority, *events):
+    return Request3(events, priority)
 
 
-def waitC_1(ev1):
-    return waitC([ev1])
+def request_func4(priority, *events):
+    return Request4(events, priority)
 
 
-def waitC_2(ev1, ev2):
-    return waitC([ev1, ev2])
+def request_func5(priority, *events):
+    return Request5(events, priority)
 
 
-def waitC_3(ev1, ev2, ev3):
-    return waitC([ev1, ev2, ev3])
+def request_func6(priority, *events):
+    return Request6(events, priority)
 
 
-def waitC_4(ev1, ev2, ev3, ev4):
-    return waitC([ev1, ev2, ev3, ev4])
+def request_func7(priority, *events):
+    return Request7(events, priority)
 
 
-def request02_1(ev1, prio):
-    return request02([ev1], prio)
+def request_func8(priority, *events):
+    return Request8(events, priority)
 
 
-def request02_2(ev1, ev2, prio):
-    return request02([ev1, ev2], prio)
+def request_func9(priority, *events):
+    return Request9(events, priority)
 
 
-def request02_3(ev1, ev2, ev3, prio):
-    return request02([ev1, ev2, ev3], prio)
+def wait_func1(*events):
+    return Wait1(events)
 
 
-def request02_4(ev1, ev2, ev3, ev4, prio):
-    return request02([ev1, ev2, ev3, ev4], prio)
+def wait_func2(*events):
+    return Wait2(events)
 
 
-def request01_1(ev1, prio):
-    return request01([ev1], prio)
+def wait_func3(*events):
+    return Wait3(events)
 
 
-def request01_2(ev1, ev2, prio):
-    return request01([ev1, ev2], prio)
+def wait_func4(*events):
+    return Wait4(events)
 
 
-def request01_3(ev1, ev2, ev3, prio):
-    return request01([ev1, ev2, ev3], prio)
+def wait_func5(*events):
+    return Wait5(events)
 
 
-def request01_4(ev1, ev2, ev3, ev4, prio):
-    return request01([ev1, ev2, ev3, ev4], prio)
+def wait_func6(*events):
+    return Wait6(events)
 
 
-def requestC_1(ev1, prio):
-    return requestC([ev1], prio)
+def wait_func7(*events):
+    return Wait7(events)
 
 
-def requestC_2(ev1, ev2, prio):
-    return requestC([ev1, ev2], prio)
+def wait_func8(*events):
+    return Wait8(events)
 
 
-def requestC_3(ev1, ev2, ev3, prio):
-    return requestC([ev1, ev2, ev3], prio)
+def wait_func9(*events):
+    return Wait9(events)
 
 
-def requestC_4(ev1, ev2, ev3, ev4, prio):
-    return requestC([ev1, ev2, ev3, ev4], prio)
+def event_func1(event):
+    return Event1(event)
 
 
-def Perm02_X_Func(pos1):
-    return Perm02_X(pos1)
+def event_func2(event):
+    return Event2(event)
 
 
-def Perm02_O_Func(pos1):
-    return Perm02_O(pos1)
+def event_func3(event):
+    return Event3(event)
 
 
-def Perm02_Func(other):
-    return Perm02(other)
+def event_func4(event):
+    return Event4(event)
 
 
-def Perm01_X_Func(pos1):
-    return Perm01_X(pos1)
+def event_func5(event):
+    return Event5(event)
 
 
-def Perm01_O_Func(pos1):
-    return Perm01_O(pos1)
+def event_func6(event):
+    return Event6(event)
 
 
-def Perm01_Func(other):
-    return Perm01(other)
+def event_func7(event):
+    return Event7(event)
 
 
-def Concrete_X_Func(pos1, pos2):
-    return Concrete_X(pos1, pos2)
+def event_func8(event):
+    return Event8(event)
 
 
-def Concrete_O_Func(pos1, pos2):
-    return Concrete_O(pos1, pos2)
+def event_func9(event):
+    return Event9(event)
 
 
-def Concrete_Func(other):
-    return Concrete(other)
+def x_event_func1(indx):
+    return XEvent1(indx)
 
 
-def posFunc(pos):
+def x_event_func2(indx):
+    return XEvent2(indx)
+
+
+def x_event_func3(indx):
+    return XEvent3(indx)
+
+
+def x_event_func4(indx):
+    return XEvent4(indx)
+
+
+def x_event_func5(indx):
+    return XEvent5(indx)
+
+
+def x_event_func6(indx):
+    return XEvent6(indx)
+
+
+def x_event_func7(indx):
+    return XEvent7(indx)
+
+
+def x_event_func8(indx):
+    return XEvent8(indx)
+
+
+def x_event_func9(indx):
+    return XEvent9(indx)
+
+
+def o_event_func1(indx):
+    return OEvent1(indx)
+
+
+def o_event_func2(indx):
+    return OEvent2(indx)
+
+
+def o_event_func3(indx):
+    return OEvent3(indx)
+
+
+def o_event_func4(indx):
+    return OEvent4(indx)
+
+
+def o_event_func5(indx):
+    return OEvent5(indx)
+
+
+def o_event_func6(indx):
+    return OEvent6(indx)
+
+
+def o_event_func7(indx):
+    return OEvent7(indx)
+
+
+def o_event_func8(indx):
+    return OEvent8(indx)
+
+
+def o_event_func9(indx):
+    return OEvent9(indx)
+
+
+def single_input_func1(*cells):
+    return SingleInput1(cells)
+
+
+def single_input_func2(*cells):
+    return SingleInput2(cells)
+
+
+def single_input_func3(*cells):
+    return SingleInput3(cells)
+
+
+def single_input_func4(*cells):
+    return SingleInput4(cells)
+
+
+def single_input_func5(*cells):
+    return SingleInput5(cells)
+
+
+def single_input_func6(*cells):
+    return SingleInput6(cells)
+
+
+def single_input_func7(*cells):
+    return SingleInput7(cells)
+
+
+def single_input_func8(*cells):
+    return SingleInput8(cells)
+
+
+def single_input_func9(*cells):
+    return SingleInput9(cells)
+
+
+def cell_func(pos1, pos2):
+    return Cell(pos1, pos2)
+
+
+def index_func(indx):
+    return indx
+
+
+def position_func(pos):
     return pos
 
 
-def posfFunc(pos):
-    return pos
-
-
-def priorityFunc(priority):
+def priority_func(priority):
     return priority

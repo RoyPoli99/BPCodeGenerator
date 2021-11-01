@@ -94,7 +94,7 @@ function addLinePermutationBthreads(l) {
   });
 
   // Player O strategy to add a the third O to win
-  LINE_CODE
+  //LINE_CODE
 }
 
 // Player O strategy:
@@ -126,7 +126,7 @@ var permsforks = [[0, 1], [1, 0]];
 
 
 // Preference to put O on the center
-OTHER_CODE
+O_PLAYER_CODE
 
 // Assertions
 

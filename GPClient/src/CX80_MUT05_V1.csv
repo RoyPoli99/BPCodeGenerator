@@ -1,0 +1,1397 @@
+,Generation,Individual,Fitness,Wins,Losses,Draws,Block_Violations,Misses,Blocks,Deadlocks,Forks,Code
+0,1.0,1.0,50.0,0.0,0.0,0.0,0.0,0.0,0.0,50.0,0.0,"function behaviorSet1(input) {
+bp.registerBThread(""O_Player_Thread_1_1"", function(){
+bp.sync({waitFor:[O(input[3].x, input[3].y), O(input[1].x, input[1].y)]});
+bp.sync({request:[O(input[2].x, input[2].y), O(input[5].x, input[5].y), O(input[3].x, input[3].y)]},3);
+});
+
+}
+var inputs_1 = [[{x: 2, y: 2}, {x: 0, y: 0}, {x: 2, y: 2}, {x: 1, y: 2}, {x: 0, y: 2}, {x: 0, y: 2}],
+[{x: 1, y: 1}, {x: 1, y: 1}, {x: 1, y: 0}, {x: 1, y: 0}, {x: 1, y: 2}, {x: 0, y: 0}]]
+inputs_1.forEach(function (input) {
+behaviorSet1(input);
+});
+
+"
+1,1.0,4.0,42.45985115550333,10.0,11.0,29.0,65.0,13.0,46.0,0.0,12.0,"function behaviorSet1(input) {
+bp.registerBThread(""O_Player_Thread_1_1"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y), X(input[0].x, input[0].y)]});
+bp.sync({waitFor:[X(input[0].x, input[0].y), O(input[0].x, input[0].y), O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[0].x, input[0].y), O(input[0].x, input[0].y)]},7);
+});
+
+bp.registerBThread(""O_Player_Thread_1_2"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y)]});
+bp.sync({waitFor:[X(input[0].x, input[0].y), X(input[0].x, input[0].y), X(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[0].x, input[0].y)]},10);
+});
+
+bp.registerBThread(""O_Player_Thread_1_3"", function(){
+bp.sync({request:[O(input[0].x, input[0].y), O(input[0].x, input[0].y), O(input[0].x, input[0].y), O(input[0].x, input[0].y)]},7);
+});
+
+}
+var inputs_1 = [[{x: 2, y: 0}],
+[{x: 2, y: 1}],
+[{x: 2, y: 2}],
+[{x: 2, y: 2}],
+[{x: 0, y: 2}]]
+inputs_1.forEach(function (input) {
+behaviorSet1(input);
+});
+
+function behaviorSet2(input) {
+bp.registerBThread(""O_Player_Thread_2_1"", function(){
+bp.sync({request:[O(input[2].x, input[2].y), O(input[2].x, input[2].y)]},11);
+});
+
+bp.registerBThread(""O_Player_Thread_2_2"", function(){
+bp.sync({waitFor:[X(input[1].x, input[1].y), O(input[3].x, input[3].y), O(input[1].x, input[1].y)]});
+bp.sync({request:[O(input[2].x, input[2].y), O(input[3].x, input[3].y)]},10);
+});
+
+}
+var inputs_2 = [[{x: 1, y: 1}, {x: 2, y: 2}, {x: 2, y: 1}, {x: 1, y: 0}],
+[{x: 2, y: 2}, {x: 1, y: 2}, {x: 2, y: 1}, {x: 2, y: 1}],
+[{x: 2, y: 0}, {x: 0, y: 1}, {x: 0, y: 2}, {x: 1, y: 2}]]
+inputs_2.forEach(function (input) {
+behaviorSet2(input);
+});
+
+function behaviorSet3(input) {
+bp.registerBThread(""O_Player_Thread_3_1"", function(){
+bp.sync({request:[O(input[0].x, input[0].y)]},3);
+});
+
+bp.registerBThread(""O_Player_Thread_3_2"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y), O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[0].x, input[0].y)]},2);
+});
+
+bp.registerBThread(""O_Player_Thread_3_3"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y), X(input[0].x, input[0].y)]});
+bp.sync({waitFor:[O(input[0].x, input[0].y), O(input[0].x, input[0].y), X(input[0].x, input[0].y), O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[0].x, input[0].y)]},1);
+});
+
+bp.registerBThread(""O_Player_Thread_3_4"", function(){
+bp.sync({request:[O(input[0].x, input[0].y), O(input[0].x, input[0].y)]},5);
+});
+
+}
+var inputs_3 = [[{x: 2, y: 1}],
+[{x: 2, y: 2}],
+[{x: 2, y: 2}],
+[{x: 0, y: 1}],
+[{x: 2, y: 2}],
+[{x: 1, y: 0}]]
+inputs_3.forEach(function (input) {
+behaviorSet3(input);
+});
+
+function behaviorSet4(input) {
+bp.registerBThread(""O_Player_Thread_4_1"", function(){
+bp.sync({request:[O(input[1].x, input[1].y)]},3);
+});
+
+}
+var inputs_4 = [[{x: 0, y: 1}, {x: 1, y: 1}, {x: 0, y: 0}],
+[{x: 2, y: 1}, {x: 1, y: 2}, {x: 2, y: 0}],
+[{x: 0, y: 1}, {x: 0, y: 2}, {x: 1, y: 2}],
+[{x: 0, y: 0}, {x: 0, y: 0}, {x: 2, y: 2}],
+[{x: 0, y: 2}, {x: 1, y: 2}, {x: 2, y: 2}],
+[{x: 2, y: 2}, {x: 2, y: 2}, {x: 2, y: 0}],
+[{x: 2, y: 0}, {x: 0, y: 1}, {x: 2, y: 2}],
+[{x: 1, y: 0}, {x: 1, y: 1}, {x: 2, y: 2}],
+[{x: 2, y: 0}, {x: 0, y: 2}, {x: 0, y: 2}]]
+inputs_4.forEach(function (input) {
+behaviorSet4(input);
+});
+
+function behaviorSet5(input) {
+bp.registerBThread(""O_Player_Thread_5_1"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[0].x, input[0].y), O(input[1].x, input[1].y), O(input[3].x, input[3].y)]},3);
+});
+
+bp.registerBThread(""O_Player_Thread_5_2"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y), X(input[0].x, input[0].y), X(input[0].x, input[0].y), O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[2].x, input[2].y), O(input[3].x, input[3].y), O(input[3].x, input[3].y)]},6);
+});
+
+bp.registerBThread(""O_Player_Thread_5_3"", function(){
+bp.sync({waitFor:[O(input[2].x, input[2].y), X(input[1].x, input[1].y), X(input[2].x, input[2].y), O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[1].x, input[1].y), O(input[3].x, input[3].y)]},6);
+});
+
+}
+var inputs_5 = [[{x: 0, y: 2}, {x: 1, y: 2}, {x: 0, y: 1}, {x: 2, y: 1}]]
+inputs_5.forEach(function (input) {
+behaviorSet5(input);
+});
+
+function behaviorSet6(input) {
+bp.registerBThread(""O_Player_Thread_6_1"", function(){
+bp.sync({waitFor:[X(input[6].x, input[6].y), X(input[7].x, input[7].y)]});
+bp.sync({request:[O(input[1].x, input[1].y)]},3);
+});
+
+bp.registerBThread(""O_Player_Thread_6_2"", function(){
+bp.sync({waitFor:[X(input[7].x, input[7].y)]});
+bp.sync({waitFor:[X(input[6].x, input[6].y)]});
+bp.sync({request:[O(input[7].x, input[7].y), O(input[4].x, input[4].y), O(input[2].x, input[2].y)]},10);
+});
+
+bp.registerBThread(""O_Player_Thread_6_3"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[2].x, input[2].y), O(input[4].x, input[4].y)]},4);
+});
+
+bp.registerBThread(""O_Player_Thread_6_4"", function(){
+bp.sync({waitFor:[X(input[4].x, input[4].y), X(input[2].x, input[2].y), O(input[3].x, input[3].y)]});
+bp.sync({waitFor:[O(input[8].x, input[8].y)]});
+bp.sync({request:[O(input[7].x, input[7].y), O(input[7].x, input[7].y), O(input[3].x, input[3].y), O(input[3].x, input[3].y)]},9);
+});
+
+}
+var inputs_6 = [[{x: 1, y: 0}, {x: 2, y: 2}, {x: 0, y: 0}, {x: 1, y: 0}, {x: 0, y: 2}, {x: 1, y: 0}, {x: 1, y: 2}, {x: 1, y: 1}, {x: 2, y: 0}],
+[{x: 0, y: 0}, {x: 0, y: 0}, {x: 2, y: 0}, {x: 1, y: 2}, {x: 1, y: 1}, {x: 1, y: 1}, {x: 1, y: 1}, {x: 2, y: 2}, {x: 0, y: 2}],
+[{x: 1, y: 2}, {x: 1, y: 2}, {x: 2, y: 1}, {x: 0, y: 2}, {x: 0, y: 0}, {x: 2, y: 2}, {x: 1, y: 1}, {x: 2, y: 0}, {x: 1, y: 2}],
+[{x: 2, y: 2}, {x: 1, y: 0}, {x: 1, y: 2}, {x: 1, y: 1}, {x: 0, y: 0}, {x: 1, y: 2}, {x: 2, y: 2}, {x: 1, y: 1}, {x: 2, y: 2}],
+[{x: 2, y: 2}, {x: 2, y: 0}, {x: 2, y: 1}, {x: 1, y: 0}, {x: 0, y: 2}, {x: 1, y: 0}, {x: 2, y: 0}, {x: 1, y: 2}, {x: 1, y: 1}],
+[{x: 2, y: 0}, {x: 0, y: 1}, {x: 2, y: 1}, {x: 0, y: 0}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 1, y: 1}, {x: 1, y: 0}, {x: 0, y: 1}]]
+inputs_6.forEach(function (input) {
+behaviorSet6(input);
+});
+
+"
+2,1.0,3.0,34.61460101867572,15.0,5.0,22.0,48.0,16.0,28.0,8.0,20.0,"function behaviorSet1(input) {
+bp.registerBThread(""O_Player_Thread_1_1"", function(){
+bp.sync({request:[O(input[0].x, input[0].y), O(input[0].x, input[0].y), O(input[0].x, input[0].y)]},4);
+});
+
+bp.registerBThread(""O_Player_Thread_1_2"", function(){
+bp.sync({waitFor:[O(input[0].x, input[0].y), X(input[0].x, input[0].y), O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[0].x, input[0].y), O(input[0].x, input[0].y), O(input[0].x, input[0].y)]},9);
+});
+
+bp.registerBThread(""O_Player_Thread_1_3"", function(){
+bp.sync({request:[O(input[0].x, input[0].y), O(input[0].x, input[0].y)]},2);
+});
+
+bp.registerBThread(""O_Player_Thread_1_4"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y)]});
+bp.sync({waitFor:[X(input[0].x, input[0].y), X(input[0].x, input[0].y), X(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[0].x, input[0].y), O(input[0].x, input[0].y)]},9);
+});
+
+}
+var inputs_1 = [[{x: 2, y: 2}],
+[{x: 0, y: 0}],
+[{x: 2, y: 1}],
+[{x: 2, y: 2}]]
+inputs_1.forEach(function (input) {
+behaviorSet1(input);
+});
+
+function behaviorSet2(input) {
+bp.registerBThread(""O_Player_Thread_2_1"", function(){
+bp.sync({waitFor:[O(input[2].x, input[2].y)]});
+bp.sync({waitFor:[X(input[1].x, input[1].y), O(input[1].x, input[1].y), O(input[1].x, input[1].y), X(input[1].x, input[1].y)]});
+bp.sync({request:[O(input[1].x, input[1].y), O(input[0].x, input[0].y), O(input[1].x, input[1].y), O(input[1].x, input[1].y)]},11);
+});
+
+}
+var inputs_2 = [[{x: 1, y: 0}, {x: 2, y: 0}, {x: 1, y: 2}],
+[{x: 0, y: 0}, {x: 2, y: 2}, {x: 2, y: 0}]]
+inputs_2.forEach(function (input) {
+behaviorSet2(input);
+});
+
+function behaviorSet3(input) {
+bp.registerBThread(""O_Player_Thread_3_1"", function(){
+bp.sync({waitFor:[O(input[2].x, input[2].y), X(input[3].x, input[3].y), X(input[4].x, input[4].y), X(input[1].x, input[1].y)]});
+bp.sync({waitFor:[X(input[4].x, input[4].y), O(input[3].x, input[3].y), O(input[4].x, input[4].y)]});
+bp.sync({request:[O(input[0].x, input[0].y)]},8);
+});
+
+bp.registerBThread(""O_Player_Thread_3_2"", function(){
+bp.sync({request:[O(input[1].x, input[1].y), O(input[0].x, input[0].y), O(input[2].x, input[2].y), O(input[1].x, input[1].y)]},1);
+});
+
+bp.registerBThread(""O_Player_Thread_3_3"", function(){
+bp.sync({waitFor:[O(input[3].x, input[3].y), O(input[4].x, input[4].y)]});
+bp.sync({waitFor:[O(input[1].x, input[1].y)]});
+bp.sync({request:[O(input[0].x, input[0].y), O(input[1].x, input[1].y), O(input[2].x, input[2].y)]},2);
+});
+
+}
+var inputs_3 = [[{x: 0, y: 2}, {x: 2, y: 0}, {x: 0, y: 1}, {x: 1, y: 2}, {x: 2, y: 1}],
+[{x: 1, y: 1}, {x: 0, y: 0}, {x: 2, y: 1}, {x: 2, y: 0}, {x: 0, y: 1}],
+[{x: 0, y: 1}, {x: 0, y: 0}, {x: 2, y: 2}, {x: 1, y: 1}, {x: 1, y: 0}],
+[{x: 2, y: 2}, {x: 1, y: 1}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 1, y: 2}],
+[{x: 2, y: 2}, {x: 2, y: 1}, {x: 2, y: 1}, {x: 0, y: 1}, {x: 2, y: 2}],
+[{x: 0, y: 1}, {x: 2, y: 0}, {x: 0, y: 1}, {x: 2, y: 1}, {x: 1, y: 0}]]
+inputs_3.forEach(function (input) {
+behaviorSet3(input);
+});
+
+function behaviorSet4(input) {
+bp.registerBThread(""O_Player_Thread_4_1"", function(){
+bp.sync({waitFor:[O(input[0].x, input[0].y), X(input[1].x, input[1].y), X(input[0].x, input[0].y)]});
+bp.sync({waitFor:[O(input[1].x, input[1].y), X(input[1].x, input[1].y), X(input[0].x, input[0].y), X(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[1].x, input[1].y), O(input[0].x, input[0].y), O(input[1].x, input[1].y), O(input[0].x, input[0].y)]},6);
+});
+
+bp.registerBThread(""O_Player_Thread_4_2"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y), X(input[1].x, input[1].y), X(input[0].x, input[0].y)]});
+bp.sync({waitFor:[X(input[0].x, input[0].y), O(input[0].x, input[0].y), O(input[1].x, input[1].y), O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[0].x, input[0].y), O(input[1].x, input[1].y), O(input[1].x, input[1].y)]},2);
+});
+
+bp.registerBThread(""O_Player_Thread_4_3"", function(){
+bp.sync({waitFor:[O(input[0].x, input[0].y), O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[0].x, input[0].y), O(input[0].x, input[0].y), O(input[0].x, input[0].y), O(input[0].x, input[0].y)]},6);
+});
+
+}
+var inputs_4 = [[{x: 1, y: 1}, {x: 0, y: 0}],
+[{x: 2, y: 0}, {x: 2, y: 2}],
+[{x: 2, y: 1}, {x: 0, y: 2}],
+[{x: 0, y: 0}, {x: 2, y: 2}],
+[{x: 0, y: 0}, {x: 0, y: 2}],
+[{x: 1, y: 1}, {x: 1, y: 0}],
+[{x: 0, y: 1}, {x: 2, y: 2}],
+[{x: 2, y: 1}, {x: 2, y: 1}],
+[{x: 1, y: 2}, {x: 1, y: 0}]]
+inputs_4.forEach(function (input) {
+behaviorSet4(input);
+});
+
+"
+3,1.0,2.0,32.33173076923077,11.0,9.0,30.0,61.0,28.0,35.0,0.0,22.0,"function behaviorSet1(input) {
+bp.registerBThread(""O_Player_Thread_1_1"", function(){
+bp.sync({waitFor:[O(input[0].x, input[0].y), O(input[4].x, input[4].y), X(input[6].x, input[6].y)]});
+bp.sync({request:[O(input[1].x, input[1].y), O(input[3].x, input[3].y)]},4);
+});
+
+bp.registerBThread(""O_Player_Thread_1_2"", function(){
+bp.sync({waitFor:[O(input[2].x, input[2].y)]});
+bp.sync({request:[O(input[5].x, input[5].y), O(input[0].x, input[0].y)]},9);
+});
+
+}
+var inputs_1 = [[{x: 1, y: 1}, {x: 2, y: 2}, {x: 1, y: 1}, {x: 1, y: 0}, {x: 0, y: 1}, {x: 2, y: 1}, {x: 0, y: 1}],
+[{x: 1, y: 2}, {x: 2, y: 1}, {x: 2, y: 1}, {x: 2, y: 1}, {x: 1, y: 2}, {x: 0, y: 0}, {x: 0, y: 0}],
+[{x: 1, y: 2}, {x: 0, y: 2}, {x: 2, y: 1}, {x: 1, y: 2}, {x: 1, y: 0}, {x: 0, y: 1}, {x: 2, y: 0}],
+[{x: 0, y: 1}, {x: 1, y: 0}, {x: 2, y: 0}, {x: 1, y: 1}, {x: 2, y: 2}, {x: 1, y: 0}, {x: 0, y: 1}],
+[{x: 2, y: 0}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 1, y: 0}, {x: 0, y: 2}, {x: 1, y: 2}, {x: 0, y: 1}],
+[{x: 0, y: 1}, {x: 0, y: 2}, {x: 2, y: 1}, {x: 0, y: 0}, {x: 0, y: 2}, {x: 1, y: 2}, {x: 2, y: 0}]]
+inputs_1.forEach(function (input) {
+behaviorSet1(input);
+});
+
+function behaviorSet2(input) {
+bp.registerBThread(""O_Player_Thread_2_1"", function(){
+bp.sync({request:[O(input[0].x, input[0].y)]},11);
+});
+
+bp.registerBThread(""O_Player_Thread_2_2"", function(){
+bp.sync({request:[O(input[0].x, input[0].y), O(input[0].x, input[0].y), O(input[0].x, input[0].y)]},2);
+});
+
+}
+var inputs_2 = [[{x: 0, y: 0}],
+[{x: 0, y: 1}],
+[{x: 1, y: 1}],
+[{x: 1, y: 1}],
+[{x: 1, y: 1}],
+[{x: 0, y: 0}],
+[{x: 1, y: 2}]]
+inputs_2.forEach(function (input) {
+behaviorSet2(input);
+});
+
+function behaviorSet3(input) {
+bp.registerBThread(""O_Player_Thread_3_1"", function(){
+bp.sync({waitFor:[O(input[3].x, input[3].y), X(input[3].x, input[3].y)]});
+bp.sync({waitFor:[X(input[6].x, input[6].y), O(input[4].x, input[4].y)]});
+bp.sync({request:[O(input[6].x, input[6].y)]},7);
+});
+
+bp.registerBThread(""O_Player_Thread_3_2"", function(){
+bp.sync({waitFor:[O(input[3].x, input[3].y), X(input[4].x, input[4].y)]});
+bp.sync({waitFor:[O(input[5].x, input[5].y), O(input[1].x, input[1].y), X(input[4].x, input[4].y)]});
+bp.sync({request:[O(input[4].x, input[4].y), O(input[2].x, input[2].y)]},9);
+});
+
+bp.registerBThread(""O_Player_Thread_3_3"", function(){
+bp.sync({request:[O(input[0].x, input[0].y), O(input[2].x, input[2].y), O(input[3].x, input[3].y)]},4);
+});
+
+}
+var inputs_3 = [[{x: 1, y: 1}, {x: 1, y: 0}, {x: 2, y: 0}, {x: 2, y: 1}, {x: 2, y: 1}, {x: 0, y: 1}, {x: 0, y: 1}]]
+inputs_3.forEach(function (input) {
+behaviorSet3(input);
+});
+
+function behaviorSet4(input) {
+bp.registerBThread(""O_Player_Thread_4_1"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y), O(input[7].x, input[7].y), X(input[8].x, input[8].y)]});
+bp.sync({waitFor:[O(input[3].x, input[3].y), O(input[2].x, input[2].y)]});
+bp.sync({request:[O(input[0].x, input[0].y), O(input[4].x, input[4].y), O(input[4].x, input[4].y), O(input[0].x, input[0].y)]},11);
+});
+
+bp.registerBThread(""O_Player_Thread_4_2"", function(){
+bp.sync({waitFor:[O(input[2].x, input[2].y), O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[2].x, input[2].y)]},9);
+});
+
+}
+var inputs_4 = [[{x: 2, y: 1}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 0, y: 1}, {x: 1, y: 0}, {x: 2, y: 0}, {x: 2, y: 1}, {x: 2, y: 0}, {x: 2, y: 1}],
+[{x: 0, y: 2}, {x: 2, y: 2}, {x: 0, y: 2}, {x: 1, y: 0}, {x: 1, y: 0}, {x: 2, y: 0}, {x: 1, y: 1}, {x: 1, y: 1}, {x: 2, y: 1}],
+[{x: 2, y: 1}, {x: 0, y: 1}, {x: 0, y: 0}, {x: 0, y: 2}, {x: 2, y: 1}, {x: 2, y: 1}, {x: 0, y: 0}, {x: 0, y: 1}, {x: 1, y: 1}],
+[{x: 0, y: 2}, {x: 0, y: 1}, {x: 1, y: 1}, {x: 2, y: 0}, {x: 2, y: 2}, {x: 1, y: 2}, {x: 1, y: 0}, {x: 2, y: 1}, {x: 2, y: 1}],
+[{x: 2, y: 1}, {x: 0, y: 1}, {x: 0, y: 2}, {x: 1, y: 2}, {x: 1, y: 2}, {x: 0, y: 1}, {x: 2, y: 2}, {x: 0, y: 2}, {x: 2, y: 0}],
+[{x: 2, y: 0}, {x: 1, y: 2}, {x: 1, y: 1}, {x: 0, y: 1}, {x: 0, y: 0}, {x: 1, y: 2}, {x: 1, y: 2}, {x: 0, y: 2}, {x: 1, y: 0}]]
+inputs_4.forEach(function (input) {
+behaviorSet4(input);
+});
+
+function behaviorSet5(input) {
+bp.registerBThread(""O_Player_Thread_5_1"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y), O(input[0].x, input[0].y), O(input[0].x, input[0].y), O(input[0].x, input[0].y)]});
+bp.sync({waitFor:[X(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[0].x, input[0].y), O(input[0].x, input[0].y), O(input[0].x, input[0].y)]},8);
+});
+
+}
+var inputs_5 = [[{x: 0, y: 2}],
+[{x: 1, y: 2}],
+[{x: 0, y: 1}],
+[{x: 1, y: 0}],
+[{x: 0, y: 0}],
+[{x: 2, y: 1}],
+[{x: 1, y: 1}],
+[{x: 0, y: 2}],
+[{x: 0, y: 0}]]
+inputs_5.forEach(function (input) {
+behaviorSet5(input);
+});
+
+function behaviorSet6(input) {
+bp.registerBThread(""O_Player_Thread_6_1"", function(){
+bp.sync({waitFor:[O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[3].x, input[3].y)]},8);
+});
+
+bp.registerBThread(""O_Player_Thread_6_2"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y)]});
+bp.sync({waitFor:[X(input[1].x, input[1].y), O(input[1].x, input[1].y), O(input[2].x, input[2].y)]});
+bp.sync({request:[O(input[1].x, input[1].y), O(input[3].x, input[3].y), O(input[0].x, input[0].y), O(input[2].x, input[2].y)]},10);
+});
+
+bp.registerBThread(""O_Player_Thread_6_3"", function(){
+bp.sync({waitFor:[O(input[1].x, input[1].y), O(input[1].x, input[1].y)]});
+bp.sync({request:[O(input[1].x, input[1].y), O(input[2].x, input[2].y), O(input[1].x, input[1].y), O(input[3].x, input[3].y)]},6);
+});
+
+bp.registerBThread(""O_Player_Thread_6_4"", function(){
+bp.sync({waitFor:[O(input[2].x, input[2].y), O(input[2].x, input[2].y), X(input[1].x, input[1].y)]});
+bp.sync({waitFor:[X(input[2].x, input[2].y), X(input[0].x, input[0].y), O(input[3].x, input[3].y)]});
+bp.sync({request:[O(input[3].x, input[3].y), O(input[3].x, input[3].y), O(input[3].x, input[3].y)]},11);
+});
+
+}
+var inputs_6 = [[{x: 2, y: 1}, {x: 2, y: 2}, {x: 1, y: 1}, {x: 2, y: 2}],
+[{x: 1, y: 1}, {x: 0, y: 1}, {x: 0, y: 2}, {x: 2, y: 1}],
+[{x: 2, y: 0}, {x: 1, y: 1}, {x: 0, y: 1}, {x: 2, y: 1}],
+[{x: 2, y: 1}, {x: 1, y: 1}, {x: 0, y: 0}, {x: 0, y: 2}],
+[{x: 0, y: 0}, {x: 0, y: 0}, {x: 1, y: 0}, {x: 0, y: 1}],
+[{x: 1, y: 1}, {x: 1, y: 0}, {x: 2, y: 2}, {x: 0, y: 0}],
+[{x: 2, y: 2}, {x: 0, y: 2}, {x: 1, y: 0}, {x: 1, y: 1}],
+[{x: 2, y: 1}, {x: 1, y: 2}, {x: 2, y: 2}, {x: 0, y: 0}],
+[{x: 1, y: 0}, {x: 2, y: 0}, {x: 2, y: 1}, {x: 1, y: 1}]]
+inputs_6.forEach(function (input) {
+behaviorSet6(input);
+});
+
+function behaviorSet7(input) {
+bp.registerBThread(""O_Player_Thread_7_1"", function(){
+bp.sync({waitFor:[O(input[1].x, input[1].y), O(input[1].x, input[1].y), O(input[1].x, input[1].y), O(input[1].x, input[1].y)]});
+bp.sync({waitFor:[O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[0].x, input[0].y)]},11);
+});
+
+bp.registerBThread(""O_Player_Thread_7_2"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y)]});
+bp.sync({waitFor:[O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[0].x, input[0].y), O(input[1].x, input[1].y)]},1);
+});
+
+}
+var inputs_7 = [[{x: 2, y: 0}, {x: 0, y: 1}, {x: 2, y: 2}],
+[{x: 1, y: 0}, {x: 0, y: 1}, {x: 1, y: 1}],
+[{x: 2, y: 1}, {x: 2, y: 1}, {x: 0, y: 0}],
+[{x: 0, y: 0}, {x: 2, y: 0}, {x: 2, y: 0}],
+[{x: 0, y: 0}, {x: 0, y: 1}, {x: 1, y: 0}],
+[{x: 1, y: 2}, {x: 0, y: 0}, {x: 2, y: 2}],
+[{x: 2, y: 1}, {x: 0, y: 1}, {x: 1, y: 2}],
+[{x: 1, y: 0}, {x: 0, y: 0}, {x: 2, y: 1}],
+[{x: 0, y: 2}, {x: 2, y: 2}, {x: 2, y: 1}]]
+inputs_7.forEach(function (input) {
+behaviorSet7(input);
+});
+
+function behaviorSet8(input) {
+bp.registerBThread(""O_Player_Thread_8_1"", function(){
+bp.sync({request:[O(input[1].x, input[1].y), O(input[8].x, input[8].y), O(input[4].x, input[4].y)]},9);
+});
+
+bp.registerBThread(""O_Player_Thread_8_2"", function(){
+bp.sync({request:[O(input[3].x, input[3].y), O(input[3].x, input[3].y)]},2);
+});
+
+bp.registerBThread(""O_Player_Thread_8_3"", function(){
+bp.sync({waitFor:[O(input[5].x, input[5].y), X(input[2].x, input[2].y)]});
+bp.sync({waitFor:[X(input[3].x, input[3].y), O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[0].x, input[0].y), O(input[4].x, input[4].y), O(input[6].x, input[6].y), O(input[1].x, input[1].y)]},8);
+});
+
+}
+var inputs_8 = [[{x: 1, y: 2}, {x: 1, y: 1}, {x: 1, y: 1}, {x: 1, y: 0}, {x: 1, y: 2}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 2, y: 0}, {x: 1, y: 2}],
+[{x: 1, y: 1}, {x: 1, y: 0}, {x: 2, y: 2}, {x: 1, y: 2}, {x: 0, y: 1}, {x: 0, y: 0}, {x: 2, y: 2}, {x: 2, y: 1}, {x: 2, y: 1}],
+[{x: 2, y: 1}, {x: 2, y: 2}, {x: 0, y: 2}, {x: 2, y: 2}, {x: 1, y: 2}, {x: 2, y: 0}, {x: 0, y: 2}, {x: 0, y: 1}, {x: 1, y: 1}],
+[{x: 1, y: 2}, {x: 1, y: 2}, {x: 2, y: 2}, {x: 2, y: 2}, {x: 2, y: 2}, {x: 2, y: 1}, {x: 2, y: 1}, {x: 2, y: 0}, {x: 0, y: 1}]]
+inputs_8.forEach(function (input) {
+behaviorSet8(input);
+});
+
+function behaviorSet9(input) {
+bp.registerBThread(""O_Player_Thread_9_1"", function(){
+bp.sync({waitFor:[O(input[7].x, input[7].y)]});
+bp.sync({waitFor:[O(input[4].x, input[4].y)]});
+bp.sync({request:[O(input[5].x, input[5].y), O(input[2].x, input[2].y)]},2);
+});
+
+bp.registerBThread(""O_Player_Thread_9_2"", function(){
+bp.sync({waitFor:[X(input[4].x, input[4].y), X(input[8].x, input[8].y), X(input[2].x, input[2].y), X(input[4].x, input[4].y)]});
+bp.sync({waitFor:[O(input[3].x, input[3].y)]});
+bp.sync({request:[O(input[3].x, input[3].y)]},10);
+});
+
+bp.registerBThread(""O_Player_Thread_9_3"", function(){
+bp.sync({request:[O(input[8].x, input[8].y)]},9);
+});
+
+}
+var inputs_9 = [[{x: 0, y: 1}, {x: 2, y: 0}, {x: 0, y: 2}, {x: 1, y: 1}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 0, y: 2}, {x: 2, y: 2}, {x: 1, y: 0}],
+[{x: 1, y: 1}, {x: 0, y: 2}, {x: 1, y: 2}, {x: 2, y: 1}, {x: 2, y: 0}, {x: 2, y: 0}, {x: 0, y: 0}, {x: 2, y: 0}, {x: 1, y: 2}],
+[{x: 0, y: 0}, {x: 1, y: 2}, {x: 2, y: 1}, {x: 1, y: 2}, {x: 2, y: 1}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 1, y: 2}, {x: 1, y: 0}],
+[{x: 1, y: 0}, {x: 2, y: 0}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 2, y: 2}, {x: 2, y: 1}, {x: 0, y: 0}, {x: 1, y: 1}, {x: 1, y: 1}],
+[{x: 2, y: 1}, {x: 2, y: 1}, {x: 1, y: 0}, {x: 0, y: 2}, {x: 2, y: 0}, {x: 0, y: 0}, {x: 2, y: 1}, {x: 1, y: 0}, {x: 1, y: 0}],
+[{x: 0, y: 2}, {x: 0, y: 0}, {x: 2, y: 0}, {x: 0, y: 0}, {x: 0, y: 2}, {x: 2, y: 1}, {x: 2, y: 0}, {x: 0, y: 0}, {x: 0, y: 1}],
+[{x: 2, y: 2}, {x: 0, y: 2}, {x: 2, y: 1}, {x: 0, y: 0}, {x: 2, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 1}, {x: 2, y: 0}],
+[{x: 2, y: 2}, {x: 1, y: 1}, {x: 2, y: 2}, {x: 1, y: 1}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 0, y: 0}, {x: 0, y: 2}, {x: 0, y: 0}],
+[{x: 1, y: 0}, {x: 2, y: 0}, {x: 2, y: 0}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 2, y: 2}, {x: 0, y: 1}, {x: 1, y: 1}, {x: 0, y: 1}]]
+inputs_9.forEach(function (input) {
+behaviorSet9(input);
+});
+
+function behaviorSet10(input) {
+bp.registerBThread(""O_Player_Thread_10_1"", function(){
+bp.sync({waitFor:[O(input[5].x, input[5].y)]});
+bp.sync({request:[O(input[3].x, input[3].y), O(input[7].x, input[7].y)]},10);
+});
+
+bp.registerBThread(""O_Player_Thread_10_2"", function(){
+bp.sync({waitFor:[O(input[4].x, input[4].y), X(input[5].x, input[5].y), O(input[1].x, input[1].y)]});
+bp.sync({request:[O(input[6].x, input[6].y), O(input[1].x, input[1].y), O(input[3].x, input[3].y)]},8);
+});
+
+bp.registerBThread(""O_Player_Thread_10_3"", function(){
+bp.sync({waitFor:[X(input[5].x, input[5].y), O(input[3].x, input[3].y), X(input[3].x, input[3].y), X(input[2].x, input[2].y)]});
+bp.sync({waitFor:[O(input[4].x, input[4].y), O(input[7].x, input[7].y), O(input[5].x, input[5].y), X(input[7].x, input[7].y)]});
+bp.sync({request:[O(input[5].x, input[5].y), O(input[1].x, input[1].y), O(input[6].x, input[6].y), O(input[3].x, input[3].y)]},8);
+});
+
+}
+var inputs_10 = [[{x: 1, y: 0}, {x: 2, y: 2}, {x: 0, y: 2}, {x: 0, y: 2}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 1, y: 0}, {x: 2, y: 1}],
+[{x: 2, y: 0}, {x: 1, y: 0}, {x: 1, y: 2}, {x: 1, y: 1}, {x: 1, y: 0}, {x: 1, y: 0}, {x: 0, y: 2}, {x: 1, y: 2}],
+[{x: 2, y: 0}, {x: 0, y: 1}, {x: 0, y: 2}, {x: 2, y: 1}, {x: 1, y: 1}, {x: 0, y: 2}, {x: 1, y: 1}, {x: 1, y: 1}],
+[{x: 2, y: 1}, {x: 2, y: 1}, {x: 2, y: 2}, {x: 2, y: 1}, {x: 0, y: 1}, {x: 2, y: 0}, {x: 1, y: 0}, {x: 1, y: 0}],
+[{x: 2, y: 1}, {x: 1, y: 0}, {x: 1, y: 0}, {x: 1, y: 0}, {x: 1, y: 2}, {x: 1, y: 0}, {x: 0, y: 0}, {x: 1, y: 0}],
+[{x: 1, y: 2}, {x: 0, y: 1}, {x: 0, y: 2}, {x: 2, y: 0}, {x: 2, y: 0}, {x: 0, y: 2}, {x: 2, y: 0}, {x: 0, y: 0}],
+[{x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 2, y: 0}, {x: 2, y: 0}, {x: 1, y: 2}, {x: 1, y: 1}, {x: 0, y: 2}]]
+inputs_10.forEach(function (input) {
+behaviorSet10(input);
+});
+
+"
+4,1.0,5.0,24.070048309178745,7.0,2.0,41.0,82.0,29.0,33.0,0.0,16.0,"function behaviorSet1(input) {
+bp.registerBThread(""O_Player_Thread_1_1"", function(){
+bp.sync({waitFor:[O(input[0].x, input[0].y), O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[2].x, input[2].y), O(input[1].x, input[1].y)]},3);
+});
+
+}
+var inputs_1 = [[{x: 2, y: 2}, {x: 2, y: 0}, {x: 2, y: 1}],
+[{x: 0, y: 1}, {x: 1, y: 0}, {x: 0, y: 0}],
+[{x: 0, y: 2}, {x: 2, y: 2}, {x: 0, y: 0}]]
+inputs_1.forEach(function (input) {
+behaviorSet1(input);
+});
+
+function behaviorSet2(input) {
+bp.registerBThread(""O_Player_Thread_2_1"", function(){
+bp.sync({waitFor:[X(input[1].x, input[1].y), X(input[2].x, input[2].y)]});
+bp.sync({request:[O(input[2].x, input[2].y), O(input[2].x, input[2].y)]},11);
+});
+
+}
+var inputs_2 = [[{x: 2, y: 0}, {x: 2, y: 2}, {x: 1, y: 0}]]
+inputs_2.forEach(function (input) {
+behaviorSet2(input);
+});
+
+function behaviorSet3(input) {
+bp.registerBThread(""O_Player_Thread_3_1"", function(){
+bp.sync({request:[O(input[0].x, input[0].y), O(input[0].x, input[0].y), O(input[1].x, input[1].y), O(input[1].x, input[1].y)]},9);
+});
+
+bp.registerBThread(""O_Player_Thread_3_2"", function(){
+bp.sync({waitFor:[O(input[1].x, input[1].y), O(input[0].x, input[0].y), O(input[0].x, input[0].y), X(input[1].x, input[1].y)]});
+bp.sync({waitFor:[O(input[1].x, input[1].y), X(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[1].x, input[1].y), O(input[1].x, input[1].y), O(input[0].x, input[0].y), O(input[0].x, input[0].y)]},11);
+});
+
+bp.registerBThread(""O_Player_Thread_3_3"", function(){
+bp.sync({waitFor:[O(input[1].x, input[1].y), X(input[1].x, input[1].y), X(input[0].x, input[0].y), X(input[1].x, input[1].y)]});
+bp.sync({waitFor:[X(input[0].x, input[0].y), O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[1].x, input[1].y), O(input[0].x, input[0].y)]},11);
+});
+
+}
+var inputs_3 = [[{x: 0, y: 0}, {x: 0, y: 1}],
+[{x: 0, y: 2}, {x: 0, y: 1}],
+[{x: 1, y: 2}, {x: 0, y: 2}],
+[{x: 2, y: 1}, {x: 0, y: 2}],
+[{x: 1, y: 2}, {x: 1, y: 2}],
+[{x: 1, y: 2}, {x: 2, y: 1}],
+[{x: 0, y: 2}, {x: 0, y: 2}],
+[{x: 0, y: 2}, {x: 1, y: 0}],
+[{x: 2, y: 0}, {x: 1, y: 2}]]
+inputs_3.forEach(function (input) {
+behaviorSet3(input);
+});
+
+function behaviorSet4(input) {
+bp.registerBThread(""O_Player_Thread_4_1"", function(){
+bp.sync({waitFor:[X(input[3].x, input[3].y)]});
+bp.sync({waitFor:[O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[2].x, input[2].y), O(input[1].x, input[1].y), O(input[3].x, input[3].y)]},6);
+});
+
+bp.registerBThread(""O_Player_Thread_4_2"", function(){
+bp.sync({waitFor:[O(input[2].x, input[2].y), X(input[3].x, input[3].y), O(input[0].x, input[0].y)]});
+bp.sync({waitFor:[X(input[3].x, input[3].y), X(input[1].x, input[1].y), X(input[2].x, input[2].y), X(input[3].x, input[3].y)]});
+bp.sync({request:[O(input[1].x, input[1].y), O(input[4].x, input[4].y), O(input[1].x, input[1].y)]},6);
+});
+
+bp.registerBThread(""O_Player_Thread_4_3"", function(){
+bp.sync({waitFor:[O(input[3].x, input[3].y), X(input[1].x, input[1].y), O(input[1].x, input[1].y), X(input[1].x, input[1].y)]});
+bp.sync({request:[O(input[2].x, input[2].y), O(input[1].x, input[1].y), O(input[2].x, input[2].y), O(input[4].x, input[4].y)]},7);
+});
+
+bp.registerBThread(""O_Player_Thread_4_4"", function(){
+bp.sync({request:[O(input[2].x, input[2].y), O(input[2].x, input[2].y)]},7);
+});
+
+bp.registerBThread(""O_Player_Thread_4_5"", function(){
+bp.sync({request:[O(input[3].x, input[3].y)]},11);
+});
+
+}
+var inputs_4 = [[{x: 0, y: 0}, {x: 0, y: 2}, {x: 1, y: 1}, {x: 1, y: 0}, {x: 1, y: 0}]]
+inputs_4.forEach(function (input) {
+behaviorSet4(input);
+});
+
+function behaviorSet5(input) {
+bp.registerBThread(""O_Player_Thread_5_1"", function(){
+bp.sync({request:[O(input[7].x, input[7].y), O(input[0].x, input[0].y)]},11);
+});
+
+bp.registerBThread(""O_Player_Thread_5_2"", function(){
+bp.sync({waitFor:[O(input[4].x, input[4].y), X(input[4].x, input[4].y), O(input[5].x, input[5].y)]});
+bp.sync({request:[O(input[6].x, input[6].y), O(input[6].x, input[6].y), O(input[0].x, input[0].y), O(input[3].x, input[3].y)]},8);
+});
+
+bp.registerBThread(""O_Player_Thread_5_3"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y), O(input[6].x, input[6].y), O(input[7].x, input[7].y), X(input[2].x, input[2].y)]});
+bp.sync({waitFor:[X(input[3].x, input[3].y), X(input[2].x, input[2].y), O(input[0].x, input[0].y), O(input[1].x, input[1].y)]});
+bp.sync({request:[O(input[5].x, input[5].y)]},2);
+});
+
+bp.registerBThread(""O_Player_Thread_5_4"", function(){
+bp.sync({waitFor:[X(input[7].x, input[7].y), X(input[5].x, input[5].y), X(input[0].x, input[0].y)]});
+bp.sync({waitFor:[O(input[3].x, input[3].y), O(input[3].x, input[3].y)]});
+bp.sync({request:[O(input[6].x, input[6].y), O(input[6].x, input[6].y)]},7);
+});
+
+}
+var inputs_5 = [[{x: 2, y: 1}, {x: 2, y: 1}, {x: 0, y: 2}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 2, y: 2}, {x: 1, y: 1}, {x: 1, y: 2}],
+[{x: 2, y: 1}, {x: 2, y: 2}, {x: 0, y: 2}, {x: 0, y: 1}, {x: 2, y: 0}, {x: 0, y: 2}, {x: 1, y: 0}, {x: 2, y: 1}],
+[{x: 0, y: 1}, {x: 0, y: 1}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 2, y: 1}, {x: 0, y: 0}, {x: 0, y: 1}, {x: 1, y: 0}],
+[{x: 0, y: 1}, {x: 0, y: 0}, {x: 2, y: 2}, {x: 0, y: 1}, {x: 0, y: 0}, {x: 2, y: 1}, {x: 0, y: 0}, {x: 0, y: 0}],
+[{x: 1, y: 2}, {x: 2, y: 0}, {x: 0, y: 0}, {x: 0, y: 2}, {x: 0, y: 1}, {x: 2, y: 0}, {x: 1, y: 2}, {x: 1, y: 2}],
+[{x: 2, y: 0}, {x: 2, y: 0}, {x: 1, y: 0}, {x: 2, y: 2}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 0, y: 0}, {x: 0, y: 1}],
+[{x: 2, y: 2}, {x: 0, y: 2}, {x: 1, y: 2}, {x: 0, y: 0}, {x: 2, y: 2}, {x: 1, y: 0}, {x: 0, y: 0}, {x: 1, y: 0}]]
+inputs_5.forEach(function (input) {
+behaviorSet5(input);
+});
+
+function behaviorSet6(input) {
+bp.registerBThread(""O_Player_Thread_6_1"", function(){
+bp.sync({waitFor:[O(input[0].x, input[0].y), X(input[0].x, input[0].y), O(input[0].x, input[0].y)]});
+bp.sync({waitFor:[X(input[2].x, input[2].y), O(input[2].x, input[2].y), O(input[2].x, input[2].y)]});
+bp.sync({request:[O(input[1].x, input[1].y), O(input[1].x, input[1].y), O(input[0].x, input[0].y), O(input[2].x, input[2].y)]},3);
+});
+
+bp.registerBThread(""O_Player_Thread_6_2"", function(){
+bp.sync({request:[O(input[0].x, input[0].y), O(input[1].x, input[1].y)]},1);
+});
+
+bp.registerBThread(""O_Player_Thread_6_3"", function(){
+bp.sync({waitFor:[O(input[2].x, input[2].y), X(input[0].x, input[0].y)]});
+bp.sync({waitFor:[O(input[1].x, input[1].y), X(input[2].x, input[2].y)]});
+bp.sync({request:[O(input[0].x, input[0].y), O(input[0].x, input[0].y), O(input[1].x, input[1].y), O(input[0].x, input[0].y)]},1);
+});
+
+}
+var inputs_6 = [[{x: 2, y: 2}, {x: 0, y: 1}, {x: 0, y: 0}],
+[{x: 0, y: 0}, {x: 0, y: 0}, {x: 2, y: 0}],
+[{x: 2, y: 0}, {x: 0, y: 2}, {x: 0, y: 0}],
+[{x: 2, y: 2}, {x: 0, y: 2}, {x: 0, y: 1}]]
+inputs_6.forEach(function (input) {
+behaviorSet6(input);
+});
+
+"
+5,2.0,4.0,50.0,0.0,0.0,0.0,0.0,0.0,0.0,50.0,0.0,"function behaviorSet1(input) {
+bp.registerBThread(""O_Player_Thread_1_1"", function(){
+bp.sync({waitFor:[O(input[3].x, input[3].y), O(input[1].x, input[1].y)]});
+bp.sync({request:[O(input[3].x, input[3].y), O(input[5].x, input[5].y), O(input[3].x, input[3].y)]},3);
+});
+
+}
+var inputs_1 = [[{x: 2, y: 2}, {x: 0, y: 0}, {x: 2, y: 2}, {x: 1, y: 2}, {x: 0, y: 2}, {x: 0, y: 2}],
+[{x: 1, y: 1}, {x: 1, y: 1}, {x: 1, y: 0}, {x: 1, y: 0}, {x: 1, y: 2}, {x: 0, y: 0}]]
+inputs_1.forEach(function (input) {
+behaviorSet1(input);
+});
+
+"
+6,2.0,3.0,50.0,0.0,0.0,0.0,0.0,0.0,0.0,50.0,0.0,"function behaviorSet1(input) {
+bp.registerBThread(""O_Player_Thread_1_1"", function(){
+bp.sync({waitFor:[O(input[3].x, input[3].y), O(input[1].x, input[1].y)]});
+bp.sync({request:[O(input[2].x, input[2].y), O(input[5].x, input[5].y), O(input[2].x, input[2].y)]},3);
+});
+
+}
+var inputs_1 = [[{x: 2, y: 2}, {x: 0, y: 0}, {x: 2, y: 2}, {x: 1, y: 2}, {x: 0, y: 2}, {x: 0, y: 2}],
+[{x: 1, y: 1}, {x: 1, y: 1}, {x: 1, y: 0}, {x: 1, y: 0}, {x: 1, y: 2}, {x: 0, y: 0}]]
+inputs_1.forEach(function (input) {
+behaviorSet1(input);
+});
+
+"
+7,2.0,2.0,29.034391534391535,7.0,9.0,34.0,76.0,20.0,36.0,0.0,13.0,"function behaviorSet1(input) {
+bp.registerBThread(""O_Player_Thread_1_1"", function(){
+bp.sync({waitFor:[O(input[0].x, input[0].y), O(input[4].x, input[4].y), X(input[6].x, input[6].y)]});
+bp.sync({request:[O(input[1].x, input[1].y), O(input[3].x, input[3].y)]},4);
+});
+
+bp.registerBThread(""O_Player_Thread_1_2"", function(){
+bp.sync({waitFor:[O(input[2].x, input[2].y)]});
+bp.sync({request:[O(input[5].x, input[5].y), O(input[0].x, input[0].y)]},9);
+});
+
+}
+var inputs_1 = [[{x: 1, y: 1}, {x: 2, y: 2}, {x: 1, y: 1}, {x: 1, y: 0}, {x: 0, y: 1}, {x: 2, y: 1}, {x: 0, y: 1}],
+[{x: 1, y: 2}, {x: 2, y: 1}, {x: 2, y: 1}, {x: 2, y: 1}, {x: 1, y: 2}, {x: 0, y: 0}, {x: 0, y: 0}],
+[{x: 1, y: 2}, {x: 0, y: 2}, {x: 2, y: 1}, {x: 1, y: 2}, {x: 1, y: 0}, {x: 0, y: 1}, {x: 2, y: 0}],
+[{x: 0, y: 1}, {x: 1, y: 0}, {x: 2, y: 0}, {x: 1, y: 1}, {x: 2, y: 2}, {x: 1, y: 0}, {x: 0, y: 1}],
+[{x: 2, y: 0}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 1, y: 0}, {x: 0, y: 2}, {x: 1, y: 2}, {x: 0, y: 1}],
+[{x: 0, y: 1}, {x: 0, y: 2}, {x: 2, y: 1}, {x: 0, y: 0}, {x: 0, y: 2}, {x: 1, y: 2}, {x: 2, y: 0}]]
+inputs_1.forEach(function (input) {
+behaviorSet1(input);
+});
+
+function behaviorSet2(input) {
+bp.registerBThread(""O_Player_Thread_2_1"", function(){
+bp.sync({request:[O(input[2].x, input[2].y), O(input[2].x, input[2].y)]},11);
+});
+
+bp.registerBThread(""O_Player_Thread_2_2"", function(){
+bp.sync({waitFor:[X(input[1].x, input[1].y), O(input[3].x, input[3].y), O(input[1].x, input[1].y)]});
+bp.sync({request:[O(input[2].x, input[2].y), O(input[3].x, input[3].y)]},10);
+});
+
+}
+var inputs_2 = [[{x: 1, y: 1}, {x: 2, y: 2}, {x: 2, y: 1}, {x: 1, y: 0}],
+[{x: 2, y: 2}, {x: 1, y: 2}, {x: 2, y: 1}, {x: 2, y: 1}],
+[{x: 2, y: 0}, {x: 0, y: 1}, {x: 0, y: 2}, {x: 1, y: 2}]]
+inputs_2.forEach(function (input) {
+behaviorSet2(input);
+});
+
+function behaviorSet3(input) {
+bp.registerBThread(""O_Player_Thread_3_1"", function(){
+bp.sync({request:[O(input[0].x, input[0].y)]},3);
+});
+
+bp.registerBThread(""O_Player_Thread_3_2"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y), O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[0].x, input[0].y)]},2);
+});
+
+bp.registerBThread(""O_Player_Thread_3_3"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y), X(input[0].x, input[0].y)]});
+bp.sync({waitFor:[O(input[0].x, input[0].y), O(input[0].x, input[0].y), X(input[0].x, input[0].y), O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[0].x, input[0].y)]},1);
+});
+
+bp.registerBThread(""O_Player_Thread_3_4"", function(){
+bp.sync({request:[O(input[0].x, input[0].y), O(input[0].x, input[0].y)]},5);
+});
+
+}
+var inputs_3 = [[{x: 2, y: 1}],
+[{x: 2, y: 2}],
+[{x: 2, y: 2}],
+[{x: 0, y: 1}],
+[{x: 2, y: 2}],
+[{x: 1, y: 0}]]
+inputs_3.forEach(function (input) {
+behaviorSet3(input);
+});
+
+function behaviorSet4(input) {
+bp.registerBThread(""O_Player_Thread_4_1"", function(){
+bp.sync({request:[O(input[1].x, input[1].y)]},3);
+});
+
+}
+var inputs_4 = [[{x: 0, y: 1}, {x: 1, y: 1}, {x: 0, y: 0}],
+[{x: 2, y: 1}, {x: 1, y: 2}, {x: 2, y: 0}],
+[{x: 0, y: 1}, {x: 0, y: 2}, {x: 1, y: 2}],
+[{x: 0, y: 0}, {x: 0, y: 0}, {x: 2, y: 2}],
+[{x: 0, y: 2}, {x: 1, y: 2}, {x: 2, y: 2}],
+[{x: 2, y: 2}, {x: 2, y: 2}, {x: 2, y: 0}],
+[{x: 2, y: 0}, {x: 0, y: 1}, {x: 2, y: 2}],
+[{x: 1, y: 0}, {x: 1, y: 1}, {x: 2, y: 2}],
+[{x: 2, y: 0}, {x: 0, y: 2}, {x: 0, y: 2}]]
+inputs_4.forEach(function (input) {
+behaviorSet4(input);
+});
+
+function behaviorSet5(input) {
+bp.registerBThread(""O_Player_Thread_5_1"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[0].x, input[0].y), O(input[1].x, input[1].y), O(input[3].x, input[3].y)]},3);
+});
+
+bp.registerBThread(""O_Player_Thread_5_2"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y), X(input[0].x, input[0].y), X(input[0].x, input[0].y), O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[2].x, input[2].y), O(input[3].x, input[3].y), O(input[3].x, input[3].y)]},6);
+});
+
+bp.registerBThread(""O_Player_Thread_5_3"", function(){
+bp.sync({waitFor:[O(input[2].x, input[2].y), X(input[1].x, input[1].y), X(input[2].x, input[2].y), O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[1].x, input[1].y), O(input[3].x, input[3].y)]},6);
+});
+
+}
+var inputs_5 = [[{x: 0, y: 2}, {x: 1, y: 2}, {x: 0, y: 1}, {x: 2, y: 1}]]
+inputs_5.forEach(function (input) {
+behaviorSet5(input);
+});
+
+function behaviorSet6(input) {
+bp.registerBThread(""O_Player_Thread_6_1"", function(){
+bp.sync({waitFor:[X(input[6].x, input[6].y), X(input[7].x, input[7].y)]});
+bp.sync({request:[O(input[1].x, input[1].y)]},3);
+});
+
+bp.registerBThread(""O_Player_Thread_6_2"", function(){
+bp.sync({waitFor:[X(input[7].x, input[7].y)]});
+bp.sync({waitFor:[X(input[6].x, input[6].y)]});
+bp.sync({request:[O(input[7].x, input[7].y), O(input[4].x, input[4].y), O(input[2].x, input[2].y)]},10);
+});
+
+bp.registerBThread(""O_Player_Thread_6_3"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[2].x, input[2].y), O(input[4].x, input[4].y)]},4);
+});
+
+bp.registerBThread(""O_Player_Thread_6_4"", function(){
+bp.sync({waitFor:[X(input[4].x, input[4].y), X(input[2].x, input[2].y), O(input[3].x, input[3].y)]});
+bp.sync({waitFor:[O(input[8].x, input[8].y)]});
+bp.sync({request:[O(input[7].x, input[7].y), O(input[7].x, input[7].y), O(input[3].x, input[3].y), O(input[3].x, input[3].y)]},9);
+});
+
+}
+var inputs_6 = [[{x: 1, y: 0}, {x: 2, y: 2}, {x: 0, y: 0}, {x: 1, y: 0}, {x: 0, y: 2}, {x: 1, y: 0}, {x: 1, y: 2}, {x: 1, y: 1}, {x: 2, y: 0}],
+[{x: 0, y: 0}, {x: 0, y: 0}, {x: 2, y: 0}, {x: 1, y: 2}, {x: 1, y: 1}, {x: 1, y: 1}, {x: 1, y: 1}, {x: 2, y: 2}, {x: 0, y: 2}],
+[{x: 1, y: 2}, {x: 1, y: 2}, {x: 2, y: 1}, {x: 0, y: 2}, {x: 0, y: 0}, {x: 2, y: 2}, {x: 1, y: 1}, {x: 2, y: 0}, {x: 1, y: 2}],
+[{x: 2, y: 2}, {x: 1, y: 0}, {x: 1, y: 2}, {x: 1, y: 1}, {x: 0, y: 0}, {x: 1, y: 2}, {x: 2, y: 2}, {x: 1, y: 1}, {x: 2, y: 2}],
+[{x: 2, y: 2}, {x: 2, y: 0}, {x: 2, y: 1}, {x: 1, y: 0}, {x: 0, y: 2}, {x: 1, y: 0}, {x: 2, y: 0}, {x: 1, y: 2}, {x: 1, y: 1}],
+[{x: 2, y: 0}, {x: 0, y: 1}, {x: 2, y: 1}, {x: 0, y: 0}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 1, y: 1}, {x: 1, y: 0}, {x: 0, y: 1}]]
+inputs_6.forEach(function (input) {
+behaviorSet6(input);
+});
+
+"
+8,2.0,1.0,39.267756128221244,14.0,15.0,21.0,51.0,23.0,35.0,0.0,21.0,"function behaviorSet1(input) {
+bp.registerBThread(""O_Player_Thread_1_1"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y), X(input[0].x, input[0].y)]});
+bp.sync({waitFor:[X(input[0].x, input[0].y), O(input[0].x, input[0].y), O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[0].x, input[0].y), O(input[0].x, input[0].y)]},7);
+});
+
+bp.registerBThread(""O_Player_Thread_1_2"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y)]});
+bp.sync({waitFor:[X(input[0].x, input[0].y), X(input[0].x, input[0].y), X(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[0].x, input[0].y)]},10);
+});
+
+bp.registerBThread(""O_Player_Thread_1_3"", function(){
+bp.sync({request:[O(input[0].x, input[0].y), O(input[0].x, input[0].y), O(input[0].x, input[0].y), O(input[0].x, input[0].y)]},7);
+});
+
+}
+var inputs_1 = [[{x: 2, y: 0}],
+[{x: 2, y: 1}],
+[{x: 2, y: 2}],
+[{x: 2, y: 2}],
+[{x: 0, y: 2}]]
+inputs_1.forEach(function (input) {
+behaviorSet1(input);
+});
+
+function behaviorSet2(input) {
+bp.registerBThread(""O_Player_Thread_2_1"", function(){
+bp.sync({request:[O(input[0].x, input[0].y)]},11);
+});
+
+bp.registerBThread(""O_Player_Thread_2_2"", function(){
+bp.sync({request:[O(input[0].x, input[0].y), O(input[0].x, input[0].y), O(input[0].x, input[0].y)]},2);
+});
+
+}
+var inputs_2 = [[{x: 0, y: 0}],
+[{x: 0, y: 1}],
+[{x: 1, y: 1}],
+[{x: 1, y: 1}],
+[{x: 1, y: 1}],
+[{x: 0, y: 0}],
+[{x: 1, y: 2}]]
+inputs_2.forEach(function (input) {
+behaviorSet2(input);
+});
+
+function behaviorSet3(input) {
+bp.registerBThread(""O_Player_Thread_3_1"", function(){
+bp.sync({waitFor:[O(input[3].x, input[3].y), X(input[3].x, input[3].y)]});
+bp.sync({waitFor:[X(input[6].x, input[6].y), O(input[4].x, input[4].y)]});
+bp.sync({request:[O(input[6].x, input[6].y)]},7);
+});
+
+bp.registerBThread(""O_Player_Thread_3_2"", function(){
+bp.sync({waitFor:[O(input[3].x, input[3].y), X(input[4].x, input[4].y)]});
+bp.sync({waitFor:[O(input[5].x, input[5].y), O(input[1].x, input[1].y), X(input[4].x, input[4].y)]});
+bp.sync({request:[O(input[4].x, input[4].y), O(input[2].x, input[2].y)]},9);
+});
+
+bp.registerBThread(""O_Player_Thread_3_3"", function(){
+bp.sync({request:[O(input[0].x, input[0].y), O(input[2].x, input[2].y), O(input[3].x, input[3].y)]},4);
+});
+
+}
+var inputs_3 = [[{x: 1, y: 1}, {x: 1, y: 0}, {x: 2, y: 0}, {x: 2, y: 1}, {x: 2, y: 1}, {x: 0, y: 1}, {x: 0, y: 1}]]
+inputs_3.forEach(function (input) {
+behaviorSet3(input);
+});
+
+function behaviorSet4(input) {
+bp.registerBThread(""O_Player_Thread_4_1"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y), O(input[7].x, input[7].y), X(input[8].x, input[8].y)]});
+bp.sync({waitFor:[O(input[3].x, input[3].y), O(input[2].x, input[2].y)]});
+bp.sync({request:[O(input[0].x, input[0].y), O(input[4].x, input[4].y), O(input[4].x, input[4].y), O(input[0].x, input[0].y)]},11);
+});
+
+bp.registerBThread(""O_Player_Thread_4_2"", function(){
+bp.sync({waitFor:[O(input[2].x, input[2].y), O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[2].x, input[2].y)]},9);
+});
+
+}
+var inputs_4 = [[{x: 2, y: 1}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 0, y: 1}, {x: 1, y: 0}, {x: 2, y: 0}, {x: 2, y: 1}, {x: 2, y: 0}, {x: 2, y: 1}],
+[{x: 0, y: 2}, {x: 2, y: 2}, {x: 0, y: 2}, {x: 1, y: 0}, {x: 1, y: 0}, {x: 2, y: 0}, {x: 1, y: 1}, {x: 1, y: 1}, {x: 2, y: 1}],
+[{x: 2, y: 1}, {x: 0, y: 1}, {x: 0, y: 0}, {x: 0, y: 2}, {x: 2, y: 1}, {x: 2, y: 1}, {x: 0, y: 0}, {x: 0, y: 1}, {x: 1, y: 1}],
+[{x: 0, y: 2}, {x: 0, y: 1}, {x: 1, y: 1}, {x: 2, y: 0}, {x: 2, y: 2}, {x: 1, y: 2}, {x: 1, y: 0}, {x: 2, y: 1}, {x: 2, y: 1}],
+[{x: 2, y: 1}, {x: 0, y: 1}, {x: 0, y: 2}, {x: 1, y: 2}, {x: 1, y: 2}, {x: 0, y: 1}, {x: 2, y: 2}, {x: 0, y: 2}, {x: 2, y: 0}],
+[{x: 2, y: 0}, {x: 1, y: 2}, {x: 1, y: 1}, {x: 0, y: 1}, {x: 0, y: 0}, {x: 1, y: 2}, {x: 1, y: 2}, {x: 0, y: 2}, {x: 1, y: 0}]]
+inputs_4.forEach(function (input) {
+behaviorSet4(input);
+});
+
+function behaviorSet5(input) {
+bp.registerBThread(""O_Player_Thread_5_1"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y), O(input[0].x, input[0].y), O(input[0].x, input[0].y), O(input[0].x, input[0].y)]});
+bp.sync({waitFor:[X(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[0].x, input[0].y), O(input[0].x, input[0].y), O(input[0].x, input[0].y)]},8);
+});
+
+}
+var inputs_5 = [[{x: 0, y: 2}],
+[{x: 1, y: 2}],
+[{x: 0, y: 1}],
+[{x: 1, y: 0}],
+[{x: 0, y: 0}],
+[{x: 2, y: 1}],
+[{x: 1, y: 1}],
+[{x: 0, y: 2}],
+[{x: 0, y: 0}]]
+inputs_5.forEach(function (input) {
+behaviorSet5(input);
+});
+
+function behaviorSet6(input) {
+bp.registerBThread(""O_Player_Thread_6_1"", function(){
+bp.sync({waitFor:[O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[3].x, input[3].y)]},8);
+});
+
+bp.registerBThread(""O_Player_Thread_6_2"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y)]});
+bp.sync({waitFor:[X(input[1].x, input[1].y), O(input[1].x, input[1].y), O(input[2].x, input[2].y)]});
+bp.sync({request:[O(input[1].x, input[1].y), O(input[3].x, input[3].y), O(input[0].x, input[0].y), O(input[2].x, input[2].y)]},10);
+});
+
+bp.registerBThread(""O_Player_Thread_6_3"", function(){
+bp.sync({waitFor:[O(input[1].x, input[1].y), O(input[1].x, input[1].y)]});
+bp.sync({request:[O(input[1].x, input[1].y), O(input[2].x, input[2].y), O(input[1].x, input[1].y), O(input[3].x, input[3].y)]},6);
+});
+
+bp.registerBThread(""O_Player_Thread_6_4"", function(){
+bp.sync({waitFor:[O(input[2].x, input[2].y), O(input[2].x, input[2].y), X(input[1].x, input[1].y)]});
+bp.sync({waitFor:[X(input[2].x, input[2].y), X(input[0].x, input[0].y), O(input[3].x, input[3].y)]});
+bp.sync({request:[O(input[3].x, input[3].y), O(input[3].x, input[3].y), O(input[3].x, input[3].y)]},11);
+});
+
+}
+var inputs_6 = [[{x: 2, y: 1}, {x: 2, y: 2}, {x: 1, y: 1}, {x: 2, y: 2}],
+[{x: 1, y: 1}, {x: 0, y: 1}, {x: 0, y: 2}, {x: 2, y: 1}],
+[{x: 2, y: 0}, {x: 1, y: 1}, {x: 0, y: 1}, {x: 2, y: 1}],
+[{x: 2, y: 1}, {x: 1, y: 1}, {x: 0, y: 0}, {x: 0, y: 2}],
+[{x: 0, y: 0}, {x: 0, y: 0}, {x: 1, y: 0}, {x: 0, y: 1}],
+[{x: 1, y: 1}, {x: 1, y: 0}, {x: 2, y: 2}, {x: 0, y: 0}],
+[{x: 2, y: 2}, {x: 0, y: 2}, {x: 1, y: 0}, {x: 1, y: 1}],
+[{x: 2, y: 1}, {x: 1, y: 2}, {x: 2, y: 2}, {x: 0, y: 0}],
+[{x: 1, y: 0}, {x: 2, y: 0}, {x: 2, y: 1}, {x: 1, y: 1}]]
+inputs_6.forEach(function (input) {
+behaviorSet6(input);
+});
+
+function behaviorSet7(input) {
+bp.registerBThread(""O_Player_Thread_7_1"", function(){
+bp.sync({waitFor:[O(input[1].x, input[1].y), O(input[1].x, input[1].y), O(input[1].x, input[1].y), O(input[1].x, input[1].y)]});
+bp.sync({waitFor:[O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[0].x, input[0].y)]},11);
+});
+
+bp.registerBThread(""O_Player_Thread_7_2"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y)]});
+bp.sync({waitFor:[O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[0].x, input[0].y), O(input[1].x, input[1].y)]},1);
+});
+
+}
+var inputs_7 = [[{x: 2, y: 0}, {x: 0, y: 1}, {x: 2, y: 2}],
+[{x: 1, y: 0}, {x: 0, y: 1}, {x: 1, y: 1}],
+[{x: 2, y: 1}, {x: 2, y: 1}, {x: 0, y: 0}],
+[{x: 0, y: 0}, {x: 2, y: 0}, {x: 2, y: 0}],
+[{x: 0, y: 0}, {x: 0, y: 1}, {x: 1, y: 0}],
+[{x: 1, y: 2}, {x: 0, y: 0}, {x: 2, y: 2}],
+[{x: 2, y: 1}, {x: 0, y: 1}, {x: 1, y: 2}],
+[{x: 1, y: 0}, {x: 0, y: 0}, {x: 2, y: 1}],
+[{x: 0, y: 2}, {x: 2, y: 2}, {x: 2, y: 1}]]
+inputs_7.forEach(function (input) {
+behaviorSet7(input);
+});
+
+function behaviorSet8(input) {
+bp.registerBThread(""O_Player_Thread_8_1"", function(){
+bp.sync({request:[O(input[1].x, input[1].y), O(input[8].x, input[8].y), O(input[4].x, input[4].y)]},9);
+});
+
+bp.registerBThread(""O_Player_Thread_8_2"", function(){
+bp.sync({request:[O(input[3].x, input[3].y), O(input[3].x, input[3].y)]},2);
+});
+
+bp.registerBThread(""O_Player_Thread_8_3"", function(){
+bp.sync({waitFor:[O(input[5].x, input[5].y), X(input[2].x, input[2].y)]});
+bp.sync({waitFor:[X(input[3].x, input[3].y), O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[0].x, input[0].y), O(input[4].x, input[4].y), O(input[6].x, input[6].y), O(input[1].x, input[1].y)]},8);
+});
+
+}
+var inputs_8 = [[{x: 1, y: 2}, {x: 1, y: 1}, {x: 1, y: 1}, {x: 1, y: 0}, {x: 1, y: 2}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 2, y: 0}, {x: 1, y: 2}],
+[{x: 1, y: 1}, {x: 1, y: 0}, {x: 2, y: 2}, {x: 1, y: 2}, {x: 0, y: 1}, {x: 0, y: 0}, {x: 2, y: 2}, {x: 2, y: 1}, {x: 2, y: 1}],
+[{x: 2, y: 1}, {x: 2, y: 2}, {x: 0, y: 2}, {x: 2, y: 2}, {x: 1, y: 2}, {x: 2, y: 0}, {x: 0, y: 2}, {x: 0, y: 1}, {x: 1, y: 1}],
+[{x: 1, y: 2}, {x: 1, y: 2}, {x: 2, y: 2}, {x: 2, y: 2}, {x: 2, y: 2}, {x: 2, y: 1}, {x: 2, y: 1}, {x: 2, y: 0}, {x: 0, y: 1}]]
+inputs_8.forEach(function (input) {
+behaviorSet8(input);
+});
+
+function behaviorSet9(input) {
+bp.registerBThread(""O_Player_Thread_9_1"", function(){
+bp.sync({waitFor:[O(input[7].x, input[7].y)]});
+bp.sync({waitFor:[O(input[4].x, input[4].y)]});
+bp.sync({request:[O(input[5].x, input[5].y), O(input[2].x, input[2].y)]},2);
+});
+
+bp.registerBThread(""O_Player_Thread_9_2"", function(){
+bp.sync({waitFor:[X(input[4].x, input[4].y), X(input[8].x, input[8].y), X(input[2].x, input[2].y), X(input[4].x, input[4].y)]});
+bp.sync({waitFor:[O(input[3].x, input[3].y)]});
+bp.sync({request:[O(input[3].x, input[3].y)]},10);
+});
+
+bp.registerBThread(""O_Player_Thread_9_3"", function(){
+bp.sync({request:[O(input[8].x, input[8].y)]},9);
+});
+
+}
+var inputs_9 = [[{x: 0, y: 1}, {x: 2, y: 0}, {x: 0, y: 2}, {x: 1, y: 1}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 0, y: 2}, {x: 2, y: 2}, {x: 1, y: 0}],
+[{x: 1, y: 1}, {x: 0, y: 2}, {x: 1, y: 2}, {x: 2, y: 1}, {x: 2, y: 0}, {x: 2, y: 0}, {x: 0, y: 0}, {x: 2, y: 0}, {x: 1, y: 2}],
+[{x: 0, y: 0}, {x: 1, y: 2}, {x: 2, y: 1}, {x: 1, y: 2}, {x: 2, y: 1}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 1, y: 2}, {x: 1, y: 0}],
+[{x: 1, y: 0}, {x: 2, y: 0}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 2, y: 2}, {x: 2, y: 1}, {x: 0, y: 0}, {x: 1, y: 1}, {x: 1, y: 1}],
+[{x: 2, y: 1}, {x: 2, y: 1}, {x: 1, y: 0}, {x: 0, y: 2}, {x: 2, y: 0}, {x: 0, y: 0}, {x: 2, y: 1}, {x: 1, y: 0}, {x: 1, y: 0}],
+[{x: 0, y: 2}, {x: 0, y: 0}, {x: 2, y: 0}, {x: 0, y: 0}, {x: 0, y: 2}, {x: 2, y: 1}, {x: 2, y: 0}, {x: 0, y: 0}, {x: 0, y: 1}],
+[{x: 2, y: 2}, {x: 0, y: 2}, {x: 2, y: 1}, {x: 0, y: 0}, {x: 2, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 1}, {x: 2, y: 0}],
+[{x: 2, y: 2}, {x: 1, y: 1}, {x: 2, y: 2}, {x: 1, y: 1}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 0, y: 0}, {x: 0, y: 2}, {x: 0, y: 0}],
+[{x: 1, y: 0}, {x: 2, y: 0}, {x: 2, y: 0}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 2, y: 2}, {x: 0, y: 1}, {x: 1, y: 1}, {x: 0, y: 1}]]
+inputs_9.forEach(function (input) {
+behaviorSet9(input);
+});
+
+function behaviorSet10(input) {
+bp.registerBThread(""O_Player_Thread_10_1"", function(){
+bp.sync({waitFor:[O(input[5].x, input[5].y)]});
+bp.sync({request:[O(input[3].x, input[3].y), O(input[7].x, input[7].y)]},10);
+});
+
+bp.registerBThread(""O_Player_Thread_10_2"", function(){
+bp.sync({waitFor:[O(input[4].x, input[4].y), X(input[5].x, input[5].y), O(input[1].x, input[1].y)]});
+bp.sync({request:[O(input[6].x, input[6].y), O(input[1].x, input[1].y), O(input[3].x, input[3].y)]},8);
+});
+
+bp.registerBThread(""O_Player_Thread_10_3"", function(){
+bp.sync({waitFor:[X(input[5].x, input[5].y), O(input[3].x, input[3].y), X(input[3].x, input[3].y), X(input[2].x, input[2].y)]});
+bp.sync({waitFor:[O(input[4].x, input[4].y), O(input[7].x, input[7].y), O(input[5].x, input[5].y), X(input[7].x, input[7].y)]});
+bp.sync({request:[O(input[5].x, input[5].y), O(input[1].x, input[1].y), O(input[6].x, input[6].y), O(input[3].x, input[3].y)]},8);
+});
+
+}
+var inputs_10 = [[{x: 1, y: 0}, {x: 2, y: 2}, {x: 0, y: 2}, {x: 0, y: 2}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 1, y: 0}, {x: 2, y: 1}],
+[{x: 2, y: 0}, {x: 1, y: 0}, {x: 1, y: 2}, {x: 1, y: 1}, {x: 1, y: 0}, {x: 1, y: 0}, {x: 0, y: 2}, {x: 1, y: 2}],
+[{x: 2, y: 0}, {x: 0, y: 1}, {x: 0, y: 2}, {x: 2, y: 1}, {x: 1, y: 1}, {x: 0, y: 2}, {x: 1, y: 1}, {x: 1, y: 1}],
+[{x: 2, y: 1}, {x: 2, y: 1}, {x: 2, y: 2}, {x: 2, y: 1}, {x: 0, y: 1}, {x: 2, y: 0}, {x: 1, y: 0}, {x: 1, y: 0}],
+[{x: 2, y: 1}, {x: 1, y: 0}, {x: 1, y: 0}, {x: 1, y: 0}, {x: 1, y: 2}, {x: 1, y: 0}, {x: 0, y: 0}, {x: 1, y: 0}],
+[{x: 1, y: 2}, {x: 0, y: 1}, {x: 0, y: 2}, {x: 2, y: 0}, {x: 2, y: 0}, {x: 0, y: 2}, {x: 2, y: 0}, {x: 0, y: 0}],
+[{x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 2, y: 0}, {x: 2, y: 0}, {x: 1, y: 2}, {x: 1, y: 1}, {x: 0, y: 2}]]
+inputs_10.forEach(function (input) {
+behaviorSet10(input);
+});
+
+"
+9,3.0,1.0,50.0,0.0,0.0,0.0,0.0,0.0,0.0,50.0,0.0,"function behaviorSet1(input) {
+bp.registerBThread(""O_Player_Thread_1_1"", function(){
+bp.sync({waitFor:[O(input[3].x, input[3].y), O(input[1].x, input[1].y)]});
+bp.sync({request:[O(input[3].x, input[3].y), O(input[5].x, input[5].y), O(input[3].x, input[3].y)]},3);
+});
+
+}
+var inputs_1 = [[{x: 2, y: 2}, {x: 0, y: 0}, {x: 2, y: 2}, {x: 1, y: 2}, {x: 0, y: 2}, {x: 0, y: 2}],
+[{x: 1, y: 1}, {x: 1, y: 1}, {x: 1, y: 0}, {x: 1, y: 0}, {x: 1, y: 2}, {x: 0, y: 0}]]
+inputs_1.forEach(function (input) {
+behaviorSet1(input);
+});
+
+"
+10,3.0,2.0,50.0,0.0,0.0,0.0,0.0,0.0,0.0,50.0,0.0,"function behaviorSet1(input) {
+bp.registerBThread(""O_Player_Thread_1_1"", function(){
+bp.sync({waitFor:[O(input[3].x, input[3].y), O(input[1].x, input[1].y)]});
+bp.sync({request:[O(input[3].x, input[3].y), O(input[5].x, input[5].y), O(input[3].x, input[3].y)]},3);
+});
+
+}
+var inputs_1 = [[{x: 2, y: 2}, {x: 0, y: 0}, {x: 2, y: 2}, {x: 1, y: 2}, {x: 0, y: 2}, {x: 0, y: 2}],
+[{x: 1, y: 1}, {x: 1, y: 1}, {x: 1, y: 0}, {x: 1, y: 0}, {x: 1, y: 2}, {x: 0, y: 0}]]
+inputs_1.forEach(function (input) {
+behaviorSet1(input);
+});
+
+"
+11,3.0,4.0,50.0,0.0,0.0,0.0,0.0,0.0,0.0,50.0,0.0,"function behaviorSet1(input) {
+bp.registerBThread(""O_Player_Thread_1_1"", function(){
+bp.sync({waitFor:[O(input[3].x, input[3].y), O(input[1].x, input[1].y)]});
+bp.sync({request:[O(input[3].x, input[3].y), O(input[5].x, input[5].y), O(input[3].x, input[3].y)]},3);
+});
+
+}
+var inputs_1 = [[{x: 2, y: 2}, {x: 0, y: 0}, {x: 2, y: 2}, {x: 1, y: 0}, {x: 0, y: 2}, {x: 0, y: 2}],
+[{x: 1, y: 1}, {x: 1, y: 1}, {x: 1, y: 0}, {x: 1, y: 0}, {x: 1, y: 2}, {x: 0, y: 0}]]
+inputs_1.forEach(function (input) {
+behaviorSet1(input);
+});
+
+"
+12,3.0,3.0,48.54312354312354,15.0,9.0,26.0,60.0,11.0,39.0,0.0,13.0,"function behaviorSet1(input) {
+bp.registerBThread(""O_Player_Thread_1_1"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y), X(input[0].x, input[0].y)]});
+bp.sync({waitFor:[X(input[0].x, input[0].y), O(input[0].x, input[0].y), O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[0].x, input[0].y), O(input[0].x, input[0].y)]},7);
+});
+
+bp.registerBThread(""O_Player_Thread_1_2"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y)]});
+bp.sync({waitFor:[X(input[0].x, input[0].y), X(input[0].x, input[0].y), X(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[0].x, input[0].y)]},10);
+});
+
+bp.registerBThread(""O_Player_Thread_1_3"", function(){
+bp.sync({request:[O(input[0].x, input[0].y), O(input[0].x, input[0].y), O(input[0].x, input[0].y), O(input[0].x, input[0].y)]},7);
+});
+
+}
+var inputs_1 = [[{x: 2, y: 0}],
+[{x: 2, y: 1}],
+[{x: 2, y: 2}],
+[{x: 2, y: 2}],
+[{x: 0, y: 2}]]
+inputs_1.forEach(function (input) {
+behaviorSet1(input);
+});
+
+function behaviorSet2(input) {
+bp.registerBThread(""O_Player_Thread_2_1"", function(){
+bp.sync({request:[O(input[2].x, input[2].y), O(input[2].x, input[2].y)]},11);
+});
+
+bp.registerBThread(""O_Player_Thread_2_2"", function(){
+bp.sync({waitFor:[X(input[1].x, input[1].y), O(input[3].x, input[3].y), O(input[1].x, input[1].y)]});
+bp.sync({request:[O(input[2].x, input[2].y), O(input[3].x, input[3].y)]},10);
+});
+
+}
+var inputs_2 = [[{x: 1, y: 1}, {x: 2, y: 2}, {x: 2, y: 1}, {x: 1, y: 0}],
+[{x: 2, y: 2}, {x: 1, y: 2}, {x: 2, y: 1}, {x: 2, y: 1}],
+[{x: 2, y: 0}, {x: 0, y: 1}, {x: 0, y: 2}, {x: 1, y: 2}]]
+inputs_2.forEach(function (input) {
+behaviorSet2(input);
+});
+
+function behaviorSet3(input) {
+bp.registerBThread(""O_Player_Thread_3_1"", function(){
+bp.sync({request:[O(input[0].x, input[0].y)]},3);
+});
+
+bp.registerBThread(""O_Player_Thread_3_2"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y), O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[0].x, input[0].y)]},2);
+});
+
+bp.registerBThread(""O_Player_Thread_3_3"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y), X(input[0].x, input[0].y)]});
+bp.sync({waitFor:[O(input[0].x, input[0].y), O(input[0].x, input[0].y), X(input[0].x, input[0].y), O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[0].x, input[0].y)]},1);
+});
+
+bp.registerBThread(""O_Player_Thread_3_4"", function(){
+bp.sync({request:[O(input[0].x, input[0].y), O(input[0].x, input[0].y)]},5);
+});
+
+}
+var inputs_3 = [[{x: 2, y: 1}],
+[{x: 2, y: 2}],
+[{x: 2, y: 2}],
+[{x: 0, y: 1}],
+[{x: 2, y: 2}],
+[{x: 1, y: 0}]]
+inputs_3.forEach(function (input) {
+behaviorSet3(input);
+});
+
+function behaviorSet4(input) {
+bp.registerBThread(""O_Player_Thread_4_1"", function(){
+bp.sync({request:[O(input[1].x, input[1].y)]},3);
+});
+
+}
+var inputs_4 = [[{x: 0, y: 1}, {x: 1, y: 1}, {x: 0, y: 0}],
+[{x: 2, y: 1}, {x: 1, y: 2}, {x: 2, y: 0}],
+[{x: 0, y: 1}, {x: 0, y: 2}, {x: 1, y: 2}],
+[{x: 0, y: 0}, {x: 0, y: 0}, {x: 2, y: 2}],
+[{x: 0, y: 2}, {x: 1, y: 2}, {x: 2, y: 2}],
+[{x: 2, y: 2}, {x: 2, y: 2}, {x: 2, y: 0}],
+[{x: 2, y: 0}, {x: 0, y: 1}, {x: 2, y: 2}],
+[{x: 1, y: 0}, {x: 1, y: 1}, {x: 2, y: 2}],
+[{x: 2, y: 0}, {x: 0, y: 2}, {x: 0, y: 2}]]
+inputs_4.forEach(function (input) {
+behaviorSet4(input);
+});
+
+function behaviorSet5(input) {
+bp.registerBThread(""O_Player_Thread_5_1"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[0].x, input[0].y), O(input[1].x, input[1].y), O(input[3].x, input[3].y)]},3);
+});
+
+bp.registerBThread(""O_Player_Thread_5_2"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y), X(input[0].x, input[0].y), X(input[0].x, input[0].y), O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[2].x, input[2].y), O(input[3].x, input[3].y), O(input[3].x, input[3].y)]},6);
+});
+
+bp.registerBThread(""O_Player_Thread_5_3"", function(){
+bp.sync({waitFor:[O(input[2].x, input[2].y), X(input[1].x, input[1].y), X(input[2].x, input[2].y), O(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[1].x, input[1].y), O(input[3].x, input[3].y)]},6);
+});
+
+}
+var inputs_5 = [[{x: 0, y: 2}, {x: 1, y: 2}, {x: 0, y: 1}, {x: 2, y: 1}]]
+inputs_5.forEach(function (input) {
+behaviorSet5(input);
+});
+
+function behaviorSet6(input) {
+bp.registerBThread(""O_Player_Thread_6_1"", function(){
+bp.sync({waitFor:[X(input[6].x, input[6].y), X(input[7].x, input[7].y)]});
+bp.sync({request:[O(input[1].x, input[1].y)]},3);
+});
+
+bp.registerBThread(""O_Player_Thread_6_2"", function(){
+bp.sync({waitFor:[X(input[7].x, input[7].y)]});
+bp.sync({waitFor:[X(input[6].x, input[6].y)]});
+bp.sync({request:[O(input[7].x, input[7].y), O(input[4].x, input[4].y), O(input[2].x, input[2].y)]},10);
+});
+
+bp.registerBThread(""O_Player_Thread_6_3"", function(){
+bp.sync({waitFor:[X(input[0].x, input[0].y)]});
+bp.sync({request:[O(input[2].x, input[2].y), O(input[4].x, input[4].y)]},4);
+});
+
+bp.registerBThread(""O_Player_Thread_6_4"", function(){
+bp.sync({waitFor:[X(input[4].x, input[4].y), X(input[2].x, input[2].y), O(input[3].x, input[3].y)]});
+bp.sync({waitFor:[O(input[8].x, input[8].y)]});
+bp.sync({request:[O(input[7].x, input[7].y), O(input[7].x, input[7].y), O(input[3].x, input[3].y), O(input[3].x, input[3].y)]},9);
+});
+
+}
+var inputs_6 = [[{x: 1, y: 0}, {x: 2, y: 2}, {x: 0, y: 0}, {x: 1, y: 0}, {x: 0, y: 2}, {x: 1, y: 0}, {x: 1, y: 2}, {x: 1, y: 1}, {x: 2, y: 0}],
+[{x: 0, y: 2}, {x: 0, y: 0}, {x: 2, y: 0}, {x: 1, y: 2}, {x: 1, y: 1}, {x: 1, y: 1}, {x: 1, y: 1}, {x: 2, y: 2}, {x: 0, y: 2}],
+[{x: 1, y: 2}, {x: 1, y: 2}, {x: 2, y: 1}, {x: 0, y: 2}, {x: 0, y: 0}, {x: 2, y: 2}, {x: 1, y: 1}, {x: 2, y: 0}, {x: 1, y: 2}],
+[{x: 2, y: 2}, {x: 1, y: 0}, {x: 1, y: 2}, {x: 1, y: 1}, {x: 0, y: 0}, {x: 1, y: 2}, {x: 2, y: 2}, {x: 1, y: 1}, {x: 2, y: 2}],
+[{x: 2, y: 2}, {x: 2, y: 0}, {x: 2, y: 1}, {x: 1, y: 0}, {x: 0, y: 2}, {x: 1, y: 0}, {x: 2, y: 0}, {x: 1, y: 2}, {x: 1, y: 1}],
+[{x: 2, y: 0}, {x: 0, y: 1}, {x: 2, y: 1}, {x: 0, y: 0}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 1, y: 1}, {x: 1, y: 0}, {x: 0, y: 1}]]
+inputs_6.forEach(function (input) {
+behaviorSet6(input);
+});
+
+"
+13,4.0,4.0,50.0,0.0,0.0,0.0,0.0,0.0,0.0,50.0,0.0,"function behaviorSet1(input) {
+bp.registerBThread(""O_Player_Thread_1_1"", function(){
+bp.sync({waitFor:[O(input[3].x, input[3].y), O(input[1].x, input[1].y)]});
+bp.sync({request:[O(input[3].x, input[3].y), O(input[5].x, input[5].y), O(input[3].x, input[3].y)]},3);
+});
+
+}
+var inputs_1 = [[{x: 2, y: 2}, {x: 0, y: 0}, {x: 2, y: 2}, {x: 1, y: 0}, {x: 0, y: 2}, {x: 0, y: 2}],
+[{x: 1, y: 1}, {x: 1, y: 1}, {x: 1, y: 0}, {x: 1, y: 0}, {x: 1, y: 2}, {x: 0, y: 0}]]
+inputs_1.forEach(function (input) {
+behaviorSet1(input);
+});
+
+"
+14,4.0,1.0,50.0,0.0,0.0,0.0,0.0,0.0,0.0,50.0,0.0,"function behaviorSet1(input) {
+bp.registerBThread(""O_Player_Thread_1_1"", function(){
+bp.sync({waitFor:[O(input[3].x, input[3].y), O(input[1].x, input[1].y)]});
+bp.sync({request:[O(input[2].x, input[2].y), O(input[5].x, input[5].y), O(input[2].x, input[2].y)]},3);
+});
+
+}
+var inputs_1 = [[{x: 2, y: 2}, {x: 0, y: 0}, {x: 2, y: 2}, {x: 1, y: 2}, {x: 0, y: 2}, {x: 0, y: 2}],
+[{x: 1, y: 1}, {x: 1, y: 1}, {x: 1, y: 0}, {x: 1, y: 0}, {x: 1, y: 2}, {x: 0, y: 0}]]
+inputs_1.forEach(function (input) {
+behaviorSet1(input);
+});
+
+"
+15,4.0,2.0,50.0,0.0,0.0,0.0,0.0,0.0,0.0,50.0,0.0,"function behaviorSet1(input) {
+bp.registerBThread(""O_Player_Thread_1_1"", function(){
+bp.sync({waitFor:[O(input[3].x, input[3].y), O(input[1].x, input[1].y)]});
+bp.sync({request:[O(input[3].x, input[3].y), O(input[5].x, input[5].y), O(input[3].x, input[3].y)]},3);
+});
+
+}
+var inputs_1 = [[{x: 2, y: 2}, {x: 0, y: 0}, {x: 2, y: 2}, {x: 1, y: 2}, {x: 0, y: 2}, {x: 0, y: 2}],
+[{x: 1, y: 1}, {x: 1, y: 1}, {x: 1, y: 0}, {x: 1, y: 0}, {x: 1, y: 2}, {x: 0, y: 0}]]
+inputs_1.forEach(function (input) {
+behaviorSet1(input);
+});
+
+"
+16,4.0,3.0,50.0,0.0,0.0,0.0,0.0,0.0,0.0,50.0,0.0,"function behaviorSet1(input) {
+bp.registerBThread(""O_Player_Thread_1_1"", function(){
+bp.sync({waitFor:[O(input[3].x, input[3].y), O(input[1].x, input[1].y)]});
+bp.sync({request:[O(input[3].x, input[3].y), O(input[5].x, input[5].y), O(input[3].x, input[3].y)]},3);
+});
+
+}
+var inputs_1 = [[{x: 2, y: 2}, {x: 0, y: 0}, {x: 2, y: 2}, {x: 1, y: 0}, {x: 0, y: 2}, {x: 0, y: 2}],
+[{x: 1, y: 1}, {x: 1, y: 1}, {x: 1, y: 0}, {x: 1, y: 0}, {x: 1, y: 2}, {x: 0, y: 0}]]
+inputs_1.forEach(function (input) {
+behaviorSet1(input);
+});
+
+"
+17,6.0,1.0,50.0,0.0,0.0,0.0,0.0,0.0,0.0,50.0,0.0,"function behaviorSet1(input) {
+bp.registerBThread(""O_Player_Thread_1_1"", function(){
+bp.sync({waitFor:[O(input[3].x, input[3].y), O(input[1].x, input[1].y)]});
+bp.sync({request:[O(input[3].x, input[3].y), O(input[5].x, input[5].y), O(input[3].x, input[3].y)]},3);
+});
+
+}
+var inputs_1 = [[{x: 2, y: 2}, {x: 0, y: 0}, {x: 2, y: 2}, {x: 1, y: 2}, {x: 0, y: 2}, {x: 0, y: 2}],
+[{x: 1, y: 1}, {x: 1, y: 1}, {x: 1, y: 0}, {x: 1, y: 0}, {x: 1, y: 2}, {x: 0, y: 0}]]
+inputs_1.forEach(function (input) {
+behaviorSet1(input);
+});
+
+"
+18,6.0,2.0,50.0,0.0,0.0,0.0,0.0,0.0,0.0,50.0,0.0,"function behaviorSet1(input) {
+bp.registerBThread(""O_Player_Thread_1_1"", function(){
+bp.sync({waitFor:[O(input[3].x, input[3].y), O(input[1].x, input[1].y)]});
+bp.sync({request:[O(input[2].x, input[2].y), O(input[5].x, input[5].y), O(input[2].x, input[2].y)]},3);
+});
+
+}
+var inputs_1 = [[{x: 2, y: 2}, {x: 0, y: 0}, {x: 2, y: 2}, {x: 1, y: 2}, {x: 0, y: 2}, {x: 0, y: 2}],
+[{x: 1, y: 1}, {x: 1, y: 1}, {x: 1, y: 0}, {x: 1, y: 0}, {x: 1, y: 2}, {x: 0, y: 0}]]
+inputs_1.forEach(function (input) {
+behaviorSet1(input);
+});
+
+"

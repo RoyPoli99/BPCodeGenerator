@@ -41,10 +41,10 @@ public abstract class Evaluator implements Callable<Bp.EvaluationResponse> {
         this.gen = gen;
         //String[] bthreads = code.split("\n");
         String player;
-        if(playerType.equals("opt"))
-            player = opt_player;
-        else
-            player = rand_player;
+        //if(playerType.equals("opt"))
+        //    player = opt_player;
+        //else
+        player = rand_player;
         b_program = add_bthreads(code, player);
         /*
         bprog = new StringBProgram(b_program);
@@ -66,10 +66,10 @@ public abstract class Evaluator implements Callable<Bp.EvaluationResponse> {
     private static String add_bthreads(String bthreads, String player_text) {
         int cut_index = bthreads.indexOf("bp.registerBThread(\"O_Player_Other_1\"");
         String curr = player_text;
-        String lines = bthreads.substring(0, cut_index);
-        String others = bthreads.substring(cut_index, bthreads.length());
-        curr = curr.replaceAll("LINE_CODE", lines);
-        curr = curr.replaceAll("OTHER_CODE", others);
+        //String lines = bthreads.substring(0, cut_index);
+        //String others = bthreads.substring(cut_index, bthreads.length());
+        //curr = curr.replaceAll("LINE_CODE", lines);
+        curr = curr.replaceAll("O_PLAYER_CODE", bthreads);
         return curr;
     }
 

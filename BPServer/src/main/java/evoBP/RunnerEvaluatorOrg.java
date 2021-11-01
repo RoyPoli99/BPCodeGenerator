@@ -53,7 +53,12 @@ public class RunnerEvaluatorOrg extends Evaluator {
             InMemoryEventLoggingListener logger = new InMemoryEventLoggingListener();
             BProgramRunner brunner = new BProgramRunner(BProgramFactory());
             brunner.addListener(logger);
-            brunner.run();
+            try {
+                brunner.run();
+            }
+            catch(Exception e){
+                System.out.println("YOINK");
+            }
             List<BEvent> events = logger.getEvents();
             String line = "Generation" + gen + "_Game" + i + ": ";
             String extra = "";
@@ -70,21 +75,21 @@ public class RunnerEvaluatorOrg extends Evaluator {
                         break;
                     case "BLOCK_VIOLATION":
                         blocks_violations.getAndIncrement();
-                        for(Integer index : threads){
-                            block_violations[index]++;
-                        }
+//                        for(Integer index : threads){
+//                            block_violations[index]++;
+//                        }
                         break;
                     case "WIN_VIOLATION":
                         misses.getAndIncrement();
-                        for(Integer index : threads){
-                            win_violations[index]++;
-                        }
+//                        for(Integer index : threads){
+//                            win_violations[index]++;
+//                        }
                         break;
                     case "FORK_VIOLATION":
                         forks.getAndIncrement();
-                        for(Integer index : threads){
-                            fork_violations[index]++;
-                        }
+//                        for(Integer index : threads){
+//                            fork_violations[index]++;
+//                        }
                         break;
                     case "BLOCK":
                         blocks.getAndIncrement();
@@ -96,16 +101,16 @@ public class RunnerEvaluatorOrg extends Evaluator {
                         }
                         break;
                     case "O":
-                        threads.clear();
+//                        threads.clear();
                         if(id == 1) {
                             Map<String, Number> data2 = (Map<String, Number>) ev.maybeData;
                             extra = "(" + data2.get("row").intValue() + "," + data2.get("col").intValue() + ")";
                         }
                         break;
                     default:
-                        int index = Character.getNumericValue(ev.name.charAt(6));
-                        threads.add(index);
-                        requests[index]++;
+//                        int index = Character.getNumericValue(ev.name.charAt(6));
+//                        threads.add(index);
+//                        requests[index]++;
                         break;
                 }
                 if(id == 1) {

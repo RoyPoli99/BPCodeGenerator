@@ -1,3 +1,5 @@
+import inspect
+import sys
 import threading
 import time
 from collections import defaultdict
@@ -20,8 +22,8 @@ import socket
 import pandas as pd
 
 # Define global arguments
-NUMBER_OF_GENERATIONS = 200
-POPULATION_SIZE = 500
+NUMBER_OF_GENERATIONS = 150
+POPULATION_SIZE = 300
 AVERAGES = []
 MAXIMUMS = []
 MINIMUMS = []
@@ -103,166 +105,183 @@ def eval_generator(individual):
 
 # Grammar Setup
 pset = PrimitiveSetTyped("main", [root], root_wrapper)
-pset.addPrimitive(root_wrapperFunc, [root], root_wrapper)
-pset.addPrimitive(rootFunc, [btGroupLine, btGroupOther], root)
+pset.addPrimitive(root_wrapper_func, [root], root_wrapper)
+pset.addPrimitive(root_func, [CTX], root)
+pset.addPrimitive(root_func, [CTX, CTX], root)
+pset.addPrimitive(root_func, [CTX, CTX, CTX], root)
+pset.addPrimitive(root_func, [CTX, CTX, CTX, CTX], root)
+pset.addPrimitive(root_func, [CTX, CTX, CTX, CTX, CTX], root)
+pset.addPrimitive(root_func, [CTX, CTX, CTX, CTX, CTX, CTX], root)
+pset.addPrimitive(root_func, [CTX, CTX, CTX, CTX, CTX, CTX, CTX], root)
+pset.addPrimitive(root_func, [CTX, CTX, CTX, CTX, CTX, CTX, CTX, CTX], root)
+pset.addPrimitive(root_func, [CTX, CTX, CTX, CTX, CTX, CTX, CTX, CTX, CTX], root)
+pset.addPrimitive(root_func, [CTX, CTX, CTX, CTX, CTX, CTX, CTX, CTX, CTX, CTX], root)
 
-# Bthreads groups
-pset.addPrimitive(btLineGroupFunc, [btLine], btGroupLine)
-pset.addPrimitive(btLineGroupFunc, [btLine, btLine], btGroupLine)
-pset.addPrimitive(btLineGroupFunc, [btLine, btLine, btLine], btGroupLine)
-pset.addPrimitive(btLineGroupFunc, [btLine, btLine, btLine, btLine], btGroupLine)
-pset.addPrimitive(btLineGroupFunc, [btLine, btLine, btLine, btLine, btLine], btGroupLine)
+# Define lists of classes
+single_input_arrays = [SingleInput1, SingleInput2, SingleInput3, SingleInput4, SingleInput5, SingleInput6, SingleInput7, SingleInput8, SingleInput9]
+behaviors_set = [BehaviorSet1, BehaviorSet2, BehaviorSet3, BehaviorSet4, BehaviorSet5, BehaviorSet6, BehaviorSet7, BehaviorSet8, BehaviorSet9]
+behaviors = [Behavior1, Behavior2, Behavior3, Behavior4, Behavior5, Behavior6, Behavior7, Behavior8, Behavior9]
+events = [Event1, Event2, Event3, Event4, Event5, Event6, Event7, Event8, Event9]
+Xevents = [XEvent1, XEvent2, XEvent3, XEvent4, XEvent5, XEvent6, XEvent7, XEvent8, XEvent9]
+Oevents = [OEvent1, OEvent2, OEvent3, OEvent4, OEvent5, OEvent6, OEvent7, OEvent8, OEvent9]
+requests = [Request1, Request2, Request3, Request4, Request5, Request6, Request7, Request8, Request9]
+waits = [Wait1, Wait2, Wait3, Wait4, Wait5, Wait6, Wait7, Wait8, Wait9]
+indexes = [Index1, Index2, Index3, Index4, Index5, Index6, Index7, Index8, Index9]
+behavior_set_funcs = [behavior_set_func1, behavior_set_func2, behavior_set_func3, behavior_set_func4, behavior_set_func5, behavior_set_func6, behavior_set_func7, behavior_set_func8, behavior_set_func9]
+behavior_funcs = [behavior_func1, behavior_func2, behavior_func3, behavior_func4, behavior_func5, behavior_func6, behavior_func7, behavior_func8, behavior_func9]
+request_funcs = [request_func1, request_func2, request_func3, request_func4, request_func5, request_func6, request_func7, request_func8, request_func9]
+wait_funcs = [wait_func1, wait_func2, wait_func3, wait_func4, wait_func5, wait_func6, wait_func7, wait_func8, wait_func9]
+event_funcs = [event_func1, event_func2, event_func3, event_func4, event_func5, event_func6, event_func7, event_func8, event_func9]
+x_event_funcs = [x_event_func1, x_event_func2, x_event_func3, x_event_func4, x_event_func5, x_event_func6, x_event_func7, x_event_func8, x_event_func9]
+o_event_funcs = [o_event_func1, o_event_func2, o_event_func3, o_event_func4, o_event_func5, o_event_func6, o_event_func7, o_event_func8, o_event_func9]
 
-pset.addPrimitive(btOtherGroupFunc, [btOther], btGroupOther)
-pset.addPrimitive(btOtherGroupFunc, [btOther, btOther], btGroupOther)
-pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther], btGroupOther)
-pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther], btGroupOther)
-pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther], btGroupOther)
-pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther, btOther], btGroupOther)
-pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther, btOther, btOther], btGroupOther)
-pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther], btGroupOther)
-pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther], btGroupOther)
-pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther], btGroupOther)
-pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther], btGroupOther)
-pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther], btGroupOther)
-pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther], btGroupOther)
-pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther], btGroupOther)
-pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther], btGroupOther)
-pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther], btGroupOther)
-pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther], btGroupOther)
-pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther], btGroupOther)
-pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther], btGroupOther)
-pset.addPrimitive(btOtherGroupFunc, [btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther, btOther], btGroupOther)
-
-
-# BThreads
-pset.addPrimitive(btLineFunc, [while_trueLine], btLine)
-pset.addPrimitive(btOtherFunc, [while_trueOther], btOther)
-#pset.addPrimitive(btCFunc, [while_trueC], btC)
-
-# Loop for BT1
-# 0 Waits
-pset.addPrimitive(while_trueLine_0, [request02], while_trueLine)
-pset.addPrimitive(while_trueLine_0, [requestC], while_trueLine)
-# 1 Waits
-pset.addPrimitive(while_trueLine_1, [wait02, request02], while_trueLine)
-pset.addPrimitive(while_trueLine_1, [wait02, requestC], while_trueLine)
-pset.addPrimitive(while_trueLine_1, [waitC, request02], while_trueLine)
-pset.addPrimitive(while_trueLine_1, [waitC, requestC], while_trueLine)
-# 2 Waits
-pset.addPrimitive(while_trueLine_2, [wait02, wait02, request02], while_trueLine)
-pset.addPrimitive(while_trueLine_2, [wait02, wait02, requestC], while_trueLine)
-pset.addPrimitive(while_trueLine_2, [wait02, waitC, request02], while_trueLine)
-pset.addPrimitive(while_trueLine_2, [wait02, waitC, requestC], while_trueLine)
-pset.addPrimitive(while_trueLine_2, [waitC, wait02, request02], while_trueLine)
-pset.addPrimitive(while_trueLine_2, [waitC, wait02, requestC], while_trueLine)
-pset.addPrimitive(while_trueLine_2, [waitC, waitC, request02], while_trueLine)
-pset.addPrimitive(while_trueLine_2, [waitC, waitC, requestC], while_trueLine)
-
-# Loop for BT2
-# 0 Waits
-pset.addPrimitive(while_trueB_0, [request01], while_trueB)
-pset.addPrimitive(while_trueB_0, [requestC], while_trueB)
-# 1 Waits
-pset.addPrimitive(while_trueB_1, [wait01, request01], while_trueB)
-pset.addPrimitive(while_trueB_1, [wait01, requestC], while_trueB)
-pset.addPrimitive(while_trueB_1, [waitC, request01], while_trueB)
-pset.addPrimitive(while_trueB_1, [waitC, requestC], while_trueB)
-# 2 Waits
-pset.addPrimitive(while_trueB_2, [wait01, wait01, request01], while_trueB)
-pset.addPrimitive(while_trueB_2, [wait01, wait01, requestC], while_trueB)
-pset.addPrimitive(while_trueB_2, [wait01, waitC, request01], while_trueB)
-pset.addPrimitive(while_trueB_2, [wait01, waitC, requestC], while_trueB)
-pset.addPrimitive(while_trueB_2, [waitC, wait01, request01], while_trueB)
-pset.addPrimitive(while_trueB_2, [waitC, wait01, requestC], while_trueB)
-pset.addPrimitive(while_trueB_2, [waitC, waitC, request01], while_trueB)
-pset.addPrimitive(while_trueB_2, [waitC, waitC, requestC], while_trueB)
-
-# Loop for BT3
-# 0 Waits
-pset.addPrimitive(while_trueOther_0, [requestC], while_trueOther)
-# 1 Waits
-pset.addPrimitive(while_trueOther_1, [waitC, requestC], while_trueOther)
-# 2 Waits
-pset.addPrimitive(while_trueOther_2, [waitC, waitC, requestC], while_trueOther)
-
-# Wait Permutation of 0-2:
-pset.addPrimitive(wait02_1, [Perm02], wait02)
-pset.addPrimitive(wait02_2, [Perm02, Perm02], wait02)
-pset.addPrimitive(wait02_3, [Perm02, Perm02, Perm02], wait02)
-pset.addPrimitive(wait02_4, [Perm02, Perm02, Perm02, Perm02], wait02)
-
-# Wait Permutation of 0-1
-pset.addPrimitive(wait01_1, [Perm01], wait01)
-pset.addPrimitive(wait01_2, [Perm01, Perm01], wait01)
-pset.addPrimitive(wait01_3, [Perm01, Perm01, Perm01], wait01)
-pset.addPrimitive(wait01_4, [Perm01, Perm01, Perm01, Perm01], wait01)
-
-# Wait Concrete
-pset.addPrimitive(waitC_1, [Concrete], waitC)
-pset.addPrimitive(waitC_2, [Concrete, Concrete], waitC)
-pset.addPrimitive(waitC_3, [Concrete, Concrete, Concrete], waitC)
-pset.addPrimitive(waitC_4, [Concrete, Concrete, Concrete, Concrete], waitC)
-
-# Request Permutation of 0-2
-pset.addPrimitive(request02_1, [Perm02_O, priority], request02)
-pset.addPrimitive(request02_2, [Perm02_O, Perm02_O, priority], request02)
-pset.addPrimitive(request02_3, [Perm02_O, Perm02_O, Perm02_O, priority], request02)
-pset.addPrimitive(request02_4, [Perm02_O, Perm02_O, Perm02_O, Perm02_O, priority], request02)
-
-# Request Permutation of 0-1
-pset.addPrimitive(request01_1, [Perm01_O, priority], request01)
-pset.addPrimitive(request01_2, [Perm01_O, Perm01_O, priority], request01)
-pset.addPrimitive(request01_3, [Perm01_O, Perm01_O, Perm01_O, priority], request01)
-pset.addPrimitive(request01_4, [Perm01_O, Perm01_O, Perm01_O, Perm01_O, priority], request01)
-
-# Request Concrete
-pset.addPrimitive(requestC_1, [Concrete_O, priority], requestC)
-pset.addPrimitive(requestC_2, [Concrete_O, Concrete_O, priority], requestC)
-pset.addPrimitive(requestC_3, [Concrete_O, Concrete_O, Concrete_O, priority], requestC)
-pset.addPrimitive(requestC_4, [Concrete_O, Concrete_O, Concrete_O, Concrete_O, priority], requestC)
-
-# Permutation of 0-2
-pset.addPrimitive(Perm02_X_Func, [position], Perm02_X)
-pset.addPrimitive(Perm02_O_Func, [position], Perm02_O)
-pset.addPrimitive(Perm02_X_Func, [position], Perm02)
-pset.addPrimitive(Perm02_O_Func, [position], Perm02)
-
-# Permutation of 0-1
-pset.addPrimitive(Perm01_X_Func, [positionf], Perm01_X)
-pset.addPrimitive(Perm01_O_Func, [positionf], Perm01_O)
-pset.addPrimitive(Perm01_X_Func, [positionf], Perm01)
-pset.addPrimitive(Perm01_O_Func, [positionf], Perm01)
-
-# Concrete of 0-2
-pset.addPrimitive(Concrete_X_Func, [position, position], Concrete_X)
-pset.addPrimitive(Concrete_O_Func, [position, position], Concrete_O)
-pset.addPrimitive(Concrete_X_Func, [position, position], Concrete)
-pset.addPrimitive(Concrete_O_Func, [position, position], Concrete)
+# Define contexts
+# 1-9 arrays of cells and a behavior groups corresponding to the number of cells and arrays
+for single_input_array, behavior_set in zip(single_input_arrays, behaviors_set):
+    pset.addPrimitive(ctx_func, [behavior_set, single_input_array], CTX)
+    pset.addPrimitive(ctx_func, [behavior_set, single_input_array, single_input_array], CTX)
+    pset.addPrimitive(ctx_func, [behavior_set, single_input_array, single_input_array, single_input_array], CTX)
+    pset.addPrimitive(ctx_func, [behavior_set, single_input_array, single_input_array, single_input_array, single_input_array], CTX)
+    pset.addPrimitive(ctx_func, [behavior_set, single_input_array, single_input_array, single_input_array, single_input_array, single_input_array], CTX)
+    pset.addPrimitive(ctx_func, [behavior_set, single_input_array, single_input_array, single_input_array, single_input_array, single_input_array, single_input_array], CTX)
+    pset.addPrimitive(ctx_func, [behavior_set, single_input_array, single_input_array, single_input_array, single_input_array, single_input_array, single_input_array, single_input_array], CTX)
+    pset.addPrimitive(ctx_func, [behavior_set, single_input_array, single_input_array, single_input_array, single_input_array, single_input_array, single_input_array, single_input_array, single_input_array], CTX)
+    pset.addPrimitive(ctx_func, [behavior_set, single_input_array, single_input_array, single_input_array, single_input_array, single_input_array, single_input_array, single_input_array, single_input_array, single_input_array], CTX)
 
 
-pset.addPrimitive(posFunc, [position], position)
-pset.addPrimitive(posfFunc, [positionf], positionf)
-pset.addPrimitive(priorityFunc, [priority], priority)
+# Define input arrays
+# 1-9 cells in every array
+pset.addPrimitive(single_input_func1, [Cell], SingleInput1)
+pset.addPrimitive(single_input_func2, [Cell, Cell], SingleInput2)
+pset.addPrimitive(single_input_func3, [Cell, Cell, Cell], SingleInput3)
+pset.addPrimitive(single_input_func4, [Cell, Cell, Cell, Cell], SingleInput4)
+pset.addPrimitive(single_input_func5, [Cell, Cell, Cell, Cell, Cell], SingleInput5)
+pset.addPrimitive(single_input_func6, [Cell, Cell, Cell, Cell, Cell, Cell], SingleInput6)
+pset.addPrimitive(single_input_func7, [Cell, Cell, Cell, Cell, Cell, Cell, Cell], SingleInput7)
+pset.addPrimitive(single_input_func8, [Cell, Cell, Cell, Cell, Cell, Cell, Cell, Cell], SingleInput8)
+pset.addPrimitive(single_input_func9, [Cell, Cell, Cell, Cell, Cell, Cell, Cell, Cell, Cell], SingleInput9)
 
-pset.addTerminal(0, position)
-pset.addTerminal(1, position)
-pset.addTerminal(2, position)
+# Define cell
+# Made out of 2 positions
+pset.addPrimitive(cell_func, [Position, Position], Cell)
 
-pset.addTerminal(0, positionf)
-pset.addTerminal(1, positionf)
+# Define positions
+# 0-2 positions on the board
+pset.addPrimitive(position_func, [Position], Position)
+pset.addTerminal(0, Position)
+pset.addTerminal(1, Position)
+pset.addTerminal(2, Position)
 
-pset.addTerminal(1, priority)
-pset.addTerminal(2, priority)
-pset.addTerminal(3, priority)
-pset.addTerminal(4, priority)
-pset.addTerminal(5, priority)
-pset.addTerminal(6, priority)
-pset.addTerminal(7, priority)
-pset.addTerminal(8, priority)
-pset.addTerminal(9, priority)
-pset.addTerminal(10, priority)
-pset.addTerminal(11, priority)
+# Define behavior sets
+# Each set contains 1-5 behaviors:
+for behavior_set, behavior, behavior_set_func in zip(behaviors_set, behaviors, behavior_set_funcs):
+    pset.addPrimitive(behavior_set_func, [behavior], behavior_set)
+    pset.addPrimitive(behavior_set_func, [behavior, behavior], behavior_set)
+    pset.addPrimitive(behavior_set_func, [behavior, behavior, behavior], behavior_set)
+    pset.addPrimitive(behavior_set_func, [behavior, behavior, behavior, behavior], behavior_set)
+    pset.addPrimitive(behavior_set_func, [behavior, behavior, behavior, behavior, behavior], behavior_set)
+
+# Define behaviors
+# Each behavior has access to only its number of cells
+# 0-2 Waits - 1 Request
+for request, wait, behavior, behavior_func in zip(requests, waits, behaviors, behavior_funcs):
+    pset.addPrimitive(behavior_func, [request], behavior)
+    pset.addPrimitive(behavior_func, [request, wait], behavior)
+    pset.addPrimitive(behavior_func, [request, wait, wait], behavior)
+
+# Define statements
+# Each statement can only use 1-4 events
+for request, Oevent, request_func in zip(requests, Oevents, request_funcs):
+    pset.addPrimitive(request_func, [Priority, Oevent], request)
+    pset.addPrimitive(request_func, [Priority, Oevent, Oevent], request)
+    pset.addPrimitive(request_func, [Priority, Oevent, Oevent, Oevent], request)
+    pset.addPrimitive(request_func, [Priority, Oevent, Oevent, Oevent, Oevent], request)
+for wait, event, wait_func in zip(waits, events, wait_funcs):
+    pset.addPrimitive(wait_func, [event], wait)
+    pset.addPrimitive(wait_func, [event, event], wait)
+    pset.addPrimitive(wait_func, [event, event, event], wait)
+    pset.addPrimitive(wait_func, [event, event, event, event], wait)
+
+# Define events
+for event, Xevent, Oevent, event_func in zip(events, Xevents, Oevents, event_funcs):
+    pset.addPrimitive(event_func, [Xevent], event)
+    pset.addPrimitive(event_func, [Oevent], event)
+for indx, Xevent, Oevent, x_event_func, o_event_func in zip(indexes, Xevents, Oevents, x_event_funcs, o_event_funcs):
+    pset.addPrimitive(x_event_func, [indx], Xevent)
+    pset.addPrimitive(o_event_func, [indx], Oevent)
+    pset.addPrimitive(index_func, [indx], indx)
+
+# Define indexes for behavior statements
+# Each statement can only use its available number of inputs
+pset.addTerminal(0, Index1)
+
+pset.addTerminal(0, Index2)
+pset.addTerminal(1, Index2)
+
+pset.addTerminal(0, Index3)
+pset.addTerminal(1, Index3)
+pset.addTerminal(2, Index3)
+
+pset.addTerminal(0, Index4)
+pset.addTerminal(1, Index4)
+pset.addTerminal(2, Index4)
+pset.addTerminal(3, Index4)
+
+pset.addTerminal(0, Index5)
+pset.addTerminal(1, Index5)
+pset.addTerminal(2, Index5)
+pset.addTerminal(3, Index5)
+pset.addTerminal(4, Index5)
+
+pset.addTerminal(0, Index6)
+pset.addTerminal(1, Index6)
+pset.addTerminal(2, Index6)
+pset.addTerminal(3, Index6)
+pset.addTerminal(4, Index6)
+pset.addTerminal(5, Index6)
+
+pset.addTerminal(0, Index7)
+pset.addTerminal(1, Index7)
+pset.addTerminal(2, Index7)
+pset.addTerminal(3, Index7)
+pset.addTerminal(4, Index7)
+pset.addTerminal(5, Index7)
+pset.addTerminal(6, Index7)
+
+pset.addTerminal(0, Index8)
+pset.addTerminal(1, Index8)
+pset.addTerminal(2, Index8)
+pset.addTerminal(3, Index8)
+pset.addTerminal(4, Index8)
+pset.addTerminal(5, Index8)
+pset.addTerminal(6, Index8)
+pset.addTerminal(7, Index8)
+
+pset.addTerminal(0, Index9)
+pset.addTerminal(1, Index9)
+pset.addTerminal(2, Index9)
+pset.addTerminal(3, Index9)
+pset.addTerminal(4, Index9)
+pset.addTerminal(5, Index9)
+pset.addTerminal(6, Index9)
+pset.addTerminal(7, Index9)
+pset.addTerminal(8, Index9)
+
+# Define priorities
+pset.addPrimitive(priority_func, [Priority], Priority)
+pset.addTerminal(1, Priority)
+pset.addTerminal(2, Priority)
+pset.addTerminal(3, Priority)
+pset.addTerminal(4, Priority)
+pset.addTerminal(5, Priority)
+pset.addTerminal(6, Priority)
+pset.addTerminal(7, Priority)
+pset.addTerminal(8, Priority)
+pset.addTerminal(9, Priority)
+pset.addTerminal(10, Priority)
+pset.addTerminal(11, Priority)
+
+terminal_types = indexes + [Priority, Position]
 
 
 def cxOnePointBP(ind1, ind2):
@@ -281,7 +300,7 @@ def cxOnePointBP(ind1, ind2):
     for idx, node in enumerate(ind2[1:], 1):
         types2[node.ret].append(idx)
     # common_types = set(types1.keys()).intersection(set(types2.keys()))
-    common_types = [btA, btB, btC]
+    common_types = []
 
     if len(common_types) > 0:
         func1 = toolbox.compile(expr=ind1)
@@ -315,11 +334,11 @@ def cxOnePointBP(ind1, ind2):
 
 
 def thread_weights(blocks_v, wins_v, forks_v):
-    return [(blocks_v + wins_v) * line_weight, forks_v * fork_weight, cell_weight]
+    return 0
 
 
 def thread_weights_reverse(blocks_v, wins_v, forks_v):
-    return [1 / ((blocks_v + wins_v) * line_weight), 1 / (forks_v * fork_weight), 1 / cell_weight]
+    return 0
 
 
 def mutUniformAnomaly(individual, expr, pset):
@@ -373,13 +392,57 @@ def mutUniformAnomalyV2(individual, expr, pset):
         return individual,
 
 
+def generate_safe(pset, min_, max_, terminal_types, type_=None):
+    if type_ is None:
+        type_ = pset.ret
+    expr = []
+    height = random.randint(min_, max_)
+    stack = [(0, type_)]
+    while len(stack) != 0:
+        depth, type_ = stack.pop()
+
+        if type_ in terminal_types:
+            try:
+                term = random.choice(pset.terminals[type_])
+            except IndexError:
+                _, _, traceback = sys.exc_info()
+                raise IndexError("The gp.generate function tried to add "
+                                 "a terminal of type '%s', but there is "
+                                 "none available." % (type_,)).with_traceback(traceback)
+            if inspect.isclass(term):
+                term = term()
+            expr.append(term)
+        else:
+            try:
+                # Might not be respected if there is a type without terminal args
+                if height <= depth or (depth >= min_ and random.random() < pset.terminalRatio):
+                    primitives_with_only_terminal_args = [p for p in pset.primitives[type_] if
+                                                          all([arg in terminal_types for arg in p.args])]
+
+                    if len(primitives_with_only_terminal_args) == 0:
+                        prim = random.choice(pset.primitives[type_])
+                    else:
+                        prim = random.choice(primitives_with_only_terminal_args)
+                else:
+                    prim = random.choice(pset.primitives[type_])
+            except IndexError:
+                _, _, traceback = sys.exc_info()
+                raise IndexError("The gp.generate function tried to add "
+                                 "a primitive of type '%s', but there is "
+                                 "none available." % (type_,)).with_traceback(traceback)
+            expr.append(prim)
+            for arg in reversed(prim.args):
+                stack.append((depth + 1, arg))
+    return expr
+
+
 # Define Individual and Fitness
 creator.create("FitnessMax", base.Fitness, weights=(1.0,))
 creator.create("Individual", gp.PrimitiveTree, fitness=creator.FitnessMax, pset=pset)
 
 # Define Toolbox
 toolbox = base.Toolbox()
-toolbox.register("expr", gp.genGrow, pset=pset, min_=7, max_=7)
+toolbox.register("expr", generate_safe, pset=pset, min_=7, max_=14, terminal_types=terminal_types)
 toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.expr)
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("compile", gp.compile, pset=pset)
@@ -393,7 +456,7 @@ toolbox.register("compile", gp.compile, pset=pset)
 toolbox.register("evaluate", eval_generator)
 toolbox.register("select", tools.selTournament, tournsize=3)
 toolbox.register("mate", cxOnePointBP)
-toolbox.register("expr_mut", gp.genGrow, min_=7, max_=7)
+toolbox.register("expr_mut", generate_safe, min_=7, max_=14, terminal_types=terminal_types)
 toolbox.register("mutate", mutUniformAnomaly, expr=toolbox.expr_mut, pset=pset)
 
 executor = ThreadPoolExecutor()
@@ -539,92 +602,15 @@ def clear_enviorment():
 
 
 if __name__ == "__main__":
-    global line_weight, fork_weight, cell_weight
-    run_experiment(0.7, 0.001, "rest_run")
-    line_weight, fork_weight, cell_weight = 0.1, 0.25, 5
-    run_experiment(0.3, 0.2, "01_025_5_V1")
-    run_experiment(0.3, 0.2, "01_025_5_V2")
-    run_experiment(0.3, 0.2, "01_025_5_V3")
-    line_weight, fork_weight, cell_weight = 0.2, 0.25, 5
-    run_experiment(0.3, 0.2, "02_025_5_V1")
-    run_experiment(0.3, 0.2, "02_025_5_V2")
-    run_experiment(0.3, 0.2, "02_025_5_V3")
-    line_weight, fork_weight, cell_weight = 0.25, 0.25, 5
-    run_experiment(0.3, 0.2, "025_025_5_V1")
-    run_experiment(0.3, 0.2, "025_025_5_V2")
-    run_experiment(0.3, 0.2, "025_025_5_V3")
-    line_weight, fork_weight, cell_weight = 0.5, 0.25, 5
-    run_experiment(0.3, 0.2, "05_025_5_V1")
-    run_experiment(0.3, 0.2, "05_025_5_V2")
-    run_experiment(0.3, 0.2, "05_025_5_V3")
-    line_weight, fork_weight, cell_weight = 1, 0.25, 5
-    run_experiment(0.3, 0.2, "1_025_5_V1")
-    run_experiment(0.3, 0.2, "1_025_5_V2")
-    run_experiment(0.3, 0.2, "1_025_5_V3")
-
-    line_weight, fork_weight, cell_weight = 0.1, 0.5, 5
-    run_experiment(0.3, 0.2, "01_05_5_V1")
-    run_experiment(0.3, 0.2, "01_05_5_V2")
-    run_experiment(0.3, 0.2, "01_05_5_V3")
-    line_weight, fork_weight, cell_weight = 0.2, 0.5, 5
-    run_experiment(0.3, 0.2, "02_05_5_V1")
-    run_experiment(0.3, 0.2, "02_05_5_V2")
-    run_experiment(0.3, 0.2, "02_05_5_V3")
-    line_weight, fork_weight, cell_weight = 0.25, 0.5, 5
-    run_experiment(0.3, 0.2, "025_05_5_V1")
-    run_experiment(0.3, 0.2, "025_05_5_V2")
-    run_experiment(0.3, 0.2, "025_05_5_V3")
-    line_weight, fork_weight, cell_weight = 0.5, 0.5, 5
-    run_experiment(0.3, 0.2, "05_05_5_V1")
-    run_experiment(0.3, 0.2, "05_05_5_V2")
-    run_experiment(0.3, 0.2, "05_05_5_V3")
-    line_weight, fork_weight, cell_weight = 1, 0.5, 5
-    run_experiment(0.3, 0.2, "1_05_5_V1")
-    run_experiment(0.3, 0.2, "1_05_5_V2")
-    run_experiment(0.3, 0.2, "1_05_5_V3")
-
-    line_weight, fork_weight, cell_weight = 0.1, 1, 5
-    run_experiment(0.3, 0.2, "01_1_5_V1")
-    run_experiment(0.3, 0.2, "01_1_5_V2")
-    run_experiment(0.3, 0.2, "01_1_5_V3")
-    line_weight, fork_weight, cell_weight = 0.2, 1, 5
-    run_experiment(0.3, 0.2, "02_1_5_V1")
-    run_experiment(0.3, 0.2, "02_1_5_V2")
-    run_experiment(0.3, 0.2, "02_1_5_V3")
-    line_weight, fork_weight, cell_weight = 0.25, 1, 5
-    run_experiment(0.3, 0.2, "025_1_5_V1")
-    run_experiment(0.3, 0.2, "025_1_5_V2")
-    run_experiment(0.3, 0.2, "025_1_5_V3")
-    line_weight, fork_weight, cell_weight = 0.5, 1, 5
-    run_experiment(0.3, 0.2, "05_1_5_V1")
-    run_experiment(0.3, 0.2, "05_1_5_V2")
-    run_experiment(0.3, 0.2, "05_1_5_V3")
-    line_weight, fork_weight, cell_weight = 1, 1, 5
-    run_experiment(0.3, 0.2, "1_1_5_V1")
-    run_experiment(0.3, 0.2, "1_1_5_V2")
-    run_experiment(0.3, 0.2, "1_1_5_V3")
-
-    line_weight, fork_weight, cell_weight = 0.1, 2, 5
-    run_experiment(0.3, 0.2, "01_2_5_V1")
-    run_experiment(0.3, 0.2, "01_2_5_V2")
-    run_experiment(0.3, 0.2, "01_2_5_V3")
-    line_weight, fork_weight, cell_weight = 0.2, 2, 5
-    run_experiment(0.3, 0.2, "02_2_5_V1")
-    run_experiment(0.3, 0.2, "02_2_5_V2")
-    run_experiment(0.3, 0.2, "02_2_5_V3")
-    line_weight, fork_weight, cell_weight = 0.25, 2, 5
-    run_experiment(0.3, 0.2, "025_2_5_V1")
-    run_experiment(0.3, 0.2, "025_2_5_V2")
-    run_experiment(0.3, 0.2, "025_2_5_V3")
-    line_weight, fork_weight, cell_weight = 0.5, 2, 5
-    run_experiment(0.3, 0.2, "05_2_5_V1")
-    run_experiment(0.3, 0.2, "05_2_5_V2")
-    run_experiment(0.3, 0.2, "05_2_5_V3")
-    line_weight, fork_weight, cell_weight = 1, 2, 5
-    run_experiment(0.3, 0.2, "1_2_5_V1")
-    run_experiment(0.3, 0.2, "1_2_5_V2")
-    run_experiment(0.3, 0.2, "1_2_5_V3")
-
+    run_experiment(0.8, 0.005, "CX80_MUT05_V1")
+    run_experiment(0.8, 0.005, "CX80_MUT05_V2")
+    run_experiment(0.8, 0.005, "CX80_MUT05_V3")
+    run_experiment(0.8, 0.01, "CX80_MUT1_V1")
+    run_experiment(0.8, 0.01, "CX80_MUT1_V2")
+    run_experiment(0.8, 0.01, "CX80_MUT1_V3")
+    run_experiment(0.8, 0.02, "CX80_MUT2_V1")
+    run_experiment(0.8, 0.02, "CX80_MUT2_V2")
+    run_experiment(0.8, 0.02, "CX80_MUT2_V3")
 
 
 

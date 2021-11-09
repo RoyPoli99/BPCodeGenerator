@@ -24,10 +24,22 @@ message EvaluationResponse {
     double blocks = 6;
     double deadlocks = 7;
     double forks = 8;
-    repeated double block_v = 9;
-    repeated double win_v = 10;
-    repeated double fork_v = 11;
-    repeated double requests = 12;
+    double forks_violations = 9;
+    repeated innerinnerType win_o = 10;
+    repeated innerinnerType win_v = 11;
+    repeated innerinnerType block_o = 12;
+    repeated innerinnerType block_v = 13;
+    repeated innerinnerType fork_o = 14;
+    repeated innerinnerType fork_v = 15;
+    repeated innerinnerType requests = 16;
+}
+
+message innerType {
+    repeated double foo = 1 [packed=true];
+}
+
+message innerinnerType {
+    repeated innerType foo = 1;
 }
 
 service EvaluationService {

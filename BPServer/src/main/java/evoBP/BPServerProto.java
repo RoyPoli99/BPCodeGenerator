@@ -20,7 +20,7 @@ public class BPServerProto {
         }
         ExecutorService es = Executors.newFixedThreadPool(3);
         //ExecutorService es = Executors.newFixedThreadPool(Integer.parseInt(args[0]));
-        int port = 8080;
+        int port = 8081;
         Server server = ServerBuilder.forPort(port)
             .executor(es)
             .addService(new EvaluationServiceImpl())

@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'\n\005evoBP',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x08\x62p.proto\"\x15\n\x05\x62prog\x12\x0c\n\x04\x63ode\x18\x01 \x01(\t\"B\n\nIndividual\x12\x12\n\ngeneration\x18\x01 \x01(\x05\x12\n\n\x02id\x18\x02 \x01(\x05\x12\x14\n\x04\x63ode\x18\x03 \x01(\x0b\x32\x06.bprog\"4\n\x11\x45valuationRequest\x12\x1f\n\nindividual\x18\x01 \x01(\x0b\x32\x0b.Individual\"\xe0\x01\n\x12\x45valuationResponse\x12\x0c\n\x04wins\x18\x01 \x01(\x01\x12\r\n\x05\x64raws\x18\x02 \x01(\x01\x12\x0e\n\x06losses\x18\x03 \x01(\x01\x12\x19\n\x11\x62locks_violations\x18\x04 \x01(\x01\x12\x0e\n\x06misses\x18\x05 \x01(\x01\x12\x0e\n\x06\x62locks\x18\x06 \x01(\x01\x12\x11\n\tdeadlocks\x18\x07 \x01(\x01\x12\r\n\x05\x66orks\x18\x08 \x01(\x01\x12\x0f\n\x07\x62lock_v\x18\t \x03(\x01\x12\r\n\x05win_v\x18\n \x03(\x01\x12\x0e\n\x06\x66ork_v\x18\x0b \x03(\x01\x12\x10\n\x08requests\x18\x0c \x03(\x01\x32H\n\x11\x45valuationService\x12\x33\n\x08\x45valuate\x12\x12.EvaluationRequest\x1a\x13.EvaluationResponseB\x07\n\x05\x65voBPb\x06proto3'
+  serialized_pb=b'\n\x08\x62p.proto\"\x15\n\x05\x62prog\x12\x0c\n\x04\x63ode\x18\x01 \x01(\t\"B\n\nIndividual\x12\x12\n\ngeneration\x18\x01 \x01(\x05\x12\n\n\x02id\x18\x02 \x01(\x05\x12\x14\n\x04\x63ode\x18\x03 \x01(\x0b\x32\x06.bprog\"4\n\x11\x45valuationRequest\x12\x1f\n\nindividual\x18\x01 \x01(\x0b\x32\x0b.Individual\"\xa1\x03\n\x12\x45valuationResponse\x12\x0c\n\x04wins\x18\x01 \x01(\x01\x12\r\n\x05\x64raws\x18\x02 \x01(\x01\x12\x0e\n\x06losses\x18\x03 \x01(\x01\x12\x19\n\x11\x62locks_violations\x18\x04 \x01(\x01\x12\x0e\n\x06misses\x18\x05 \x01(\x01\x12\x0e\n\x06\x62locks\x18\x06 \x01(\x01\x12\x11\n\tdeadlocks\x18\x07 \x01(\x01\x12\r\n\x05\x66orks\x18\x08 \x01(\x01\x12\x18\n\x10\x66orks_violations\x18\t \x01(\x01\x12\x1e\n\x05win_o\x18\n \x03(\x0b\x32\x0f.innerinnerType\x12\x1e\n\x05win_v\x18\x0b \x03(\x0b\x32\x0f.innerinnerType\x12 \n\x07\x62lock_o\x18\x0c \x03(\x0b\x32\x0f.innerinnerType\x12 \n\x07\x62lock_v\x18\r \x03(\x0b\x32\x0f.innerinnerType\x12\x1f\n\x06\x66ork_o\x18\x0e \x03(\x0b\x32\x0f.innerinnerType\x12\x1f\n\x06\x66ork_v\x18\x0f \x03(\x0b\x32\x0f.innerinnerType\x12!\n\x08requests\x18\x10 \x03(\x0b\x32\x0f.innerinnerType\"\x1c\n\tinnerType\x12\x0f\n\x03\x66oo\x18\x01 \x03(\x01\x42\x02\x10\x01\")\n\x0einnerinnerType\x12\x17\n\x03\x66oo\x18\x01 \x03(\x0b\x32\n.innerType2H\n\x11\x45valuationService\x12\x33\n\x08\x45valuate\x12\x12.EvaluationRequest\x1a\x13.EvaluationResponseB\x07\n\x05\x65voBPb\x06proto3'
 )
 
 
@@ -200,29 +200,57 @@ _EVALUATIONRESPONSE = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='block_v', full_name='EvaluationResponse.block_v', index=8,
-      number=9, type=1, cpp_type=5, label=3,
+      name='forks_violations', full_name='EvaluationResponse.forks_violations', index=8,
+      number=9, type=1, cpp_type=5, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='win_o', full_name='EvaluationResponse.win_o', index=9,
+      number=10, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='win_v', full_name='EvaluationResponse.win_v', index=9,
-      number=10, type=1, cpp_type=5, label=3,
+      name='win_v', full_name='EvaluationResponse.win_v', index=10,
+      number=11, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='fork_v', full_name='EvaluationResponse.fork_v', index=10,
-      number=11, type=1, cpp_type=5, label=3,
+      name='block_o', full_name='EvaluationResponse.block_o', index=11,
+      number=12, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='requests', full_name='EvaluationResponse.requests', index=11,
-      number=12, type=1, cpp_type=5, label=3,
+      name='block_v', full_name='EvaluationResponse.block_v', index=12,
+      number=13, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='fork_o', full_name='EvaluationResponse.fork_o', index=13,
+      number=14, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='fork_v', full_name='EvaluationResponse.fork_v', index=14,
+      number=15, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='requests', full_name='EvaluationResponse.requests', index=15,
+      number=16, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -240,15 +268,89 @@ _EVALUATIONRESPONSE = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=158,
-  serialized_end=382,
+  serialized_end=575,
+)
+
+
+_INNERTYPE = _descriptor.Descriptor(
+  name='innerType',
+  full_name='innerType',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='foo', full_name='innerType.foo', index=0,
+      number=1, type=1, cpp_type=5, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=b'\020\001', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=577,
+  serialized_end=605,
+)
+
+
+_INNERINNERTYPE = _descriptor.Descriptor(
+  name='innerinnerType',
+  full_name='innerinnerType',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='foo', full_name='innerinnerType.foo', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=607,
+  serialized_end=648,
 )
 
 _INDIVIDUAL.fields_by_name['code'].message_type = _BPROG
 _EVALUATIONREQUEST.fields_by_name['individual'].message_type = _INDIVIDUAL
+_EVALUATIONRESPONSE.fields_by_name['win_o'].message_type = _INNERINNERTYPE
+_EVALUATIONRESPONSE.fields_by_name['win_v'].message_type = _INNERINNERTYPE
+_EVALUATIONRESPONSE.fields_by_name['block_o'].message_type = _INNERINNERTYPE
+_EVALUATIONRESPONSE.fields_by_name['block_v'].message_type = _INNERINNERTYPE
+_EVALUATIONRESPONSE.fields_by_name['fork_o'].message_type = _INNERINNERTYPE
+_EVALUATIONRESPONSE.fields_by_name['fork_v'].message_type = _INNERINNERTYPE
+_EVALUATIONRESPONSE.fields_by_name['requests'].message_type = _INNERINNERTYPE
+_INNERINNERTYPE.fields_by_name['foo'].message_type = _INNERTYPE
 DESCRIPTOR.message_types_by_name['bprog'] = _BPROG
 DESCRIPTOR.message_types_by_name['Individual'] = _INDIVIDUAL
 DESCRIPTOR.message_types_by_name['EvaluationRequest'] = _EVALUATIONREQUEST
 DESCRIPTOR.message_types_by_name['EvaluationResponse'] = _EVALUATIONRESPONSE
+DESCRIPTOR.message_types_by_name['innerType'] = _INNERTYPE
+DESCRIPTOR.message_types_by_name['innerinnerType'] = _INNERINNERTYPE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 bprog = _reflection.GeneratedProtocolMessageType('bprog', (_message.Message,), {
@@ -279,8 +381,23 @@ EvaluationResponse = _reflection.GeneratedProtocolMessageType('EvaluationRespons
   })
 _sym_db.RegisterMessage(EvaluationResponse)
 
+innerType = _reflection.GeneratedProtocolMessageType('innerType', (_message.Message,), {
+  'DESCRIPTOR' : _INNERTYPE,
+  '__module__' : 'bp_pb2'
+  # @@protoc_insertion_point(class_scope:innerType)
+  })
+_sym_db.RegisterMessage(innerType)
+
+innerinnerType = _reflection.GeneratedProtocolMessageType('innerinnerType', (_message.Message,), {
+  'DESCRIPTOR' : _INNERINNERTYPE,
+  '__module__' : 'bp_pb2'
+  # @@protoc_insertion_point(class_scope:innerinnerType)
+  })
+_sym_db.RegisterMessage(innerinnerType)
+
 
 DESCRIPTOR._options = None
+_INNERTYPE.fields_by_name['foo']._options = None
 
 _EVALUATIONSERVICE = _descriptor.ServiceDescriptor(
   name='EvaluationService',
@@ -289,8 +406,8 @@ _EVALUATIONSERVICE = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=384,
-  serialized_end=456,
+  serialized_start=650,
+  serialized_end=722,
   methods=[
   _descriptor.MethodDescriptor(
     name='Evaluate',

@@ -118,8 +118,7 @@ var forks02 = [[{x: 1, y: 2}, {x: 0, y: 0}], [{x: 0, y: 1}, {x: 2, y: 2}], [{x: 
 var forks20 = [[{x: 1, y: 0}, {x: 2, y: 2}], [{x: 2, y: 1}, {x: 0, y: 0}], [{x: 2, y: 1}, {x: 1, y: 0}]];
 var forks00 = [[{x: 0, y: 1}, {x: 2, y: 0}], [{x: 1, y: 0}, {x: 0, y: 2}], [{x: 0, y: 1}, {x: 1, y: 0}]];
 
-var forksdiag = [[{x: 0, y: 2}, {x: 2, y: 0}]
-  //,[ { x:0, y:0 },{ x:2, y:2 }] // <--- Intentional BUG
+var forksdiag = [[{x: 0, y: 2}, {x: 2, y: 0}],[ { x:0, y:0 },{ x:2, y:2 }] // <--- Intentional BUG
 ];
 
 var permsforks = [[0, 1], [1, 0]];
@@ -197,22 +196,41 @@ function addAssertions(f, p) {
 }
 
 
-function addForkAssertions(f, p, solution) {
+function addForkAssertions(f, solution) {
 
   // Player X strategy to prevent the Fork22 of player O
-  bp.registerBThread("ForkAssertion(<" + f[p[0]].x + "," + f[p[0]].y + ">," + "<" + f[p[1]].x + "," + f[p[1]].y + ">)", function() {
+  bp.registerBThread("ForkAssertion(<" + f[0].x + "," + f[0].y + ">," + "<" + f[1].x + "," + f[1].y + ">)", function() {
     while (true) {
-      bp.sync({ waitFor:[ X(f[p[0]].x, f[p[0]].y) ] });
-
-      bp.sync({ waitFor:[ X(f[p[1]].x, f[p[1]].y) ] });
-
-      if (! bp.sync({waitFor: [Omove]}) in solution)
+      solution.push(X(f[0].x, f[0].y));
+      solution.push(X(f[1].x, f[1].y));
+      if(bp.sync({ waitFor:solution }).name.equals("O"))
         return;
-      else
+
+      if(bp.sync({ waitFor:solution }).name.equals("O"))
+        return;
+
+      solution.push(Xmove);
+      solution.push(OWin);
+
+      let ev = bp.sync({waitFor: solution});
+
+      if (ev.name.equals("OWin"))
+        return;
+      if (ev.name.equals("X"))
         bp.sync({request: bp.Event("FORK_VIOLATION")}, 110);
+      else
+        bp.sync({request: bp.Event("FORK")}, 110);
+
+      // if (solution.includes(ev))
+      //   bp.sync({request: bp.Event("FORK")}, 110);
+      // if (ev.name.equals("OWin"))
+      //   return;
+      // else
+      //   bp.sync({request: bp.Event("FORK_VIOLATION")}, 110);
     }
   });
 }
+
 
 var perms = [[0, 1, 2], [0, 2, 1], [1, 0, 2],
   [1, 2, 0], [2, 0, 1], [2, 1, 0]];
@@ -224,11 +242,17 @@ lines.forEach(function (l) {
 });
 
 forks22.forEach(function(f) {
-  permsforks.forEach(function(p) {
-    addForkAssertions(f, p, [ O(2, 2), O(0,2), O(2,0) ]);
-    addForkAssertions(f, p, [ O(0, 2), O(0,0), O(2,2) ]);
-    addForkAssertions(f, p, [ O(2, 0), O(0,0), O(2,2) ]);
-    addForkAssertions(f, p, [ O(0, 0), O(0,2), O(2,0) ]);
-    addForkAssertions(f, p, [ O(0, 1), O(1, 0), O(1, 2), O(2, 1) ]);
-  });
+  addForkAssertions(f, [ O(2, 2), O(0,2), O(2,0) ]);
+});
+forks02.forEach(function(f) {
+  addForkAssertions(f, [ O(0, 2), O(0,0), O(2,2) ]);
+});
+forks20.forEach(function(f) {
+  addForkAssertions(f, [ O(2, 0), O(0,0), O(2,2) ]);
+});
+forks00.forEach(function(f) {
+  addForkAssertions(f, [ O(0, 0), O(0,2), O(2,0) ]);
+});
+forksdiag.forEach(function(f) {
+  addForkAssertions(f, [ O(0, 1), O(1, 0), O(1, 2), O(2, 1) ]);
 });

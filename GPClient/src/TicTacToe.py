@@ -1,4 +1,5 @@
 import inspect
+import math
 import sys
 import threading
 import time
@@ -8,6 +9,7 @@ import random
 from typing import List, Any
 import matplotlib.pyplot as plt
 import numpy
+import numpy as np
 from deap import algorithms
 from deap import base
 from deap import creator
@@ -23,7 +25,7 @@ import pandas as pd
 
 # Define global arguments
 NUMBER_OF_GENERATIONS = 150
-POPULATION_SIZE = 300
+POPULATION_SIZE = 100
 AVERAGES = []
 MAXIMUMS = []
 MINIMUMS = []
@@ -32,7 +34,8 @@ CURR_GEN = 1
 INDV_ID = 0
 anomaly_dict = {}
 anomaly_dict_v2 = {}
-exp_type = 1
+anomaly_map = {}
+exp_type = "BP"
 
 lock = threading.Lock()
 prev_time = 0
@@ -49,22 +52,39 @@ df = pd.DataFrame({'Generation': [],
                    'Blocks': [],
                    'Deadlocks': [],
                    'Forks': [],
+                   'Fork_Violations': [],
                    'Code': []})
 
 
-def results_to_fitness(wins, wins_misses, blocks, block_misses, deadlocks):
+def exp_func(x):
+    num = 1 - math.pow(math.e, -x)
+    den = 1 - math.pow(math.e, -1)
+    return num / den
+
+
+def exp_func2(x):
+    return 2 * math.pow(x, 2)
+
+
+def results_to_fitness(wins, wins_misses, blocks, block_misses, forks, forks_misses, deadlocks):
+    w_win, w_block = 0.3, 0.7
     try:
         win_stat = wins / (wins + wins_misses)
     except:
-        win_stat = 1
+        win_stat = 0
     try:
         block_stat = blocks / (blocks + block_misses)
     except:
-        block_stat = 1
-    return 50 * win_stat + 50 * block_stat - deadlocks
+        block_stat = 0
+    try:
+        fork_stat = forks / (forks + forks_misses)
+    except:
+        fork_stat = 0
+    return 100 * (w_win * exp_func(win_stat) + w_block * exp_func(block_stat)) - deadlocks
+    # return 100 * ((win_stat + block_stat * block_weight) / 3) - deadlocks
 
 
-def document_individual(individual, curr_id, fitness, wins, draws, losses, blocks_v, misses, blocks, deadlocks, forks, code):
+def document_individual(individual, curr_id, fitness, wins, draws, losses, blocks_v, misses, blocks, deadlocks, forks, forks_violations, code):
     # tree
     #nodes, edges, labels = gp.graph(individual)
     #g = pgv.AGraph()
@@ -81,7 +101,30 @@ def document_individual(individual, curr_id, fitness, wins, draws, losses, block
     #g.draw(folder_name + "/" + img_name)
     # stats
     with lock:
-        df.loc[len(df)] = [CURR_GEN, curr_id, fitness, wins, draws, losses, blocks_v, misses, blocks, deadlocks, forks, code]
+        df.loc[len(df)] = [CURR_GEN, curr_id, fitness, wins, losses, draws, blocks_v, misses, blocks, deadlocks, forks, forks_violations, code]
+
+
+def parse_results_lists(result_list):
+    sets_layer = list()
+    for item in result_list._values:
+        threads_layer = list()
+        for inner_item in item.foo._values:
+            inputs_layer = list()
+            for inner_inner_item in inner_item.foo._values:
+                inputs_layer.append(inner_inner_item)
+            threads_layer.append(inputs_layer)
+        sets_layer.append(threads_layer)
+    return sets_layer
+
+
+def map_anomalies(results, func_string):
+    anomaly_map[func_string] = {"win_o": parse_results_lists(results.win_o),
+                               "win_v": parse_results_lists(results.win_v),
+                               "block_o": parse_results_lists(results.block_o),
+                               "block_v": parse_results_lists(results.block_v),
+                               "fork_o": parse_results_lists(results.fork_o),
+                               "fork_v": parse_results_lists(results.fork_v),
+                               "requests": parse_results_lists(results.fork_v)}
 
 
 # Send to BPServer to evaluate
@@ -96,10 +139,12 @@ def eval_generator(individual):
         indv.id = INDV_ID
     indv.code.code = func_string
     results = send_proto_request(indv)
+    map_anomalies(results, func_string)
+    x = anomaly_map
     anomaly_dict[func_string] = (results.blocks_violations, results.misses, results.forks)
     anomaly_dict_v2[func_string] = (results.block_v, results.win_v, results.fork_v, results.requests)
-    fitness = results_to_fitness(results.wins, results.misses, results.blocks, results.blocks_violations, results.deadlocks)
-    document_individual(individual, indv.id, fitness, results.wins, results.draws, results.losses, results.blocks_violations, results.misses, results.blocks, results.deadlocks, results.forks, func_string)
+    fitness = results_to_fitness(results.wins, results.misses, results.blocks, results.blocks_violations, results.forks, results.forks_violations, results.deadlocks)
+    document_individual(individual, indv.id, fitness, results.wins, results.draws, results.losses, results.blocks_violations, results.misses, results.blocks, results.deadlocks, results.forks, results.forks_violations, func_string)
     return fitness,
 
 
@@ -284,13 +329,75 @@ pset.addTerminal(11, Priority)
 terminal_types = indexes + [Priority, Position]
 
 
-def cxOnePointBP(ind1, ind2):
-    if exp_type == 1:
-        return gp.cxOnePoint(ind1, ind2)
-    if len(ind1) < 2 or len(ind2) < 2:
-        # No crossover on single node tree
-        return ind1, ind2
 
+def calculate_set_scores(thread_scores):
+    x = [sum(set_anomalies) for set_anomalies in thread_scores]
+    return [sum(set_anomalies) for set_anomalies in thread_scores]
+
+
+def calculate_thread_scores(anomalies, weights):
+    thread_scores = np.zeros((10, 5))
+    for anomaly, weight in zip(anomalies, weights):
+        for i, anomaly_set in enumerate(anomaly):
+            for j, anomaly_thread in enumerate(anomaly_set):
+                thread_scores[i][j] += sum(anomaly_thread) * weight
+    return np.where(thread_scores < 0, 1, thread_scores)
+
+
+def calculate_context_scores(anomalies, weights):
+    context_scores = np.zeros((10, 10))
+    for anomaly, weight in zip(anomalies, weights):
+        for i, anomaly_set in enumerate(anomaly):
+            for anomaly_thread in anomaly_set:
+                for j, anomaly_context in enumerate(anomaly_thread):
+                    context_scores[i][j] += anomaly_context * weight
+    return np.where(context_scores < 0, 1, context_scores)
+
+
+def get_index(individual, func_string, good_index):
+    anomalies = anomaly_map[func_string]
+    list_indv = list(individual)
+    if good_index:
+        anomaly_weights = [2, -2, 1, -1, 0.25]
+    else:
+        anomaly_weights = [-2, 2, -1, 1, -0.25]
+
+
+    set_indexes = [i for i, node in enumerate(list_indv) if node.name == "ctx_func"] + [len(list_indv)]
+    thread_indexes = [i for i, node in enumerate(list_indv) if node.name.startswith("behavior_func")]
+    context_indexes = [i for i, node in enumerate(list_indv) if node.name.startswith("single_input_func")]
+
+    thread_scores = calculate_thread_scores(
+        [anomalies["win_o"], anomalies["win_v"], anomalies["block_o"], anomalies["block_v"], anomalies["requests"]],
+        anomaly_weights)
+    context_scores = calculate_context_scores(
+        [anomalies["win_o"], anomalies["win_v"], anomalies["block_o"], anomalies["block_v"], anomalies["requests"]],
+        anomaly_weights)
+    set_scores = calculate_set_scores(thread_scores)
+
+    chosen_set = random.choices(range(10), weights=set_scores)[0]
+    chosen_thread = random.choices(range(5), weights=thread_scores[chosen_set])[0]
+    chosen_context = random.choices(range(10), weights=context_scores[chosen_set])[0]
+
+    chosen_set_range = list(range(set_indexes[chosen_set], set_indexes[chosen_set + 1]))
+    relevant_contexts = [x for x in context_indexes if x in chosen_set_range] + [set_indexes[chosen_set + 1]]
+    relevant_threads = [x for x in thread_indexes if x in chosen_set_range] + [relevant_contexts[0]]
+    chosen_thread_range = list(range(relevant_threads[chosen_thread], relevant_threads[chosen_thread + 1]))
+    chosen_context_range = list(range(relevant_contexts[chosen_context], relevant_contexts[chosen_context + 1]))
+
+    chosen_range = random.choices([chosen_set_range, chosen_thread_range, chosen_context_range],
+                                  weights=[0.4, 0.3, 0.3])
+    # return random.choice(chosen_range[0])
+    chosen_range = random.choices(
+        [[chosen_set_range[0]], chosen_context_range, chosen_thread_range[1:], [chosen_thread_range[0]]],
+        weights=[0.05, 0.4, 0.4, 0.15])
+    index = random.choice(chosen_range[0])
+    return index
+    # return random.choices([chosen_set_range[0], chosen_thread_range[0], chosen_context_range[0]], weights=[0.4, 0.3, 0.3])
+
+
+def cxAnomalyDetection(ind1, ind2):
+    # return gp.cxOnePoint(ind1, ind2)
     # List all available primitive types in each individual
     types1 = defaultdict(list)
     types2 = defaultdict(list)
@@ -299,8 +406,8 @@ def cxOnePointBP(ind1, ind2):
         types1[node.ret].append(idx)
     for idx, node in enumerate(ind2[1:], 1):
         types2[node.ret].append(idx)
-    # common_types = set(types1.keys()).intersection(set(types2.keys()))
-    common_types = []
+    common_types = set(types1.keys()).intersection(set(types2.keys()))
+    # common_types = []
 
     if len(common_types) > 0:
         func1 = toolbox.compile(expr=ind1)
@@ -308,82 +415,59 @@ def cxOnePointBP(ind1, ind2):
         func2 = toolbox.compile(expr=ind2)
         func_string2 = str(func2(0).root)
         try:
-            anomalies1 = anomaly_dict[func_string1]
-            anomalies2 = anomaly_dict[func_string2]
-            prob_weights1 = [50 - (anomalies1[0] + anomalies1[1]) / 4, 50 - anomalies1[2], 40]
-            prob_weights2 = [50 - (anomalies2[0] + anomalies2[1]) / 4, 50 - anomalies2[2], 40]
-            prob_weights1 = thread_weights_reverse(anomalies1[0], anomalies1[1], anomalies1[2])
-            prob_weights2 = thread_weights_reverse(anomalies2[0], anomalies2[1], anomalies2[2])
-            type1_ = random.choices(list(common_types), weights=prob_weights1)
-            type2_ = random.choices(list(common_types), weights=prob_weights2)
+            index1_1 = get_index(ind1, func_string1, True)[0]
+            index2_1 = get_index(ind2, func_string2, True)[0]
+            type1_ = ind1[index1_1].ret
+            type2_ = ind2[index2_1].ret
 
-            index1_1 = random.choice(types1[type1_])
-            index2_1 = random.choice(types2[type1_])
+            if type1_ not in types2 or type2_ not in types1:
+                raise BaseException
+
             slice1_1 = ind1.searchSubtree(index1_1)
             slice2_1 = ind2.searchSubtree(index2_1)
 
             index1_2 = random.choice(types1[type2_])
-            index2_2 = random.choice(types2[type2_])
+            index2_2 = random.choice(types2[type1_])
             slice1_2 = ind1.searchSubtree(index1_2)
             slice2_2 = ind2.searchSubtree(index2_2)
 
-            ind2[slice2_1], ind1[slice1_2] = ind1[slice1_1], ind2[slice2_2]
+            ind2[slice2_1], ind1[slice1_1] = ind1[slice1_2], ind2[slice2_2]
         except:
             return ind1, ind2
     return ind1, ind2
 
 
-def thread_weights(blocks_v, wins_v, forks_v):
-    return 0
-
-
-def thread_weights_reverse(blocks_v, wins_v, forks_v):
-    return 0
-
-
-def mutUniformAnomaly(individual, expr, pset):
-    if exp_type == 1:
-        return gp.mutUniform(individual, expr, pset)
+def mutAnomalyDetection(individual, expr, pset):
+    # return gp.mutUniform(individual=individual, expr=expr, pset=pset)
     func = toolbox.compile(expr=individual)
     func_string = str(func(0).root)
     try:
-        anomalies = anomaly_dict[func_string]
+        anomalies = anomaly_map[func_string]
         list_indv = list(individual)
-        startA_index = 2
-        startB_index = [i for i, node in enumerate(list_indv) if node.name == "btBFunc"][0]
-        startC_index = [i for i, node in enumerate(list_indv) if node.name == "btCFunc"][0]
-        a_range = list(range(startA_index, startB_index))
-        b_range = list(range(startB_index, startC_index))
-        c_range = list(range(startC_index, len(individual)))
-        prob_weights = thread_weights(anomalies[0], anomalies[1], anomalies[2])
-        index_range = random.choices([a_range, b_range, c_range], weights=prob_weights)
-        index = random.choice(index_range[0])
-        slice_ = individual.searchSubtree(index)
-        type_ = individual[index].ret
-        individual[slice_] = expr(pset=pset, type_=type_)
-        return individual,
-    except:
-        return individual,
+
+        set_indexes = [i for i, node in enumerate(list_indv) if node.name == "ctx_func"] + [len(list_indv)]
+        thread_indexes = [i for i, node in enumerate(list_indv) if node.name.startswith("behavior_func")]
+        context_indexes = [i for i, node in enumerate(list_indv) if node.name.startswith("single_input_func")]
+
+        thread_scores = calculate_thread_scores([anomalies["win_o"], anomalies["win_v"], anomalies["block_o"], anomalies["block_v"], anomalies["requests"]], [-2, 2, -1, 1, -0.25])
+        context_scores = calculate_context_scores([anomalies["win_o"], anomalies["win_v"], anomalies["block_o"], anomalies["block_v"], anomalies["requests"]], [-2, 2, -1, 1, -0.25])
+        set_scores = calculate_set_scores(thread_scores)
 
 
-def thread_score(blocks, misses, forks, requests):
-    # high score is bad
-    score = blocks / 2 + misses + forks + 50 - requests / 3
-    return max(score, 1)
+        chosen_set = random.choices(range(10), weights=set_scores)[0]
+        chosen_thread = random.choices(range(5), weights=thread_scores[chosen_set])[0]
+        chosen_context = random.choices(range(10), weights=context_scores[chosen_set])[0]
 
+        chosen_set_range = list(range(set_indexes[chosen_set], set_indexes[chosen_set + 1]))
+        relevant_contexts = [x for x in context_indexes if x in chosen_set_range] + [set_indexes[chosen_set + 1]]
+        relevant_threads = [x for x in thread_indexes if x in chosen_set_range] + [relevant_contexts[0]]
+        chosen_thread_range = list(range(relevant_threads[chosen_thread], relevant_threads[chosen_thread + 1]))
+        chosen_context_range = list(range(relevant_contexts[chosen_context], relevant_contexts[chosen_context + 1]))
 
-def mutUniformAnomalyV2(individual, expr, pset):
-    func = toolbox.compile(expr=individual)
-    func_string = str(func(0).root)
-    try:
-        anomalies = anomaly_dict_v2[func_string]
-        list_indv = list(individual)
-        index_list = [i for i, node in enumerate(list_indv) if node.name == "btAFunc" or node.name == "btBFunc" or node.name == "btCFunc"]
-        index_list.append(len(list_indv))
-        ranges_list = [list(range(index_list[i], index_list[i+1])) for i in range(10)]
-        bthread_scores = [thread_score(anomalies[0][i], anomalies[1][i], anomalies[2][i], anomalies[3][i]) for i in range(10)]
-        index_range = random.choices(ranges_list, weights=bthread_scores)
-        index = random.choice(index_range[0])
+        # chosen_range = random.choices([chosen_set_range, chosen_thread_range, chosen_context_range], weights=[0.4, 0.3, 0.3])
+
+        chosen_range = random.choices([[chosen_set_range[0]], chosen_context_range, chosen_thread_range[1:], [chosen_thread_range[0]]], weights=[0.05, 0.4, 0.4, 0.15])
+        index = random.choice(chosen_range[0])
         slice_ = individual.searchSubtree(index)
         type_ = individual[index].ret
         individual[slice_] = expr(pset=pset, type_=type_)
@@ -455,9 +539,9 @@ toolbox.register("compile", gp.compile, pset=pset)
 # Define GP Operators
 toolbox.register("evaluate", eval_generator)
 toolbox.register("select", tools.selTournament, tournsize=3)
-toolbox.register("mate", cxOnePointBP)
+toolbox.register("mate", cxAnomalyDetection)
 toolbox.register("expr_mut", generate_safe, min_=7, max_=14, terminal_types=terminal_types)
-toolbox.register("mutate", mutUniformAnomaly, expr=toolbox.expr_mut, pset=pset)
+toolbox.register("mutate", mutAnomalyDetection, expr=toolbox.expr_mut, pset=pset)
 
 executor = ThreadPoolExecutor()
 toolbox.register("map", executor.map)
@@ -485,11 +569,6 @@ def real_time_plotter(name, plot):
     plt.legend()
     plt.savefig(name + '.png')
     plt.close()
-
-
-# Save results
-def save_results(log):
-    x = 0
 
 
 def time_stat(indv):
@@ -598,19 +677,14 @@ def clear_enviorment():
                        'Blocks': [],
                        'Deadlocks': [],
                        'Forks': [],
+                       'Fork_Violations': [],
                        'Code': []})
 
 
 if __name__ == "__main__":
-    run_experiment(0.8, 0.005, "CX80_MUT05_V1")
-    run_experiment(0.8, 0.005, "CX80_MUT05_V2")
-    run_experiment(0.8, 0.005, "CX80_MUT05_V3")
-    run_experiment(0.8, 0.01, "CX80_MUT1_V1")
-    run_experiment(0.8, 0.01, "CX80_MUT1_V2")
-    run_experiment(0.8, 0.01, "CX80_MUT1_V3")
-    run_experiment(0.8, 0.02, "CX80_MUT2_V1")
-    run_experiment(0.8, 0.02, "CX80_MUT2_V2")
-    run_experiment(0.8, 0.02, "CX80_MUT2_V3")
+    run_experiment(0.0, 0.5, "NO_CX_V1")
+    run_experiment(0.0, 0.5, "NO_CX_V2")
+    run_experiment(0.0, 0.5, "NO_CX_V3")
 
 
 

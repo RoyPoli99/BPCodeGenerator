@@ -13,8 +13,8 @@ btNames = ["bp.registerBThread(\"AddThirdO(<\"+f[p[0]].x+\",\"+f[p[0]].y+\">,\"+
            "bp.registerBThread(\"Sides\",function(){"
            ]
 
-currentBehaviorSetIndex = 1
-currentBehaviorIndex = 1
+currentBehaviorSetIndex = 0
+currentBehaviorIndex = 0
 lock = threading.Lock()
 
 class root_wrapper:
@@ -34,12 +34,12 @@ class root:
     def __str__(self):
         global currentBehaviorSetIndex, currentBehaviorIndex
         code = ""
-        currentBehaviorSetIndex = 1
-        currentBehaviorIndex = 1
+        currentBehaviorSetIndex = 0
+        currentBehaviorIndex = 0
         for ctx in self.ctxs:
             code += str(ctx) + "\n"
-        currentBehaviorSetIndex = 1
-        currentBehaviorIndex = 1
+        currentBehaviorSetIndex = 0
+        currentBehaviorIndex = 0
         return str(code)
 
     __repr__ = __str__
@@ -57,10 +57,10 @@ class CTX:
         for single_input in self.single_inputs:
             code += str(single_input) + ",\n"
         code = code[:-2] + "]\n"
-        code += "inputs_" + str(currentBehaviorSetIndex) + ".forEach(function (input) {\n"
-        code += "behaviorSet" + str(currentBehaviorSetIndex) + "(input);\n"
+        code += "inputs_" + str(currentBehaviorSetIndex) + ".forEach(function (input, index) {\n"
+        code += "behaviorSet" + str(currentBehaviorSetIndex) + "(input, index);\n"
         code += "});\n"
-        currentBehaviorIndex = 1
+        currentBehaviorIndex = 0
         currentBehaviorSetIndex += 1
         return code_behaviors + code
     __repr__ = __str__
@@ -71,7 +71,7 @@ class BehaviorSet1:
         self.behaviors = behaviors
 
     def __str__(self):
-        code = "function behaviorSet" + str(currentBehaviorSetIndex) + "(input) {\n"
+        code = "function behaviorSet" + str(currentBehaviorSetIndex) + "(input, index) {\n"
         for behavior in self.behaviors:
             code += str(behavior) + "\n"
         return code + "}\n"
@@ -83,7 +83,7 @@ class BehaviorSet2:
         self.behaviors = behaviors
 
     def __str__(self):
-        code = "function behaviorSet" + str(currentBehaviorSetIndex) + "(input) {\n"
+        code = "function behaviorSet" + str(currentBehaviorSetIndex) + "(input, index) {\n"
         for behavior in self.behaviors:
             code += str(behavior) + "\n"
         return code + "}\n"
@@ -95,7 +95,7 @@ class BehaviorSet3:
         self.behaviors = behaviors
 
     def __str__(self):
-        code = "function behaviorSet" + str(currentBehaviorSetIndex) + "(input) {\n"
+        code = "function behaviorSet" + str(currentBehaviorSetIndex) + "(input, index) {\n"
         for behavior in self.behaviors:
             code += str(behavior) + "\n"
         return code + "}\n"
@@ -108,7 +108,7 @@ class BehaviorSet4:
         self.behaviors = behaviors
 
     def __str__(self):
-        code = "function behaviorSet" + str(currentBehaviorSetIndex) + "(input) {\n"
+        code = "function behaviorSet" + str(currentBehaviorSetIndex) + "(input, index) {\n"
         for behavior in self.behaviors:
             code += str(behavior) + "\n"
         return code + "}\n"
@@ -121,7 +121,7 @@ class BehaviorSet5:
         self.behaviors = behaviors
 
     def __str__(self):
-        code = "function behaviorSet" + str(currentBehaviorSetIndex) + "(input) {\n"
+        code = "function behaviorSet" + str(currentBehaviorSetIndex) + "(input, index) {\n"
         for behavior in self.behaviors:
             code += str(behavior) + "\n"
         return code + "}\n"
@@ -134,7 +134,7 @@ class BehaviorSet6:
         self.behaviors = behaviors
 
     def __str__(self):
-        code = "function behaviorSet" + str(currentBehaviorSetIndex) + "(input) {\n"
+        code = "function behaviorSet" + str(currentBehaviorSetIndex) + "(input, index) {\n"
         for behavior in self.behaviors:
             code += str(behavior) + "\n"
         return code + "}\n"
@@ -147,7 +147,7 @@ class BehaviorSet7:
         self.behaviors = behaviors
 
     def __str__(self):
-        code = "function behaviorSet" + str(currentBehaviorSetIndex) + "(input) {\n"
+        code = "function behaviorSet" + str(currentBehaviorSetIndex) + "(input, index) {\n"
         for behavior in self.behaviors:
             code += str(behavior) + "\n"
         return code + "}\n"
@@ -160,7 +160,7 @@ class BehaviorSet8:
         self.behaviors = behaviors
 
     def __str__(self):
-        code = "function behaviorSet" + str(currentBehaviorSetIndex) + "(input) {\n"
+        code = "function behaviorSet" + str(currentBehaviorSetIndex) + "(input, index) {\n"
         for behavior in self.behaviors:
             code += str(behavior) + "\n"
         return code + "}\n"
@@ -173,7 +173,7 @@ class BehaviorSet9:
         self.behaviors = behaviors
 
     def __str__(self):
-        code = "function behaviorSet" + str(currentBehaviorSetIndex) + "(input) {\n"
+        code = "function behaviorSet" + str(currentBehaviorSetIndex) + "(input, index) {\n"
         for behavior in self.behaviors:
             code += str(behavior) + "\n"
         return code + "}\n"
@@ -193,8 +193,10 @@ class Behavior1:
         code += str(self.request) + "\n"
         global currentBehaviorIndex
         curr_name = "bp.registerBThread(\"O_Player_Thread_" + str(currentBehaviorSetIndex) + "_" + str(currentBehaviorIndex) + "\", function(){\n"
+        performing_bthread_name = "\"SET_" + str(currentBehaviorSetIndex) + "_THREAD_" + str(currentBehaviorIndex) + "_INPUT_\" + index.toString()"
+        document_calling_bthread = "bp.sync({request: bp.Event(" + performing_bthread_name + ")}, 115);\n"
         currentBehaviorIndex = currentBehaviorIndex + 1
-        return curr_name + code + "});\n"
+        return curr_name + code + document_calling_bthread + "});\n"
     __repr__ = __str__
 
 
@@ -210,8 +212,10 @@ class Behavior2:
         code += str(self.request) + "\n"
         global currentBehaviorIndex
         curr_name = "bp.registerBThread(\"O_Player_Thread_" + str(currentBehaviorSetIndex) + "_" + str(currentBehaviorIndex) + "\", function(){\n"
+        performing_bthread_name = "\"SET_" + str(currentBehaviorSetIndex) + "_THREAD_" + str(currentBehaviorIndex) + "_INPUT_\" + index.toString()"
+        document_calling_bthread = "bp.sync({request: bp.Event(" + performing_bthread_name + ")}, 115);\n"
         currentBehaviorIndex = currentBehaviorIndex + 1
-        return curr_name + code + "});\n"
+        return curr_name + code + document_calling_bthread + "});\n"
     __repr__ = __str__
 
 
@@ -227,8 +231,10 @@ class Behavior3:
         code += str(self.request) + "\n"
         global currentBehaviorIndex
         curr_name = "bp.registerBThread(\"O_Player_Thread_" + str(currentBehaviorSetIndex) + "_" + str(currentBehaviorIndex) + "\", function(){\n"
+        performing_bthread_name = "\"SET_" + str(currentBehaviorSetIndex) + "_THREAD_" + str(currentBehaviorIndex) + "_INPUT_\" + index.toString()"
+        document_calling_bthread = "bp.sync({request: bp.Event(" + performing_bthread_name + ")}, 115);\n"
         currentBehaviorIndex = currentBehaviorIndex + 1
-        return curr_name + code + "});\n"
+        return curr_name + code + document_calling_bthread + "});\n"
     __repr__ = __str__
 
 
@@ -244,8 +250,10 @@ class Behavior4:
         code += str(self.request) + "\n"
         global currentBehaviorIndex
         curr_name = "bp.registerBThread(\"O_Player_Thread_" + str(currentBehaviorSetIndex) + "_" + str(currentBehaviorIndex) + "\", function(){\n"
+        performing_bthread_name = "\"SET_" + str(currentBehaviorSetIndex) + "_THREAD_" + str(currentBehaviorIndex) + "_INPUT_\" + index.toString()"
+        document_calling_bthread = "bp.sync({request: bp.Event(" + performing_bthread_name + ")}, 115);\n"
         currentBehaviorIndex = currentBehaviorIndex + 1
-        return curr_name + code + "});\n"
+        return curr_name + code + document_calling_bthread + "});\n"
     __repr__ = __str__
 
 
@@ -261,8 +269,10 @@ class Behavior5:
         code += str(self.request) + "\n"
         global currentBehaviorIndex
         curr_name = "bp.registerBThread(\"O_Player_Thread_" + str(currentBehaviorSetIndex) + "_" + str(currentBehaviorIndex) + "\", function(){\n"
+        performing_bthread_name = "\"SET_" + str(currentBehaviorSetIndex) + "_THREAD_" + str(currentBehaviorIndex) + "_INPUT_\" + index.toString()"
+        document_calling_bthread = "bp.sync({request: bp.Event(" + performing_bthread_name + ")}, 115);\n"
         currentBehaviorIndex = currentBehaviorIndex + 1
-        return curr_name + code + "});\n"
+        return curr_name + code + document_calling_bthread + "});\n"
     __repr__ = __str__
 
 
@@ -278,8 +288,10 @@ class Behavior6:
         code += str(self.request) + "\n"
         global currentBehaviorIndex
         curr_name = "bp.registerBThread(\"O_Player_Thread_" + str(currentBehaviorSetIndex) + "_" + str(currentBehaviorIndex) + "\", function(){\n"
+        performing_bthread_name = "\"SET_" + str(currentBehaviorSetIndex) + "_THREAD_" + str(currentBehaviorIndex) + "_INPUT_\" + index.toString()"
+        document_calling_bthread = "bp.sync({request: bp.Event(" + performing_bthread_name + ")}, 115);\n"
         currentBehaviorIndex = currentBehaviorIndex + 1
-        return curr_name + code + "});\n"
+        return curr_name + code + document_calling_bthread + "});\n"
     __repr__ = __str__
 
 
@@ -295,8 +307,10 @@ class Behavior7:
         code += str(self.request) + "\n"
         global currentBehaviorIndex
         curr_name = "bp.registerBThread(\"O_Player_Thread_" + str(currentBehaviorSetIndex) + "_" + str(currentBehaviorIndex) + "\", function(){\n"
+        performing_bthread_name = "\"SET_" + str(currentBehaviorSetIndex) + "_THREAD_" + str(currentBehaviorIndex) + "_INPUT_\" + index.toString()"
+        document_calling_bthread = "bp.sync({request: bp.Event(" + performing_bthread_name + ")}, 115);\n"
         currentBehaviorIndex = currentBehaviorIndex + 1
-        return curr_name + code + "});\n"
+        return curr_name + code + document_calling_bthread + "});\n"
     __repr__ = __str__
 
 
@@ -312,8 +326,10 @@ class Behavior8:
         code += str(self.request) + "\n"
         global currentBehaviorIndex
         curr_name = "bp.registerBThread(\"O_Player_Thread_" + str(currentBehaviorSetIndex) + "_" + str(currentBehaviorIndex) + "\", function(){\n"
+        performing_bthread_name = "\"SET_" + str(currentBehaviorSetIndex) + "_THREAD_" + str(currentBehaviorIndex) + "_INPUT_\" + index.toString()"
+        document_calling_bthread = "bp.sync({request: bp.Event(" + performing_bthread_name + ")}, 115);\n"
         currentBehaviorIndex = currentBehaviorIndex + 1
-        return curr_name + code + "});\n"
+        return curr_name + code + document_calling_bthread + "});\n"
     __repr__ = __str__
 
 
@@ -329,8 +345,10 @@ class Behavior9:
         code += str(self.request) + "\n"
         global currentBehaviorIndex
         curr_name = "bp.registerBThread(\"O_Player_Thread_" + str(currentBehaviorSetIndex) + "_" + str(currentBehaviorIndex) + "\", function(){\n"
+        performing_bthread_name = "\"SET_" + str(currentBehaviorSetIndex) + "_THREAD_" + str(currentBehaviorIndex) + "_INPUT_\" + index.toString()"
+        document_calling_bthread = "bp.sync({request: bp.Event(" + performing_bthread_name + ")}, 115);\n"
         currentBehaviorIndex = currentBehaviorIndex + 1
-        return curr_name + code + "});\n"
+        return curr_name + code + document_calling_bthread + "});\n"
     __repr__ = __str__
 
 

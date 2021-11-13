@@ -11,18 +11,22 @@ import java.util.concurrent.Callable;
 
 public abstract class Evaluator implements Callable<Bp.EvaluationResponse> {
 
-    private static String rand_player;
-    private static String opt_player;
+    private static String first_x;
+    private static String first_o;
+    private static String first_opt_x;
+    private static String first_opt_o;
     static {
         try {
-            rand_player = new Scanner(new File("resources/BPJSTicTacToe.js")).useDelimiter("\\Z").next();
-            //rand_player = new Scanner(new File("resources/BPJSTicTacToe.js")).useDelimiter("\\Z").next();
-            opt_player = new Scanner(new File("resources/BPJSTicTacToeOpt.js")).useDelimiter("\\Z").next();
+            first_x = new Scanner(new File("resources/BPJSTicTacToeFirstX.js")).useDelimiter("\\Z").next();
+            first_o = new Scanner(new File("resources/BPJSTicTacToeFirstO.js")).useDelimiter("\\Z").next();
+            first_opt_x = new Scanner(new File("resources/BPJSTicTacToeOptFirstX.js")).useDelimiter("\\Z").next();
+            first_opt_o = new Scanner(new File("resources/BPJSTicTacToeOptFirstO.js")).useDelimiter("\\Z").next();
         } catch (FileNotFoundException e) {
             try{
-                rand_player = new Scanner(new File("src/main/resources/BPJSTicTacToe.js")).useDelimiter("\\Z").next();
-                //rand_player = new Scanner(new File("src/main/resources/BPJSTicTacToe.js")).useDelimiter("\\Z").next();
-                opt_player = new Scanner(new File("src/main/resources/BPJSTicTacToeOpt.js")).useDelimiter("\\Z").next();
+                first_x = new Scanner(new File("src/main/resources/BPJSTicTacToeFirstX.js")).useDelimiter("\\Z").next();
+                first_o = new Scanner(new File("src/main/resources/BPJSTicTacToeFirstO.js")).useDelimiter("\\Z").next();
+                first_opt_x = new Scanner(new File("src/main/resources/BPJSTicTacToeOptFirstX.js")).useDelimiter("\\Z").next();
+                first_opt_o = new Scanner(new File("src/main/resources/BPJSTicTacToeOptFirstO.js")).useDelimiter("\\Z").next();
             } catch (FileNotFoundException e2) {
                 e.printStackTrace();
             }
@@ -31,8 +35,10 @@ public abstract class Evaluator implements Callable<Bp.EvaluationResponse> {
 
     protected final int gen;
     protected final int id;
-    //protected final BProgram bprog;
-    protected final String b_program;
+    protected final String b_program_first_x;
+    protected final String b_program_first_o;
+    protected final String b_program_opt_first_x;
+    protected final String b_program_opt_first_o;
 
 
     protected Evaluator(String code, int gen, int id, String playerType){
@@ -44,8 +50,12 @@ public abstract class Evaluator implements Callable<Bp.EvaluationResponse> {
         //if(playerType.equals("opt"))
         //    player = opt_player;
         //else
-        player = rand_player;
-        b_program = add_bthreads(code, player);
+        // player = rand_player;
+        // b_program = add_bthreads(code, player);
+        b_program_first_x = add_bthreads(code, first_x);
+        b_program_first_o = add_bthreads(code, first_o);
+        b_program_opt_first_x = add_bthreads(code, first_opt_x);
+        b_program_opt_first_o = add_bthreads(code, first_opt_o);
         /*
         bprog = new StringBProgram(b_program);
         var prio = new PrioritizedBSyncEventSelectionStrategy();
@@ -73,8 +83,25 @@ public abstract class Evaluator implements Callable<Bp.EvaluationResponse> {
         return curr;
     }
 
-    protected BProgram BProgramFactory(){
-        BProgram bprog = new StringBProgram(b_program);
+    protected BProgram BProgramFactory(String player_type){
+        BProgram bprog;
+        switch(player_type){
+            case "rand_x":
+                bprog = new StringBProgram(b_program_first_x);
+                break;
+            case "rand_o":
+                bprog = new StringBProgram(b_program_first_o);
+                break;
+            case "opt_x":
+                bprog = new StringBProgram(b_program_opt_first_x);
+                break;
+            case "opt_o":
+                bprog = new StringBProgram(b_program_opt_first_o);
+                break;
+            default:
+                bprog = null;
+                break;
+        }
         var prio = new PrioritizedBSyncEventSelectionStrategy();
         prio.setDefaultPriority(0);
         bprog.setEventSelectionStrategy(prio);

@@ -62,7 +62,7 @@ public class RunnerEvaluator extends Evaluator {
         e.printStackTrace();
       }*/
       InMemoryEventLoggingListener logger = new InMemoryEventLoggingListener();
-      BProgramRunner brunner = new BProgramRunner(BProgramFactory());
+      BProgramRunner brunner = new BProgramRunner(BProgramFactory("rand_x"));
       brunner.addListener(new RunnerXPlayer(l));
       brunner.addListener(logger);
       brunner.run();

@@ -7,7 +7,7 @@ class ProtoClient(object):
 
     def __init__(self):
         self.host = '127.0.0.1'
-        self.server_port = 8081
+        self.server_port = 8080
 
         self.channel = grpc.insecure_channel(
             '{}:{}'.format(self.host, self.server_port), options=(('grpc.enable_http_proxy', 0), ('grpc.enable_https_proxy', 0),))

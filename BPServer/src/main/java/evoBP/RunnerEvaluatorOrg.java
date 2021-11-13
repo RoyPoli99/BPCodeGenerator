@@ -77,9 +77,20 @@ public class RunnerEvaluatorOrg extends Evaluator {
         double[][][] wins_observances = new double[10][5][9];
         double[][][] forks_block_observances = new double[10][5][9];
         double[][][] requests = new double[10][5][9];
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 100; i++) {
             InMemoryEventLoggingListener logger = new InMemoryEventLoggingListener();
-            BProgramRunner brunner = new BProgramRunner(BProgramFactory());
+            String player_type;
+            if(i < 10)
+                player_type = "opt_x";
+            else
+                if(i < 20)
+                    player_type = "opt_o";
+                else
+                    if(i < 60)
+                        player_type = "rand_x";
+                    else
+                        player_type = "rand_o";
+            BProgramRunner brunner = new BProgramRunner(BProgramFactory(player_type));
             brunner.addListener(logger);
             brunner.run();
             List<BEvent> events = logger.getEvents();
@@ -164,7 +175,7 @@ public class RunnerEvaluatorOrg extends Evaluator {
             }
         }
         //});
-        double deadlocks = 50 - wins.get() - losses.get() - draws.get();
+        double deadlocks = 100 - wins.get() - losses.get() - draws.get();
         double[][][] results = new double[][][]{{{wins.get(), losses.get(), draws.get(), blocks_violations.get(), misses.get(), blocks.get(), deadlocks, forks.get(), forks_violations.get() }}};
         return new double[][][][]{results, wins_observances, win_violations_list, blocks_observances, block_violations_list, forks_block_observances, fork_violations_list, requests};
 

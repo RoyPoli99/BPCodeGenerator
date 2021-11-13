@@ -24,7 +24,7 @@ import socket
 import pandas as pd
 
 # Define global arguments
-NUMBER_OF_GENERATIONS = 150
+NUMBER_OF_GENERATIONS = 200
 POPULATION_SIZE = 100
 AVERAGES = []
 MAXIMUMS = []
@@ -682,9 +682,12 @@ def clear_enviorment():
 
 
 if __name__ == "__main__":
-    run_experiment(0.0, 0.5, "NO_CX_V1")
-    run_experiment(0.0, 0.5, "NO_CX_V2")
-    run_experiment(0.0, 0.5, "NO_CX_V3")
+    try:
+        run_experiment(0.70, 0.01, "smart_opt_30_70")
+    except:
+        df.to_csv("smart_opt_30_70" + ".csv")
+    # run_experiment(0.7, 0.01, "SWITCH_REG_25_75_V2")
+    # run_experiment(0.7, 0.01, "SWITCH_REG_25_75_V3")
 
 
 

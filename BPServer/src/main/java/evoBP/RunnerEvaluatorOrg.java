@@ -80,13 +80,13 @@ public class RunnerEvaluatorOrg extends Evaluator {
         for (int i = 0; i < 100; i++) {
             InMemoryEventLoggingListener logger = new InMemoryEventLoggingListener();
             String player_type;
-            if(i < 10)
+            if(i < 25)
                 player_type = "opt_x";
             else
-                if(i < 20)
+                if(i < 50)
                     player_type = "opt_o";
                 else
-                    if(i < 60)
+                    if(i < 75)
                         player_type = "rand_x";
                     else
                         player_type = "rand_o";

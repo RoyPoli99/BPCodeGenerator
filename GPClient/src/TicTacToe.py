@@ -1,3 +1,4 @@
+import copy
 import inspect
 import math
 import sys
@@ -24,7 +25,7 @@ import socket
 import pandas as pd
 
 # Define global arguments
-NUMBER_OF_GENERATIONS = 200
+NUMBER_OF_GENERATIONS = 300
 POPULATION_SIZE = 100
 AVERAGES = []
 MAXIMUMS = []
@@ -39,6 +40,8 @@ exp_type = "BP"
 
 lock = threading.Lock()
 prev_time = 0
+mut_performed = False
+cx_performed = False
 
 
 df = pd.DataFrame({'Generation': [],
@@ -54,16 +57,36 @@ df = pd.DataFrame({'Generation': [],
                    'Forks': [],
                    'Fork_Violations': [],
                    'Code': []})
+df_muts = pd.DataFrame({
+    'Node': [],
+    'Type': [],
+    'Fitness': [],
+    'Win_Violations': [],
+    'Block_Violations': [],
+    'Fork_Violations': [],
+    'Win_Stat': [],
+    'Block_Stat': [],
+    'Fork_Stat': [],
+    'Code': []
+})
+df_cx = pd.DataFrame({
+    'Node': [],
+    'Type': [],
+    'Fitness': [],
+    'Win_Violations': [],
+    'Block_Violations': [],
+    'Fork_Violations': [],
+    'Win_Stat': [],
+    'Block_Stat': [],
+    'Fork_Stat': [],
+    'Code': []
+})
 
 
 def exp_func(x):
     num = 1 - math.pow(math.e, -x)
     den = 1 - math.pow(math.e, -1)
     return num / den
-
-
-def exp_func2(x):
-    return 2 * math.pow(x, 2)
 
 
 def results_to_fitness(wins, wins_misses, blocks, block_misses, forks, forks_misses, deadlocks):
@@ -80,6 +103,7 @@ def results_to_fitness(wins, wins_misses, blocks, block_misses, forks, forks_mis
         fork_stat = forks / (forks + forks_misses)
     except:
         fork_stat = 0
+    fitness = 100 * (w_win * exp_func(win_stat) + w_block * exp_func(block_stat)) - deadlocks
     return 100 * (w_win * exp_func(win_stat) + w_block * exp_func(block_stat)) - deadlocks
     # return 100 * ((win_stat + block_stat * block_weight) / 3) - deadlocks
 
@@ -125,6 +149,18 @@ def map_anomalies(results, func_string):
                                "fork_o": parse_results_lists(results.fork_o),
                                "fork_v": parse_results_lists(results.fork_v),
                                "requests": parse_results_lists(results.fork_v)}
+
+
+def just_eval(individual):
+    func = toolbox.compile(expr=individual)
+    func_string = str(func(0).root)
+    indv = bp_pb2.Individual()
+    indv.generation = CURR_GEN
+    indv.code.code = func_string
+    results = send_proto_request(indv)
+    fitness = results_to_fitness(results.wins, results.misses, results.blocks, results.blocks_violations, results.forks,
+                                 results.forks_violations, results.deadlocks)
+    return fitness
 
 
 # Send to BPServer to evaluate
@@ -391,7 +427,7 @@ def get_index(individual, func_string, good_index):
     chosen_range = random.choices(
         [[chosen_set_range[0]], chosen_context_range, chosen_thread_range[1:], [chosen_thread_range[0]]],
         weights=[0.05, 0.4, 0.4, 0.15])
-    index = random.choice(chosen_range[0])
+    index = random.choice(chosen_range)
     return index
     # return random.choices([chosen_set_range[0], chosen_thread_range[0], chosen_context_range[0]], weights=[0.4, 0.3, 0.3])
 
@@ -423,6 +459,14 @@ def cxAnomalyDetection(ind1, ind2):
             if type1_ not in types2 or type2_ not in types1:
                 raise BaseException
 
+            fitness1 = just_eval(ind1)
+            fitness2 = just_eval(ind2)
+            if fitness1 >= 65 and fitness2 >= 65 and not cx_performed:
+                print("performing cx")
+                perform_500_cx(ind1, ind2)
+            #if mut_performed and cx_performed:
+            #    exit(0)
+
             slice1_1 = ind1.searchSubtree(index1_1)
             slice2_1 = ind2.searchSubtree(index2_1)
 
@@ -444,6 +488,13 @@ def mutAnomalyDetection(individual, expr, pset):
     try:
         anomalies = anomaly_map[func_string]
         list_indv = list(individual)
+
+        fitness = just_eval(individual)
+        if fitness >= 73 and not mut_performed:
+            print("performing mut")
+            perform_500_muts(individual, expr, pset)
+        #if mut_performed and cx_performed:
+        #    exit(0)
 
         set_indexes = [i for i, node in enumerate(list_indv) if node.name == "ctx_func"] + [len(list_indv)]
         thread_indexes = [i for i, node in enumerate(list_indv) if node.name.startswith("behavior_func")]
@@ -474,6 +525,140 @@ def mutAnomalyDetection(individual, expr, pset):
         return individual,
     except:
         return individual,
+
+
+def perform_500_muts(individual, expr, pset):
+    global mut_performed
+    func = toolbox.compile(expr=individual)
+    func_string = str(func(0).root)
+    anomalies = anomaly_map[func_string]
+    list_indv = list(individual)
+
+    indv = bp_pb2.Individual()
+    indv.generation = CURR_GEN
+    indv.code.code = func_string
+    results_main = send_proto_request(indv)
+    fitness_main = results_to_fitness(results_main.wins, results_main.misses, results_main.blocks, results_main.blocks_violations,
+                                 results_main.forks, results_main.forks_violations, results_main.deadlocks)
+    win_stat_main = results_main.wins / (results_main.wins + results_main.misses)
+    block_stat_main = results_main.blocks / (results_main.blocks + results_main.blocks_violations)
+    fork_stat_main = results_main.forks / (results_main.forks + results_main.forks_violations)
+    set_indexes = [i for i, node in enumerate(list_indv) if node.name == "ctx_func"] + [len(list_indv)]
+    thread_indexes = [i for i, node in enumerate(list_indv) if node.name.startswith("behavior_func")]
+    context_indexes = [i for i, node in enumerate(list_indv) if node.name.startswith("single_input_func")]
+
+    df_muts.loc[len(df_muts)] = ["Original", "Original", str(fitness_main), str(results_main.misses), str(results_main.blocks_violations), str(results_main.forks_violations), str(win_stat_main), str(block_stat_main), str(fork_stat_main), func_string]
+
+    thread_scores = calculate_thread_scores(
+        [anomalies["win_o"], anomalies["win_v"], anomalies["block_o"], anomalies["block_v"], anomalies["requests"]],
+        [-2, 2, -1, 1, -0.25])
+    context_scores = calculate_context_scores(
+        [anomalies["win_o"], anomalies["win_v"], anomalies["block_o"], anomalies["block_v"], anomalies["requests"]],
+        [-2, 2, -1, 1, -0.25])
+    set_scores = calculate_set_scores(thread_scores)
+
+    for i in range(500):
+        chosen_set = random.choices(range(10), weights=set_scores)[0]
+        chosen_thread = random.choices(range(5), weights=thread_scores[chosen_set])[0]
+        chosen_context = random.choices(range(10), weights=context_scores[chosen_set])[0]
+
+        chosen_set_range = list(range(set_indexes[chosen_set], set_indexes[chosen_set + 1]))
+        relevant_contexts = [x for x in context_indexes if x in chosen_set_range] + [set_indexes[chosen_set + 1]]
+        relevant_threads = [x for x in thread_indexes if x in chosen_set_range] + [relevant_contexts[0]]
+        chosen_thread_range = list(range(relevant_threads[chosen_thread], relevant_threads[chosen_thread + 1]))
+        chosen_context_range = list(range(relevant_contexts[chosen_context], relevant_contexts[chosen_context + 1]))
+
+        # chosen_range = random.choices([chosen_set_range, chosen_thread_range, chosen_context_range], weights=[0.4, 0.3, 0.3])
+
+        chosen_range_info = random.choices(
+            [([chosen_set_range[0]], 'full set'), (chosen_context_range, 'context'), (chosen_thread_range[1:], 'in thread'), ([chosen_thread_range[0]], 'full thread')],
+            weights=[0.05, 0.4, 0.4, 0.15])
+        chosen_range = chosen_range_info[0]
+        index = random.choice(chosen_range[0])
+        slice_ = individual.searchSubtree(index)
+        info = chosen_range[1]
+        type_ = individual[index].ret
+        new_individual = copy.deepcopy(individual)
+        new_individual[slice_] = expr(pset=pset, type_=type_)
+
+        new_func = toolbox.compile(expr=new_individual)
+        new_func_string = str(new_func(0).root)
+        indv = bp_pb2.Individual()
+        indv.generation = CURR_GEN
+        indv.code.code = new_func_string
+        results = send_proto_request(indv)
+        fitness = results_to_fitness(results.wins, results.misses, results.blocks, results.blocks_violations,
+                                     results.forks, results.forks_violations, results.deadlocks)
+        win_stat = results.wins / (results.wins + results.misses)
+        block_stat = results.blocks / (results.blocks + results.blocks_violations)
+        fork_stat = results.forks / (results.forks + results.forks_violations)
+        df_muts.loc[len(df_muts)] = [str(type_), chosen_range[1], str(fitness - fitness_main), str(results.misses - results_main.misses), str(results.blocks_violations - results_main.blocks_violations),
+                                str(results.forks_violations - results_main.forks_violations), str(win_stat - win_stat_main), str(block_stat - block_stat_main), str(fork_stat - fork_stat_main), new_func_string]
+    df_muts.to_csv("muts_results3" + ".csv")
+    mut_performed = True
+
+
+
+
+
+
+
+def perform_500_cx(ind1, ind2):
+    global cx_performed
+    func = toolbox.compile(expr=ind1)
+    func_string = str(func(0).root)
+    anomalies = anomaly_map[func_string]
+    list_indv = list(ind1)
+    indv = bp_pb2.Individual()
+    indv.generation = CURR_GEN
+    indv.code.code = func_string
+    results_main = send_proto_request(indv)
+    fitness_main = results_to_fitness(results_main.wins, results_main.misses, results_main.blocks, results_main.blocks_violations,
+                                 results_main.forks, results_main.forks_violations, results_main.deadlocks)
+    win_stat_main = results_main.wins / (results_main.wins + results_main.misses)
+    block_stat_main = results_main.blocks / (results_main.blocks + results_main.blocks_violations)
+    fork_stat_main = results_main.forks / (results_main.forks + results_main.forks_violations)
+
+    df_muts.loc[len(df_cx)] = ["Original", "Original", str(fitness_main), str(results_main.misses), str(results_main.blocks_violations), str(results_main.forks_violations), str(win_stat_main), str(block_stat_main), str(fork_stat_main), func_string]
+
+    types1 = defaultdict(list)
+    types2 = defaultdict(list)
+    for idx, node in enumerate(ind1[1:], 1):
+        types1[node.ret].append(idx)
+    for idx, node in enumerate(ind2[1:], 1):
+        types2[node.ret].append(idx)
+    common_types = set(types1.keys()).intersection(set(types2.keys()))
+    func1 = toolbox.compile(expr=ind1)
+    func_string1 = str(func1(0).root)
+    func2 = toolbox.compile(expr=ind2)
+    func_string2 = str(func2(0).root)
+    for i in range(500):
+        index1_1 = get_index(ind1, func_string1, True)[0]
+        type1_ = ind1[index1_1].ret
+        slice1_1 = ind1.searchSubtree(index1_1)
+        index2_2 = random.choice(types2[type1_])
+        slice2_2 = ind2.searchSubtree(index2_2)
+        new_individual = copy.deepcopy(ind1)
+        new_individual[slice1_1] = ind2[slice2_2]
+
+        new_func = toolbox.compile(expr=new_individual)
+        new_func_string = str(new_func(0).root)
+        indv = bp_pb2.Individual()
+        indv.generation = CURR_GEN
+        indv.code.code = new_func_string
+        results = send_proto_request(indv)
+        fitness = results_to_fitness(results.wins, results.misses, results.blocks, results.blocks_violations,
+                                     results.forks, results.forks_violations, results.deadlocks)
+        win_stat = results.wins / (results.wins + results.misses)
+        block_stat = results.blocks / (results.blocks + results.blocks_violations)
+        fork_stat = results.forks / (results.forks + results.forks_violations)
+        df_cx.loc[len(df_cx)] = [str(type1_), "", str(fitness - fitness_main), str(results.misses - results_main.misses), str(results.blocks_violations - results_main.blocks_violations),
+                                str(results.forks_violations - results_main.forks_violations), str(win_stat - win_stat_main), str(block_stat - block_stat_main), str(fork_stat - fork_stat_main), new_func_string]
+    df_cx.to_csv("crossover_results3" + ".csv")
+    cx_performed = True
+
+
+
 
 
 def generate_safe(pset, min_, max_, terminal_types, type_=None):
@@ -683,9 +868,9 @@ def clear_enviorment():
 
 if __name__ == "__main__":
     try:
-        run_experiment(0.70, 0.01, "smart_opt_30_70")
+        run_experiment(0.01, 0.7, "operators_analysis3")
     except:
-        df.to_csv("smart_opt_30_70" + ".csv")
+        df.to_csv("operators_analysis3" + ".csv")
     # run_experiment(0.7, 0.01, "SWITCH_REG_25_75_V2")
     # run_experiment(0.7, 0.01, "SWITCH_REG_25_75_V3")
 

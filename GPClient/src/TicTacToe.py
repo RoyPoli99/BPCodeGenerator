@@ -25,7 +25,7 @@ import socket
 import pandas as pd
 
 # Define global arguments
-NUMBER_OF_GENERATIONS = 300
+NUMBER_OF_GENERATIONS = 400
 POPULATION_SIZE = 100
 AVERAGES = []
 MAXIMUMS = []
@@ -37,11 +37,21 @@ anomaly_dict = {}
 anomaly_dict_v2 = {}
 anomaly_map = {}
 exp_type = "BP"
+EXP_NAME = "Smart_Paper0"
 
 lock = threading.Lock()
 prev_time = 0
-mut_performed = False
-cx_performed = False
+
+
+mut_performed_50 = False
+mut_performed_150 = False
+mut_performed_300 = False
+mut_performed_450 = False
+
+cx_performed_50 = False
+cx_performed_150 = False
+cx_performed_300 = False
+cx_performed_450 = False
 
 
 df = pd.DataFrame({'Generation': [],
@@ -421,13 +431,13 @@ def get_index(individual, func_string, good_index):
     chosen_thread_range = list(range(relevant_threads[chosen_thread], relevant_threads[chosen_thread + 1]))
     chosen_context_range = list(range(relevant_contexts[chosen_context], relevant_contexts[chosen_context + 1]))
 
-    chosen_range = random.choices([chosen_set_range, chosen_thread_range, chosen_context_range],
-                                  weights=[0.4, 0.3, 0.3])
+    # chosen_range = random.choices([chosen_set_range, chosen_thread_range, chosen_context_range],
+    #                               weights=[0.4, 0.3, 0.3])
     # return random.choice(chosen_range[0])
     chosen_range = random.choices(
         [[chosen_set_range[0]], chosen_context_range, chosen_thread_range[1:], [chosen_thread_range[0]]],
         weights=[0.05, 0.4, 0.4, 0.15])
-    index = random.choice(chosen_range)
+    index = random.choice(chosen_range[0])
     return index
     # return random.choices([chosen_set_range[0], chosen_thread_range[0], chosen_context_range[0]], weights=[0.4, 0.3, 0.3])
 
@@ -451,8 +461,8 @@ def cxAnomalyDetection(ind1, ind2):
         func2 = toolbox.compile(expr=ind2)
         func_string2 = str(func2(0).root)
         try:
-            index1_1 = get_index(ind1, func_string1, True)[0]
-            index2_1 = get_index(ind2, func_string2, True)[0]
+            index1_1 = get_index(ind1, func_string1, True)
+            index2_1 = get_index(ind2, func_string2, True)
             type1_ = ind1[index1_1].ret
             type2_ = ind2[index2_1].ret
 
@@ -461,9 +471,15 @@ def cxAnomalyDetection(ind1, ind2):
 
             fitness1 = just_eval(ind1)
             fitness2 = just_eval(ind2)
-            if fitness1 >= 65 and fitness2 >= 65 and not cx_performed:
-                print("performing cx")
-                perform_500_cx(ind1, ind2)
+            if fitness1 >= 80 and fitness2 >= 80 and CURR_GEN >= 50 and not cx_performed_50:
+                print("performing cx 50")
+                perform_500_cx(ind1, ind2, 50)
+            elif fitness1 >= 85 and fitness2 >= 85 and CURR_GEN >= 150 and not cx_performed_150:
+                print("performing cx 150")
+                perform_500_cx(ind1, ind2, 150)
+            elif fitness1 >= 90 and fitness2 >= 90 and CURR_GEN >= 300 and not cx_performed_300:
+                print("performing cx 300")
+                perform_500_cx(ind1, ind2, 300)
             #if mut_performed and cx_performed:
             #    exit(0)
 
@@ -490,9 +506,15 @@ def mutAnomalyDetection(individual, expr, pset):
         list_indv = list(individual)
 
         fitness = just_eval(individual)
-        if fitness >= 73 and not mut_performed:
-            print("performing mut")
-            perform_500_muts(individual, expr, pset)
+        if fitness >= 85 and CURR_GEN >= 50 and not mut_performed_50:
+            print("performing mut 50")
+            perform_500_muts(individual, expr, pset, 50)
+        elif fitness >= 90 and CURR_GEN >= 150 and not mut_performed_150:
+            print("performing mut 150")
+            perform_500_muts(individual, expr, pset, 150)
+        elif fitness >= 95 and CURR_GEN >= 300 and not mut_performed_300:
+            print("performing mut 300")
+            perform_500_muts(individual, expr, pset, 300)
         #if mut_performed and cx_performed:
         #    exit(0)
 
@@ -516,8 +538,14 @@ def mutAnomalyDetection(individual, expr, pset):
         chosen_context_range = list(range(relevant_contexts[chosen_context], relevant_contexts[chosen_context + 1]))
 
         # chosen_range = random.choices([chosen_set_range, chosen_thread_range, chosen_context_range], weights=[0.4, 0.3, 0.3])
-
-        chosen_range = random.choices([[chosen_set_range[0]], chosen_context_range, chosen_thread_range[1:], [chosen_thread_range[0]]], weights=[0.05, 0.4, 0.4, 0.15])
+        # full set, in context, in thread, full thread, full line
+        #chosen_range = random.choices(
+        #    [[chosen_set_range[0]], chosen_context_range, chosen_thread_range[1:], [chosen_thread_range[0]],
+        #     [chosen_context_range[0]]],
+        #    weights=[0.03, 0.24, 0.46, 0.03, 0.24])
+        chosen_range = random.choices(
+            [[chosen_set_range[0]], chosen_context_range, chosen_thread_range[1:], [chosen_thread_range[0]]],
+            weights=[0.05, 0.4, 0.4, 0.15])
         index = random.choice(chosen_range[0])
         slice_ = individual.searchSubtree(index)
         type_ = individual[index].ret
@@ -527,8 +555,8 @@ def mutAnomalyDetection(individual, expr, pset):
         return individual,
 
 
-def perform_500_muts(individual, expr, pset):
-    global mut_performed
+def perform_500_muts(individual, expr, pset, gen):
+    global mut_performed_50, mut_performed_150, mut_performed_300, mut_performed_450, df_muts
     func = toolbox.compile(expr=individual)
     func_string = str(func(0).root)
     anomalies = anomaly_map[func_string]
@@ -570,8 +598,12 @@ def perform_500_muts(individual, expr, pset):
 
         # chosen_range = random.choices([chosen_set_range, chosen_thread_range, chosen_context_range], weights=[0.4, 0.3, 0.3])
 
+        #chosen_range_info = random.choices(
+        #    [([chosen_set_range[0]], 'full set'), (chosen_context_range, 'context'), (chosen_thread_range[1:], 'in thread'), ([chosen_thread_range[0]], 'full thread'), ([chosen_context_range[0]], 'full line')],
+        #    weights=[0.03, 0.24, 0.46, 0.03, 0.24])
         chosen_range_info = random.choices(
-            [([chosen_set_range[0]], 'full set'), (chosen_context_range, 'context'), (chosen_thread_range[1:], 'in thread'), ([chosen_thread_range[0]], 'full thread')],
+            [([chosen_set_range[0]], 'full set'), (chosen_context_range, 'context'),
+             (chosen_thread_range[1:], 'in thread'), ([chosen_thread_range[0]], 'full thread')],
             weights=[0.05, 0.4, 0.4, 0.15])
         chosen_range = chosen_range_info[0]
         index = random.choice(chosen_range[0])
@@ -594,8 +626,27 @@ def perform_500_muts(individual, expr, pset):
         fork_stat = results.forks / (results.forks + results.forks_violations)
         df_muts.loc[len(df_muts)] = [str(type_), chosen_range[1], str(fitness - fitness_main), str(results.misses - results_main.misses), str(results.blocks_violations - results_main.blocks_violations),
                                 str(results.forks_violations - results_main.forks_violations), str(win_stat - win_stat_main), str(block_stat - block_stat_main), str(fork_stat - fork_stat_main), new_func_string]
-    df_muts.to_csv("muts_results3" + ".csv")
-    mut_performed = True
+    df_muts.to_csv(EXP_NAME + "_mutation_results_" + str(gen) + ".csv")
+    df_muts = pd.DataFrame({
+        'Node': [],
+        'Type': [],
+        'Fitness': [],
+        'Win_Violations': [],
+        'Block_Violations': [],
+        'Fork_Violations': [],
+        'Win_Stat': [],
+        'Block_Stat': [],
+        'Fork_Stat': [],
+        'Code': []
+    })
+    if gen == 50:
+        mut_performed_50 = True
+    elif gen == 150:
+        mut_performed_150 = True
+    elif gen == 300:
+        mut_performed_300 = True
+    else:
+        mut_performed_450 = True
 
 
 
@@ -603,12 +654,10 @@ def perform_500_muts(individual, expr, pset):
 
 
 
-def perform_500_cx(ind1, ind2):
-    global cx_performed
+def perform_500_cx(ind1, ind2, gen):
+    global cx_performed_50, cx_performed_150, cx_performed_300, cx_performed_450, df_cx
     func = toolbox.compile(expr=ind1)
     func_string = str(func(0).root)
-    anomalies = anomaly_map[func_string]
-    list_indv = list(ind1)
     indv = bp_pb2.Individual()
     indv.generation = CURR_GEN
     indv.code.code = func_string
@@ -633,7 +682,7 @@ def perform_500_cx(ind1, ind2):
     func2 = toolbox.compile(expr=ind2)
     func_string2 = str(func2(0).root)
     for i in range(500):
-        index1_1 = get_index(ind1, func_string1, True)[0]
+        index1_1 = get_index(ind1, func_string1, True)
         type1_ = ind1[index1_1].ret
         slice1_1 = ind1.searchSubtree(index1_1)
         index2_2 = random.choice(types2[type1_])
@@ -654,8 +703,27 @@ def perform_500_cx(ind1, ind2):
         fork_stat = results.forks / (results.forks + results.forks_violations)
         df_cx.loc[len(df_cx)] = [str(type1_), "", str(fitness - fitness_main), str(results.misses - results_main.misses), str(results.blocks_violations - results_main.blocks_violations),
                                 str(results.forks_violations - results_main.forks_violations), str(win_stat - win_stat_main), str(block_stat - block_stat_main), str(fork_stat - fork_stat_main), new_func_string]
-    df_cx.to_csv("crossover_results3" + ".csv")
-    cx_performed = True
+    df_cx.to_csv(EXP_NAME + "_crossover_results_" + str(gen) + ".csv")
+    df_cx = pd.DataFrame({
+        'Node': [],
+        'Type': [],
+        'Fitness': [],
+        'Win_Violations': [],
+        'Block_Violations': [],
+        'Fork_Violations': [],
+        'Win_Stat': [],
+        'Block_Stat': [],
+        'Fork_Stat': [],
+        'Code': []
+    })
+    if gen == 50:
+        cx_performed_50 = True
+    elif gen == 150:
+        cx_performed_150 = True
+    elif gen == 300:
+        cx_performed_300 = True
+    else:
+        cx_performed_450 = True
 
 
 
@@ -771,6 +839,7 @@ def run_experiment(cross_over_p, mutation_p, experiment_name):
     stats.register("std", numpy.std)
     stats.register("min", numpy.min)
     stats.register("max", numpy.max)
+    stats.register("median", numpy.median)
     prev_time = time.time()
     stats.register("time", time_stat)
     stats.register("plot", lambda x: real_time_plotter(experiment_name, x))
@@ -782,6 +851,7 @@ def run_experiment(cross_over_p, mutation_p, experiment_name):
     # Save results
     # save_results(log)
     df.to_csv(experiment_name + ".csv")
+    pd.DataFrame(log).to_csv(experiment_name + "_log.csv")
     clear_enviorment()
     return bla, log
 
@@ -867,12 +937,7 @@ def clear_enviorment():
 
 
 if __name__ == "__main__":
-    try:
-        run_experiment(0.01, 0.7, "operators_analysis3")
-    except:
-        df.to_csv("operators_analysis3" + ".csv")
-    # run_experiment(0.7, 0.01, "SWITCH_REG_25_75_V2")
-    # run_experiment(0.7, 0.01, "SWITCH_REG_25_75_V3")
+    run_experiment(0.05, 0.7, EXP_NAME)
 
 
 
